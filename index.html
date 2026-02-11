@@ -3,125 +3,230 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Painel de Triagem - Troca de Advogados</title>
+    <title>Comissão de Advogados Dativos - Santana de Parnaíba</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .glass { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); }
+        .hover-card:hover { transform: translateY(-3px); transition: all 0.2s; }
+        .gradient-bg { background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); }
+    </style>
 </head>
-<body class="bg-gray-50 font-sans">
+<body class="bg-slate-50 min-h-screen font-sans text-slate-900">
 
-    <nav class="bg-blue-900 text-white p-4 shadow-lg">
-        <div class="container mx-auto flex justify-between items-center">
-            <h1 class="text-xl font-bold italic">HUB Jurídico - Triagem</h1>
-            <span class="text-sm bg-blue-800 px-3 py-1 rounded">Visualização Pública</span>
+    <nav class="gradient-bg text-white shadow-2xl sticky top-0 z-50">
+        <div class="container mx-auto px-6 py-4 flex flex-col md:flex-row justify-between items-center gap-4">
+            <div class="flex items-center gap-4">
+                <div class="bg-amber-500 p-2 rounded-lg shadow-inner">
+                    <i class="fa-solid fa-scale-balanced text-slate-900 text-2xl"></i>
+                </div>
+                <div>
+                    <h1 class="text-lg font-black tracking-tight leading-none uppercase">Comissão de Advogados Dativos</h1>
+                    <p class="text-amber-400 text-xs font-bold tracking-widest uppercase">Santana de Parnaíba</p>
+                </div>
+            </div>
+            <div id="relogio" class="font-mono text-slate-400 text-sm bg-slate-800/50 px-4 py-2 rounded-full border border-slate-700"></div>
         </div>
     </nav>
 
-    <main class="container mx-auto mt-8 p-4">
+    <main class="container mx-auto px-4 py-8">
         
-        <div class="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
-            <div>
-                <h2 class="text-2xl font-semibold text-gray-800">Histórico de Trocas</h2>
-                <p class="text-gray-500">Acompanhe as alterações de plantão mensalmente</p>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+            <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-200 hover-card">
+                <div class="flex justify-between items-center">
+                    <div>
+                        <p class="text-slate-500 text-xs font-bold uppercase tracking-widest">Registros na Escala</p>
+                        <h3 id="totalTrocas" class="text-4xl font-black text-slate-800 mt-1">0</h3>
+                    </div>
+                    <div class="bg-amber-100 p-4 rounded-2xl text-amber-600"><i class="fa-solid fa-calendar-check text-2xl"></i></div>
+                </div>
             </div>
-            
-            <div class="flex gap-2">
-                <select id="filtroMes" class="border rounded-md p-2 bg-white shadow-sm outline-none">
-                    <option value="2">Fevereiro 2026</option>
-                    <option value="1">Janeiro 2026</option>
-                </select>
-                <button onclick="document.getElementById('modalTroca').classList.remove('hidden')" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md transition-all shadow-md">
-                    <i class="fa-solid fa-plus mr-2"></i>Registrar Troca
-                </button>
+            <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-200 hover-card">
+                <p class="text-slate-500 text-xs font-bold uppercase tracking-widest">Acesso Público</p>
+                <div class="flex items-center gap-2 mt-2 text-blue-600 font-bold">
+                    <i class="fa-solid fa-users-viewfinder animate-pulse"></i>
+                    Modo de Edição Liberado
+                </div>
+                <p class="text-[10px] text-slate-400 mt-1">As alterações são salvas localmente neste dispositivo.</p>
             </div>
         </div>
 
-        <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-            <table class="w-full text-left border-collapse">
-                <thead>
-                    <tr class="bg-gray-100 text-gray-700 uppercase text-xs font-bold">
-                        <th class="p-4">Data do Plantão</th>
-                        <th class="p-4 text-red-600">Sainte (Sai)</th>
-                        <th class="p-4 text-green-600">Entrante (Assume)</th>
-                        <th class="p-4">Motivo</th>
-                        <th class="p-4 text-center">Status</th>
-                    </tr>
-                </thead>
-                <tbody id="tabelaCorpo" class="text-gray-600">
-                    </tbody>
-            </table>
+        <div class="flex flex-col md:flex-row gap-4 mb-8">
+            <div class="relative flex-grow">
+                <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
+                <input type="text" id="busca" onkeyup="filtrarTabela()" placeholder="Buscar por advogado sainte, entrante ou motivo..." 
+                    class="w-full pl-12 pr-4 py-4 bg-white border border-slate-200 rounded-2xl shadow-sm focus:ring-2 focus:ring-amber-500 outline-none transition-all">
+            </div>
+            <button onclick="abrirModal()" class="bg-slate-900 hover:bg-slate-800 text-amber-400 px-8 py-4 rounded-2xl font-bold shadow-lg flex items-center justify-center gap-2 transition-all active:scale-95">
+                <i class="fa-solid fa-plus-circle"></i> Registrar Troca
+            </button>
+        </div>
+
+        <div class="bg-white rounded-[2.5rem] shadow-sm border border-slate-200 overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="w-full text-left">
+                    <thead class="bg-slate-50 border-b border-slate-100 text-slate-400 text-[10px] font-black uppercase tracking-widest">
+                        <tr>
+                            <th class="px-8 py-6">Data do Plantão</th>
+                            <th class="px-8 py-6">Advogado Sainte</th>
+                            <th class="px-8 py-6">Advogado Entrante</th>
+                            <th class="px-8 py-6">Motivo</th>
+                            <th class="px-8 py-6 text-center">Gestão</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabelaCorpo" class="divide-y divide-slate-50">
+                        </tbody>
+                </table>
+            </div>
         </div>
     </main>
 
-    <div id="modalTroca" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden p-4">
-        <div class="bg-white rounded-lg p-6 w-full max-w-md shadow-2xl">
-            <h3 class="text-xl font-bold mb-4 text-blue-900">Registrar Nova Substituição</h3>
-            <div class="space-y-4">
+    <div id="modal" class="fixed inset-0 bg-slate-900/90 backdrop-blur-md hidden flex items-center justify-center p-4 z-[100]">
+        <div class="bg-white w-full max-w-lg rounded-[2.5rem] shadow-2xl overflow-hidden border border-white/20">
+            <div class="gradient-bg p-8 text-white flex justify-between items-center">
                 <div>
-                    <label class="block text-sm font-medium text-gray-700">Data do Plantão</label>
-                    <input type="date" id="inputData" class="w-full border rounded-md p-2 mt-1 outline-blue-500">
+                    <h3 id="modalTitulo" class="text-2xl font-bold">Alterar Escala</h3>
+                    <p class="text-slate-400 text-xs uppercase tracking-widest font-bold">Plantão Santana de Parnaíba</p>
                 </div>
-                <div>
-                    <label class="block text-sm font-medium text-gray-700">Advogado Sainte</label>
-                    <input type="text" id="inputSainte" placeholder="Nome do Dr(a)." class="w-full border rounded-md p-2 mt-1 outline-blue-500">
+                <button onclick="fecharModal()" class="text-slate-400 hover:text-white text-3xl transition-transform hover:rotate-90">&times;</button>
+            </div>
+            
+            <div class="p-8 space-y-6">
+                <input type="hidden" id="editIndex">
+                
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="space-y-2">
+                        <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Data</label>
+                        <input type="date" id="data" class="w-full p-4 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-amber-500 outline-none font-bold">
+                    </div>
+                    <div class="space-y-2">
+                        <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Motivo</label>
+                        <select id="motivo" class="w-full p-4 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-amber-500 outline-none font-bold">
+                            <option>Troca de Plantão</option>
+                            <option>Audiência Judicial</option>
+                            <option>Férias / Recesso</option>
+                            <option>Licença Médica</option>
+                            <option>Compromisso OAB</option>
+                        </select>
+                    </div>
                 </div>
-                <div>
-                    <label class="block text-sm font-medium text-gray-700">Advogado Entrante</label>
-                    <input type="text" id="inputEntrante" placeholder="Nome do Dr(a)." class="w-full border rounded-md p-2 mt-1 outline-blue-500">
+
+                <div class="space-y-2">
+                    <label class="text-[10px] font-black text-red-500 uppercase tracking-widest">Sainte (Dr/Dra que sai)</label>
+                    <input type="text" id="sainte" placeholder="Nome completo" class="w-full p-4 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-red-400 outline-none font-bold">
                 </div>
-                <div class="flex gap-2 mt-6">
-                    <button onclick="document.getElementById('modalTroca').classList.add('hidden')" class="flex-1 bg-gray-200 p-2 rounded-md font-semibold text-gray-700">Cancelar</button>
-                    <button onclick="adicionarTroca()" class="flex-1 bg-blue-900 text-white p-2 rounded-md font-semibold hover:bg-blue-800">Confirmar Troca</button>
+
+                <div class="space-y-2">
+                    <label class="text-[10px] font-black text-emerald-500 uppercase tracking-widest">Entrante (Dr/Dra que assume)</label>
+                    <input type="text" id="entrante" placeholder="Nome completo" class="w-full p-4 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-400 outline-none font-bold">
+                </div>
+
+                <div class="flex gap-3 pt-4">
+                    <button onclick="fecharModal()" class="flex-1 py-4 text-slate-500 font-bold hover:bg-slate-100 rounded-2xl transition-all">Cancelar</button>
+                    <button onclick="salvar()" class="flex-[2] bg-amber-500 text-slate-900 py-4 rounded-2xl font-black shadow-lg shadow-amber-100 hover:bg-amber-400 transition-all uppercase tracking-tighter">Gravar Alteração</button>
                 </div>
             </div>
         </div>
     </div>
 
     <script>
-        // Dados Iniciais Simulados
-        let trocas = [
-            { data: '2026-02-15', sainte: 'Dra. Beatriz Santos', entrante: 'Dr. Roberto Lima', motivo: 'Audiência Externa', status: 'Concluído' },
-            { data: '2026-02-18', sainte: 'Dr. Carlos Mendes', entrante: 'Dra. Cássia Silva', motivo: 'Férias', status: 'Agendado' }
-        ];
+        let registros = JSON.parse(localStorage.getItem('triagem_dativos_v1')) || [];
 
-        function renderizarTabela() {
+        function renderizar() {
             const corpo = document.getElementById('tabelaCorpo');
             corpo.innerHTML = '';
             
-            trocas.forEach(t => {
-                const dataFormatada = new Date(t.data).toLocaleDateString('pt-BR');
+            registros.forEach((item, index) => {
                 corpo.innerHTML += `
-                    <tr class="border-t hover:bg-gray-50 transition-colors">
-                        <td class="p-4 font-medium">${dataFormatada}</td>
-                        <td class="p-4 font-semibold text-red-500">${t.sainte}</td>
-                        <td class="p-4 font-semibold text-green-600">${t.entrante}</td>
-                        <td class="p-4 text-sm text-gray-500">${t.motivo || 'Troca de Agenda'}</td>
-                        <td class="p-4 text-center">
-                            <span class="px-2 py-1 text-xs rounded-full ${t.status === 'Concluído' ? 'bg-green-100 text-green-700' : 'bg-blue-100 text-blue-700'}">
-                                ${t.status}
-                            </span>
+                    <tr class="hover:bg-slate-50/80 transition-all group">
+                        <td class="px-8 py-6 font-black text-slate-700">${item.data.split('-').reverse().join('/')}</td>
+                        <td class="px-8 py-6"><span class="text-red-600 font-bold underline decoration-red-200 underline-offset-4">${item.sainte}</span></td>
+                        <td class="px-8 py-6"><span class="text-emerald-700 font-bold underline decoration-emerald-200 underline-offset-4">${item.entrante}</span></td>
+                        <td class="px-8 py-6 font-medium text-slate-400 text-sm">${item.motivo}</td>
+                        <td class="px-8 py-6">
+                            <div class="flex justify-center gap-3">
+                                <button onclick="editar(${index})" class="w-10 h-10 flex items-center justify-center text-slate-400 hover:bg-amber-100 hover:text-amber-700 rounded-full transition-all" title="Editar registro"><i class="fa-solid fa-pen"></i></button>
+                                <button onclick="remover(${index})" class="w-10 h-10 flex items-center justify-center text-slate-400 hover:bg-red-100 hover:text-red-700 rounded-full transition-all" title="Excluir registro"><i class="fa-solid fa-trash-can"></i></button>
+                            </div>
                         </td>
                     </tr>
                 `;
             });
+            document.getElementById('totalTrocas').innerText = registros.length;
         }
 
-        function adicionarTroca() {
-            const data = document.getElementById('inputData').value;
-            const sainte = document.getElementById('inputSainte').value;
-            const entrante = document.getElementById('inputEntrante').value;
+        function salvar() {
+            const index = document.getElementById('editIndex').value;
+            const novoItem = {
+                data: document.getElementById('data').value,
+                motivo: document.getElementById('motivo').value,
+                sainte: document.getElementById('sainte').value,
+                entrante: document.getElementById('entrante').value
+            };
 
-            if(data && sainte && entrante) {
-                trocas.unshift({ data, sainte, entrante, status: 'Agendado' });
-                renderizarTabela();
-                document.getElementById('modalTroca').classList.add('hidden');
-                alert('Troca registrada com sucesso!');
+            if(!novoItem.data || !novoItem.sainte || !novoItem.entrante) return alert("Erro: Preencha todos os campos obrigatórios.");
+
+            if(index === "") {
+                registros.unshift(novoItem);
             } else {
-                alert('Preencha todos os campos.');
+                registros[index] = novoItem;
+            }
+
+            localStorage.setItem('triagem_dativos_v1', JSON.stringify(registros));
+            fecharModal();
+            renderizar();
+        }
+
+        function editar(index) {
+            const item = registros[index];
+            document.getElementById('editIndex').value = index;
+            document.getElementById('data').value = item.data;
+            document.getElementById('motivo').value = item.motivo;
+            document.getElementById('sainte').value = item.sainte;
+            document.getElementById('entrante').value = item.entrante;
+            document.getElementById('modalTitulo').innerText = "Editar Troca";
+            abrirModal();
+        }
+
+        function remover(index) {
+            if(confirm('Atenção: Deseja realmente excluir este registro da comissão?')) {
+                registros.splice(index, 1);
+                localStorage.setItem('triagem_dativos_v1', JSON.stringify(registros));
+                renderizar();
             }
         }
 
-        // Inicializar
-        renderizarTabela();
+        function abrirModal() {
+            if(document.getElementById('editIndex').value === "") {
+                document.getElementById('modalTitulo').innerText = "Alterar Escala";
+                limparCampos();
+            }
+            document.getElementById('modal').classList.remove('hidden');
+        }
+
+        function fecharModal() {
+            document.getElementById('modal').classList.add('hidden');
+            document.getElementById('editIndex').value = "";
+            limparCampos();
+        }
+
+        function limparCampos() {
+            ['data', 'sainte', 'entrante'].forEach(id => document.getElementById(id).value = "");
+            document.getElementById('motivo').selectedIndex = 0;
+        }
+
+        function filtrarTabela() {
+            const termo = document.getElementById('busca').value.toLowerCase();
+            const linhas = document.querySelectorAll('#tabelaCorpo tr');
+            linhas.forEach(l => l.style.display = l.innerText.toLowerCase().includes(termo) ? '' : 'none');
+        }
+
+        setInterval(() => {
+            const d = new Date();
+            document.getElementById('relogio').innerText = d.toLocaleDateString('pt-BR') + ' | ' + d.toLocaleTimeString('pt-BR');
+        }, 1000);
+
+        renderizar();
     </script>
 </body>
 </html>
