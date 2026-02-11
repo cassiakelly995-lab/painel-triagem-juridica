@@ -10,10 +10,10 @@
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;700;800&display=swap');
         body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #000; color: #fff; height: 100vh; overflow: hidden; }
         .glass-box { background: #0a0a0a; border: 1px solid #1a1a1a; border-radius: 24px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
-        .input-clean { background: #111; border: 1px solid #222; border-radius: 12px; padding: 12px; font-weight: 600; color: #fff; outline: none; }
+        .input-clean { background: #111; border: 1px solid #222; border-radius: 12px; padding: 12px; font-weight: 600; color: #fff; outline: none; transition: 0.2s; }
         .input-clean:focus { border-color: #fbbf24; background: #161616; }
         .card-registro { background: linear-gradient(to right, #0a0a0a, #000); border: 1px solid #1a1a1a; border-left: 4px solid #fbbf24; border-radius: 16px; transition: 0.3s; }
-        .card-registro:hover { transform: scale(1.01); border-color: #333; }
+        .card-falta { border-left-color: #ef4444; }
         iframe { width: 100%; height: 100%; border-radius: 16px; background: #000; border: none; }
         ::-webkit-scrollbar { width: 5px; }
         ::-webkit-scrollbar-thumb { background: #222; border-radius: 10px; }
@@ -42,7 +42,7 @@
 
     <main class="max-w-[1700px] mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8 h-[calc(100vh-140px)]">
         
-        <div class="lg:col-span-7 flex flex-col gap-3">
+        <div class="lg:col-span-6 flex flex-col gap-3">
             <span class="text-[9px] font-black text-slate-600 uppercase tracking-widest px-2 italic">Documento Oficial de Fevereiro</span>
             <div class="glass-box flex-grow overflow-hidden relative border-amber-500/10">
                 <div id="msgVazio" class="absolute inset-0 flex flex-col items-center justify-center opacity-10">
@@ -53,48 +53,52 @@
             </div>
         </div>
 
-        <div class="lg:col-span-5 flex flex-col gap-6 overflow-hidden">
+        <div class="lg:col-span-6 flex flex-col gap-6 overflow-hidden">
             
-            <div class="glass-box p-8 border-amber-500/10">
-                <h2 class="text-[10px] font-black text-amber-500 uppercase tracking-widest mb-6 flex items-center gap-2">
-                    <i class="fa-solid fa-pen-to-square"></i> Registrar Substituição Manual
-                </h2>
+            <div class="glass-box p-6 border-amber-500/10">
+                <div class="flex gap-4 mb-6">
+                    <button onclick="aba('troca')" id="btnTroca" class="text-[10px] font-black uppercase tracking-widest pb-2 border-b-2 border-amber-500">Trocas</button>
+                    <button onclick="aba('falta')" id="btnFalta" class="text-[10px] font-black uppercase tracking-widest pb-2 border-b-2 border-transparent text-slate-500">Faltas</button>
+                </div>
                 
-                <div class="space-y-4">
-                    <div class="flex flex-col gap-1.5">
-                        <label class="text-[9px] font-bold text-slate-500 uppercase ml-1">Dia do Plantão</label>
-                        <input type="text" id="campoDia" placeholder="Ex: 15/02" class="input-clean">
+                <div id="formTroca" class="space-y-4">
+                    <div class="grid grid-cols-3 gap-3">
+                        <input type="text" id="tDia" placeholder="Dia" class="input-clean">
+                        <input type="text" id="tSai" placeholder="Dra. que SAI" class="input-clean text-slate-500">
+                        <input type="text" id="tEntra" placeholder="Dra. que ENTRA" class="input-clean border-emerald-900/20">
                     </div>
-                    <div class="grid grid-cols-2 gap-4">
-                        <div class="flex flex-col gap-1.5">
-                            <label class="text-[9px] font-bold text-slate-500 uppercase ml-1">Dra. que SAI</label>
-                            <input type="text" id="campoSai" placeholder="Dra. Nome" class="input-clean text-slate-400 font-normal">
-                        </div>
-                        <div class="flex flex-col gap-1.5">
-                            <label class="text-[9px] font-bold text-emerald-500 uppercase ml-1">Dra. que ENTRA</label>
-                            <input type="text" id="campoEntra" placeholder="Dra. Nome" class="input-clean border-emerald-900/30">
-                        </div>
+                    <button onclick="registrarTroca()" class="w-full bg-amber-500 text-black py-3 rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-amber-400 transition-all">Salvar Troca de Triagem</button>
+                </div>
+
+                <div id="formFalta" class="hidden space-y-4">
+                    <div class="grid grid-cols-2 gap-3">
+                        <input type="text" id="fDia" placeholder="Dia da Falta" class="input-clean">
+                        <input type="text" id="fNome" placeholder="Nome da Advogada" class="input-clean border-red-900/20">
                     </div>
-                    <button onclick="registrar()" class="w-full bg-amber-500 text-black py-4 rounded-xl font-black text-xs uppercase tracking-widest hover:bg-amber-400 transition-all shadow-xl mt-2">
-                        Salvar Alteração
-                    </button>
+                    <button onclick="registrarFalta()" class="w-full bg-red-600 text-white py-3 rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-red-500 transition-all">Registrar Falta na Triagem</button>
                 </div>
             </div>
 
             <div class="flex-grow overflow-y-auto pr-2">
                 <div class="flex justify-between items-center mb-4 px-2">
-                    <h3 class="text-[10px] font-black text-slate-700 uppercase tracking-widest italic">Trocas Confirmadas</h3>
+                    <h3 class="text-[10px] font-black text-slate-700 uppercase tracking-widest italic">Ocorrências da Triagem</h3>
                     <button onclick="resetar()" class="text-[9px] font-bold text-red-900 hover:text-red-500 uppercase">Limpar</button>
                 </div>
-                <div id="lista" class="space-y-4"></div>
+                <div id="lista" class="space-y-3"></div>
             </div>
         </div>
     </main>
 
     <script>
-        let trocas = JSON.parse(localStorage.getItem('cad_v50')) || [];
+        let registros = JSON.parse(localStorage.getItem('cad_v60')) || [];
 
-        // FUNÇÃO DE UPLOAD GERAL
+        function aba(tipo) {
+            document.getElementById('formTroca').classList.toggle('hidden', tipo !== 'troca');
+            document.getElementById('formFalta').classList.toggle('hidden', tipo !== 'falta');
+            document.getElementById('btnTroca').className = tipo === 'troca' ? 'text-[10px] font-black uppercase tracking-widest pb-2 border-b-2 border-amber-500' : 'text-[10px] font-black uppercase tracking-widest pb-2 border-b-2 border-transparent text-slate-500';
+            document.getElementById('btnFalta').className = tipo === 'falta' ? 'text-[10px] font-black uppercase tracking-widest pb-2 border-b-2 border-red-500 text-red-500' : 'text-[10px] font-black uppercase tracking-widest pb-2 border-b-2 border-transparent text-slate-500';
+        }
+
         function processarPDF(input) {
             const file = input.files[0];
             if (file) {
@@ -117,66 +121,74 @@
             }
         }
 
-        // REGISTRO 100% MANUAL
-        function registrar() {
-            const dia = document.getElementById('campoDia').value;
-            const sai = document.getElementById('campoSai').value;
-            const entra = document.getElementById('campoEntra').value;
-
+        function registrarTroca() {
+            const dia = document.getElementById('tDia').value;
+            const sai = document.getElementById('tSai').value;
+            const entra = document.getElementById('tEntra').value;
             if (dia && sai && entra) {
-                trocas.unshift({ id: Date.now(), dia, sai, entra });
-                localStorage.setItem('cad_v50', JSON.stringify(trocas));
-                
-                // Limpar campos
-                document.getElementById('campoDia').value = "";
-                document.getElementById('campoSai').value = "";
-                document.getElementById('campoEntra').value = "";
-                
-                desenharLista();
-            } else {
-                alert("Preencha o dia e os nomes das advogadas.");
+                registros.unshift({ id: Date.now(), tipo: 'troca', dia, sai, entra });
+                salvar();
+                document.getElementById('tDia').value = ""; document.getElementById('tSai').value = ""; document.getElementById('tEntra').value = "";
             }
+        }
+
+        function registrarFalta() {
+            const dia = document.getElementById('fDia').value;
+            const nome = document.getElementById('fNome').value;
+            if (dia && nome) {
+                registros.unshift({ id: Date.now(), tipo: 'falta', dia, nome });
+                salvar();
+                document.getElementById('fDia').value = ""; document.getElementById('fNome').value = "";
+            }
+        }
+
+        function salvar() {
+            localStorage.setItem('cad_v60', JSON.stringify(registros));
+            desenharLista();
         }
 
         function desenharLista() {
             const box = document.getElementById('lista');
-            box.innerHTML = trocas.length ? '' : '<p class="text-center py-10 text-white/5 font-black uppercase text-xs tracking-widest">Nenhuma troca registrada</p>';
+            box.innerHTML = registros.length ? '' : '<p class="text-center py-10 text-white/5 font-black uppercase text-xs tracking-widest">Nenhuma ocorrência</p>';
 
-            trocas.forEach(t => {
-                box.innerHTML += `
-                    <div class="card-registro p-5 flex items-center justify-between">
-                        <div class="flex items-center gap-6">
-                            <div class="bg-amber-500 text-black w-14 py-2 rounded-xl text-center font-black">
-                                <span class="text-[8px] block leading-none opacity-60">FEV</span>
-                                <span class="text-lg leading-none italic">${t.dia}</span>
-                            </div>
+            registros.forEach(r => {
+                if(r.tipo === 'troca') {
+                    box.innerHTML += `
+                        <div class="card-registro p-4 flex items-center justify-between">
                             <div class="flex items-center gap-4">
-                                <div class="flex flex-col">
-                                    <span class="text-[8px] font-bold text-white/20 uppercase tracking-widest">Removida</span>
-                                    <span class="text-xs font-bold text-white/40 italic"><s>${t.sai}</s></span>
-                                </div>
-                                <i class="fa-solid fa-arrow-right text-amber-500/20 text-xs"></i>
-                                <div class="flex flex-col">
-                                    <span class="text-[8px] font-black text-emerald-500 uppercase tracking-widest">Assume</span>
-                                    <span class="text-base font-black text-white italic underline decoration-emerald-500/30">${t.entra}</span>
+                                <div class="bg-amber-500 text-black w-12 py-1.5 rounded-lg text-center font-black text-sm italic">${r.dia}</div>
+                                <div class="flex items-center gap-3">
+                                    <span class="text-[10px] text-white/30 italic"><s>${r.sai}</s></span>
+                                    <i class="fa-solid fa-right-long text-amber-500/20 text-[10px]"></i>
+                                    <span class="text-sm font-black text-white italic underline decoration-emerald-500/30">${r.entra}</span>
                                 </div>
                             </div>
-                        </div>
-                        <button onclick="apagar(${t.id})" class="text-white/10 hover:text-red-500 transition-all"><i class="fa-solid fa-xmark"></i></button>
-                    </div>
-                `;
+                            <button onclick="apagar(${r.id})" class="text-white/10 hover:text-red-500"><i class="fa-solid fa-xmark"></i></button>
+                        </div>`;
+                } else {
+                    box.innerHTML += `
+                        <div class="card-registro card-falta p-4 flex items-center justify-between">
+                            <div class="flex items-center gap-4">
+                                <div class="bg-red-600 text-white w-12 py-1.5 rounded-lg text-center font-black text-sm italic">${r.dia}</div>
+                                <div class="flex flex-col">
+                                    <span class="text-[8px] font-black text-red-500 uppercase tracking-widest leading-none mb-1">Falta Registrada</span>
+                                    <span class="text-sm font-black text-white italic uppercase">${r.nome}</span>
+                                </div>
+                            </div>
+                            <button onclick="apagar(${r.id})" class="text-white/10 hover:text-red-500"><i class="fa-solid fa-xmark"></i></button>
+                        </div>`;
+                }
             });
         }
 
         function apagar(id) {
-            trocas = trocas.filter(x => x.id !== id);
-            localStorage.setItem('cad_v50', JSON.stringify(trocas));
-            desenharLista();
+            registros = registros.filter(x => x.id !== id);
+            salvar();
         }
 
         function resetar() {
-            if(confirm("Deseja apagar o histórico de trocas?")) {
-                trocas = []; localStorage.removeItem('cad_v50'); desenharLista();
+            if(confirm("Deseja apagar o histórico de triagem?")) {
+                registros = []; localStorage.removeItem('cad_v60'); desenharLista();
             }
         }
 
