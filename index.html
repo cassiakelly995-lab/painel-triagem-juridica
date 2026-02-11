@@ -3,170 +3,181 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CAD Santana de Parnaíba | Sistema Inteligente</title>
+    <title>CAD Santana de Parnaíba | Triagem Inteligente</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&display=swap');
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background: #f8fafc; color: #1e293b; height: 100vh; overflow: hidden; }
-        .escala-area { background: #fff; border: 2px dashed #e2e8f0; border-radius: 24px; height: 100%; overflow: auto; position: relative; transition: 0.3s; }
-        .escala-area:hover { border-color: #fbbf24; }
-        .panel-glass { background: #ffffff; border: 1px solid #e2e8f0; border-radius: 30px; box-shadow: 0 20px 40px -10px rgba(0,0,0,0.05); }
-        .card-troca { border: 1px solid #f1f5f9; border-left: 5px solid #fbbf24; background: #fff; transition: 0.2s; }
-        .card-troca:hover { transform: scale(1.02); }
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap');
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: #f4f7fa; color: #1e293b; height: 100vh; overflow: hidden; }
+        .escala-view { background: #ffffff; border: 2px dashed #cbd5e1; border-radius: 24px; height: 100%; overflow: auto; transition: 0.3s; position: relative; }
+        .escala-view:hover { border-color: #f59e0b; background: #fffcf5; }
+        .glass-card { background: #ffffff; border-radius: 24px; border: 1px solid #e2e8f0; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.05); }
+        .badge-data { background: #0f172a; color: #fbbf24; padding: 4px 12px; border-radius: 8px; font-weight: 800; font-size: 14px; }
+        .card-troca { background: #ffffff; border-radius: 20px; border: 1px solid #e2e8f0; transition: 0.3s; position: relative; overflow: hidden; }
+        .card-troca:hover { transform: translateY(-3px); box-shadow: 0 12px 20px -5px rgba(0,0,0,0.1); }
+        .seta-troca { color: #f59e0b; animation: pulse 2s infinite; }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
     </style>
 </head>
-<body class="flex flex-col p-4">
+<body class="p-4 md:p-6 flex flex-col">
 
-    <header class="flex justify-between items-center mb-6 px-4">
-        <div class="flex items-center gap-3">
-            <div class="bg-slate-900 p-2.5 rounded-2xl text-amber-400 shadow-xl"><i class="fa-solid fa-scale-balanced text-xl"></i></div>
+    <header class="flex justify-between items-center mb-6">
+        <div class="flex items-center gap-4">
+            <div class="bg-slate-900 p-3 rounded-2xl text-amber-400 shadow-xl shadow-slate-900/20">
+                <i class="fa-solid fa-scale-balanced text-xl"></i>
+            </div>
             <div>
-                <h1 class="text-sm font-black uppercase tracking-tight">CAD Santana de Parnaíba</h1>
-                <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Painel Administrativo</p>
+                <h1 class="text-lg font-extrabold uppercase tracking-tighter leading-none">CAD Santana de Parnaíba</h1>
+                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">Gestão de Triagem • Cássia</p>
             </div>
         </div>
         <div class="flex gap-3">
-            <input type="file" id="upInput" class="hidden" accept="image/*" onchange="fazerUpload(this)">
-            <button onclick="document.getElementById('upInput').click()" class="bg-amber-500 text-black px-6 py-2.5 rounded-full text-[10px] font-black uppercase shadow-lg shadow-amber-500/20 hover:bg-amber-400 transition-all">
-                <i class="fa-solid fa-cloud-arrow-up mr-2"></i> Subir Escala de Fevereiro
+            <input type="file" id="upEscala" class="hidden" accept="image/*" onchange="uploadLocal(this)">
+            <button onclick="document.getElementById('upEscala').click()" class="bg-amber-500 text-black px-6 py-2.5 rounded-full text-[11px] font-black uppercase shadow-lg shadow-amber-500/30 hover:bg-amber-400 transition-all flex items-center gap-2">
+                <i class="fa-solid fa-cloud-arrow-up"></i> Upload da Escala
             </button>
         </div>
     </header>
 
     <main class="flex-grow grid grid-cols-1 lg:grid-cols-12 gap-8 overflow-hidden">
         
-        <div class="lg:col-span-7 h-full flex flex-col gap-2">
-            <span class="text-[10px] font-black text-slate-400 uppercase ml-2 tracking-widest">Escala de Fevereiro Fixada</span>
-            <div id="dropZone" class="escala-area flex items-center justify-center">
-                <div id="instrucao" class="text-center p-10 opacity-40">
-                    <i class="fa-solid fa-file-image text-6xl mb-4"></i>
-                    <p class="text-xs font-bold uppercase">Clique no botão acima para carregar a escala</p>
+        <div class="lg:col-span-6 flex flex-col gap-3 h-full">
+            <div class="flex items-center justify-between px-2 text-[10px] font-black text-slate-400 uppercase tracking-widest">
+                <span>Documento de Referência</span>
+                <span id="statusEscala" class="text-emerald-500 hidden"><i class="fa-solid fa-circle-check"></i> Escala Ativa</span>
+            </div>
+            <div class="escala-view flex items-center justify-center overflow-hidden">
+                <div id="placeholder" class="text-center p-10 pointer-events-none">
+                    <div class="bg-slate-100 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4 border border-slate-200">
+                        <i class="fa-solid fa-image text-slate-300 text-3xl"></i>
+                    </div>
+                    <p class="text-xs font-bold text-slate-500 uppercase">Aguardando arquivo da escala...</p>
+                    <p class="text-[10px] text-slate-400 mt-2 uppercase">Clique no botão "Upload" no topo</p>
                 </div>
-                <img id="escalaView" class="hidden w-full h-auto">
+                <img id="imgEscala" class="hidden w-full h-auto object-contain">
             </div>
         </div>
 
-        <div class="lg:col-span-5 flex flex-col gap-6 overflow-hidden">
+        <div class="lg:col-span-6 flex flex-col gap-6 overflow-hidden">
             
-            <div class="panel-glass p-8">
-                <div class="flex items-center gap-2 mb-6">
-                    <span class="text-amber-500"><i class="fa-solid fa-microchip animate-pulse"></i></span>
-                    <h2 class="text-[10px] font-black text-slate-500 uppercase tracking-widest">Identificador de Trocas</h2>
+            <div class="glass-card p-6">
+                <div class="flex items-center gap-2 mb-4 text-[10px] font-black text-amber-600 uppercase tracking-widest">
+                    <i class="fa-solid fa-bolt"></i> Registro Inteligente
                 </div>
-
-                <textarea id="textoIA" rows="2" 
-                    placeholder="Dra. Kelly trocou com Dra. Silvia dia 20/02..."
-                    class="w-full text-xl font-medium text-slate-800 outline-none placeholder:text-slate-200 resize-none mb-6"></textarea>
-                
-                <button onclick="processar()" class="w-full bg-slate-900 text-white py-4 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-slate-800 transition-all shadow-xl active:scale-95">
-                    Registrar Substituição
-                </button>
+                <textarea id="entradaIA" rows="2" 
+                    placeholder="Dra. Paula substitui Dra. Silvia no dia 15/02..."
+                    class="w-full text-lg font-semibold text-slate-800 outline-none placeholder:text-slate-300 resize-none mb-4"></textarea>
+                <div class="flex justify-between items-center border-t pt-4">
+                    <span class="text-[9px] text-slate-400 font-bold uppercase italic">A IA identificará quem entra e quem sai</span>
+                    <button onclick="registrar()" class="bg-slate-900 text-white px-8 py-3 rounded-xl font-black text-xs uppercase tracking-widest hover:bg-amber-500 hover:text-black transition-all shadow-xl active:scale-95">
+                        Registrar Troca
+                    </button>
+                </div>
             </div>
 
             <div class="flex-grow overflow-y-auto space-y-4 pr-2">
-                <div class="flex justify-between items-center px-2">
-                    <h3 class="text-[10px] font-black text-slate-400 uppercase tracking-widest italic">Trocas Confirmadas</h3>
-                    <button onclick="limparTudo()" class="text-[9px] font-bold text-red-400 hover:text-red-600 uppercase">Limpar</button>
+                <div class="flex justify-between items-center mb-2 px-1">
+                    <h3 class="text-[10px] font-black text-slate-400 uppercase tracking-widest italic">Substituições Confirmadas</h3>
+                    <button onclick="resetar()" class="text-[9px] font-bold text-red-400 hover:text-red-600 uppercase">Limpar Histórico</button>
                 </div>
-                <div id="listaTrocas" class="space-y-3"></div>
+                <div id="lista" class="space-y-4">
+                    </div>
             </div>
         </div>
     </main>
 
     <script>
-        let trocas = JSON.parse(localStorage.getItem('cad_oficial_v15')) || [];
+        let db = JSON.parse(localStorage.getItem('cad_v20')) || [];
 
-        // SISTEMA DE UPLOAD REFORÇADO
-        function fazerUpload(input) {
+        // Função de Upload Local
+        function uploadLocal(input) {
             const file = input.files[0];
             if (!file) return;
-
             const reader = new FileReader();
             reader.onload = (e) => {
-                const imagemBase64 = e.target.result;
-                localStorage.setItem('escala_fixa_v15', imagemBase64);
-                mostrarEscala();
+                localStorage.setItem('escala_temp', e.target.result);
+                exibirEscala();
             };
             reader.readAsDataURL(file);
         }
 
-        function mostrarEscala() {
-            const imgData = localStorage.getItem('escala_fixa_v15');
-            if (imgData) {
-                document.getElementById('instrucao').classList.add('hidden');
-                const view = document.getElementById('escalaView');
-                view.src = imgData;
-                view.classList.remove('hidden');
+        function exibirEscala() {
+            const data = localStorage.getItem('escala_temp');
+            if (data) {
+                document.getElementById('placeholder').style.display = 'none';
+                document.getElementById('statusEscala').classList.remove('hidden');
+                const img = document.getElementById('imgEscala');
+                img.src = data;
+                img.classList.remove('hidden');
             }
         }
 
-        // IA DE IDENTIFICAÇÃO: "A trocou com B"
-        function processar() {
-            const txt = document.getElementById('textoIA').value;
+        // IA de Registro Interativo
+        function registrar() {
+            const txt = document.getElementById('entradaIA').value;
             if (!txt) return;
 
             const nomes = [...txt.matchAll(/(?:Dra?\.\s?)([A-ZÀ-Ú][a-zà-ú]+(?:\s[A-ZÀ-Ú][a-zà-ú]+)*)/g)];
-            const data = txt.match(/(\d{1,2}\/\d{1,2})/);
+            const dataMatch = txt.match(/(\d{1,2}\/\d{1,2})/);
 
-            if (nomes.length >= 2 && data) {
-                // A primeira pessoa mencionada é quem assume
-                // A segunda pessoa mencionada é quem sai
-                salvar(data[0], "Dra. " + nomes[1][1], "Dra. " + nomes[0][1]);
-                document.getElementById('textoIA').value = "";
+            if (nomes.length >= 2 && dataMatch) {
+                // Lógica Interativa: No texto de troca, a primeira citada assume, a segunda sai
+                // Ex: "Paula substitui Silvia" -> Paula ENTRA, Silvia SAI.
+                addTroca(dataMatch[0], "Dra. " + nomes[1][1], "Dra. " + nomes[0][1]);
+                document.getElementById('entradaIA').value = "";
             } else {
-                alert("IA: Por favor, mencione os dois nomes (Ex: Dra. Ana trocou com Dra. Bia) e a data.");
+                alert("Erro na Identificação: Mencione os dois nomes e a data (Ex: 15/02)");
             }
         }
 
-        function salvar(dia, sainte, entrante) {
-            trocas.unshift({ id: Date.now(), dia, sainte, entrante });
-            localStorage.setItem('cad_oficial_v15', JSON.stringify(trocas));
-            renderizar();
+        function addTroca(dia, sainte, entrante) {
+            db.unshift({ id: Date.now(), dia, sainte, entrante });
+            localStorage.setItem('cad_v20', JSON.stringify(db));
+            render();
         }
 
-        function renderizar() {
-            const container = document.getElementById('listaTrocas');
-            container.innerHTML = trocas.length ? '' : '<p class="text-center py-10 text-slate-300 font-bold uppercase text-[9px] tracking-widest italic">Aguardando Triagem</p>';
-            
-            trocas.forEach(t => {
-                container.innerHTML += `
-                    <div class="card-troca p-5 rounded-2xl flex items-center justify-between shadow-sm">
-                        <div class="flex items-center gap-6">
-                            <div class="text-center bg-slate-50 border border-slate-100 px-3 py-1.5 rounded-xl">
-                                <span class="text-[8px] font-black text-slate-400 block uppercase">DIA</span>
-                                <span class="text-base font-black text-slate-700">${t.dia}</span>
+        function render() {
+            const c = document.getElementById('lista');
+            c.innerHTML = db.length ? '' : '<div class="py-20 text-center opacity-20 font-black uppercase tracking-widest text-xs">Sem trocas registradas</div>';
+
+            db.forEach(t => {
+                c.innerHTML += `
+                    <div class="card-troca p-5 shadow-sm border-l-[6px] border-amber-500">
+                        <div class="flex items-center justify-between mb-4">
+                            <span class="badge-data">${t.dia}</span>
+                            <button onclick="del(${t.id})" class="text-slate-300 hover:text-red-500 transition-all"><i class="fa-solid fa-trash-can"></i></button>
+                        </div>
+                        <div class="flex items-center justify-around gap-4 text-center">
+                            <div class="flex flex-col">
+                                <span class="text-[9px] font-black text-slate-400 uppercase mb-1">Sai do Plantão</span>
+                                <span class="text-sm font-bold text-slate-400 italic"><s>${t.sainte}</s></span>
+                            </div>
+                            <div class="seta-troca text-xl">
+                                <i class="fa-solid fa-arrow-right-arrow-left"></i>
                             </div>
                             <div class="flex flex-col">
-                                <span class="text-[9px] font-bold text-slate-300 uppercase leading-none mb-1">Sai: <s class="text-slate-400">${t.sainte}</s></span>
-                                <span class="text-sm font-extrabold text-slate-900 uppercase">Assume: <span class="text-emerald-600 underline">${t.entrante}</span></span>
+                                <span class="text-[9px] font-black text-emerald-500 uppercase mb-1 tracking-widest">Assume o Lugar</span>
+                                <span class="text-base font-black text-slate-900 uppercase underline decoration-emerald-400 decoration-2">${t.entrante}</span>
                             </div>
                         </div>
-                        <button onclick="excluir(${t.id})" class="text-slate-300 hover:text-red-500"><i class="fa-solid fa-circle-xmark"></i></button>
                     </div>
                 `;
             });
         }
 
-        function excluir(id) {
-            trocas = trocas.filter(x => x.id !== id);
-            localStorage.setItem('cad_oficial_v15', JSON.stringify(trocas));
-            renderizar();
+        function del(id) {
+            db = db.filter(x => x.id !== id);
+            localStorage.setItem('cad_v20', JSON.stringify(db));
+            render();
         }
 
-        function limparTudo() {
-            if(confirm("Deseja apagar todos os registros de trocas?")) {
-                trocas = [];
-                localStorage.removeItem('cad_oficial_v15');
-                renderizar();
+        function resetar() {
+            if(confirm("Deseja apagar todo o histórico de trocas?")) {
+                db = []; localStorage.removeItem('cad_v20'); render();
             }
         }
 
-        // Inicia o painel
-        window.onload = () => {
-            mostrarEscala();
-            renderizar();
-        };
+        window.onload = () => { exibirEscala(); render(); };
     </script>
 </body>
 </html>
