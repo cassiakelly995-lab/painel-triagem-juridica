@@ -3,18 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SISTEMA INTELIGENTE CAD - Santana de Parnaíba</title>
+    <title>SISTEMA CAD - INTELIGÊNCIA E CONTROLE</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap');
         body { font-family: 'Inter', sans-serif; background-color: #020617; color: #f8fafc; overflow: hidden; }
-        .panel-split { height: calc(100vh - 80px); }
-        .escala-view { background: #000; border: 1px solid #1e293b; border-radius: 20px; position: relative; overflow: auto; }
-        .ai-terminal { background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(10px); border: 1px solid #334155; border-radius: 30px; }
-        .card-troca { border-left: 5px solid #fbbf24; background: #1e293b; transition: 0.3s; animation: slideIn 0.4s ease-out; }
-        @keyframes slideIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        ::-webkit-scrollbar { width: 4px; }
+        .main-grid { height: calc(100vh - 80px); }
+        .escala-container { background: #000; border: 2px solid #1e293b; border-radius: 24px; overflow: auto; }
+        .panel-right { background: rgba(15, 23, 42, 0.5); backdrop-filter: blur(10px); }
+        .card-troca { border-left: 4px solid #fbbf24; background: #1e293b; transition: 0.3s; }
+        .ia-alert { background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.3); color: #fca5a5; }
+        ::-webkit-scrollbar { width: 5px; }
         ::-webkit-scrollbar-thumb { background: #334155; border-radius: 10px; }
     </style>
 </head>
@@ -23,172 +23,196 @@
     <header class="h-20 flex items-center px-8 border-b border-slate-800 bg-slate-950">
         <div class="container mx-auto flex justify-between items-center">
             <div class="flex items-center gap-4">
-                <div class="bg-amber-500 text-black p-2 rounded-lg shadow-lg shadow-amber-500/20">
-                    <i class="fa-solid fa-brain text-xl"></i>
+                <div class="bg-amber-500 text-black p-2 rounded-lg shadow-lg">
+                    <i class="fa-solid fa-shield-halved text-xl"></i>
                 </div>
                 <div>
-                    <h1 class="text-lg font-black uppercase tracking-tighter">CAD Inteligente</h1>
-                    <p class="text-amber-500 text-[9px] font-bold tracking-[0.3em] uppercase">Santana de Parnaíba</p>
+                    <h1 class="text-lg font-black uppercase tracking-tighter">CAD Santana de Parnaíba</h1>
+                    <p class="text-amber-500 text-[9px] font-bold tracking-[0.3em] uppercase italic">Gestão e Triagem Inteligente</p>
                 </div>
             </div>
             
             <div class="flex gap-4">
-                <input type="file" id="fileInput" class="hidden" accept="image/*,application/pdf" onchange="uploadEscala(this)">
-                <button onclick="document.getElementById('fileInput').click()" class="bg-slate-800 hover:bg-slate-700 text-white px-6 py-2 rounded-full text-[10px] font-black uppercase border border-slate-600 transition-all flex items-center gap-2">
-                    <i class="fa-solid fa-file-import"></i> Carregar Escala de Fevereiro
+                <button onclick="document.getElementById('fileInput').click()" class="bg-amber-500 text-black px-6 py-2 rounded-full text-[10px] font-black uppercase transition-all flex items-center gap-2">
+                    <i class="fa-solid fa-file-export"></i> Expor Escala de Fevereiro
                 </button>
+                <input type="file" id="fileInput" class="hidden" accept="image/*,application/pdf" onchange="uploadEscala(this)">
             </div>
         </div>
     </header>
 
-    <main class="container mx-auto p-4 panel-split grid grid-cols-1 lg:grid-cols-12 gap-6">
+    <main class="container mx-auto p-4 main-grid grid grid-cols-1 lg:grid-cols-12 gap-6">
         
-        <div class="lg:col-span-6 flex flex-col gap-3">
-            <span class="text-[10px] font-black text-slate-500 uppercase ml-2 italic">Visualização da Escala Oficial</span>
-            <div id="escalaContainer" class="escala-view h-full flex items-center justify-center">
+        <div class="lg:col-span-5 flex flex-col gap-3">
+            <div class="flex items-center justify-between px-2">
+                <span class="text-[10px] font-black text-slate-500 uppercase tracking-widest italic">Documento Oficial de Triagem</span>
+            </div>
+            <div id="escalaContainer" class="escala-container h-full flex items-center justify-center relative">
                 <div id="placeholder" class="text-center opacity-30 p-10">
-                    <i class="fa-solid fa-file-arrow-up text-6xl mb-4"></i>
-                    <p class="text-sm font-bold">A ESCALA APARECERÁ AQUI</p>
+                    <i class="fa-solid fa-image text-7xl mb-4"></i>
+                    <p class="font-bold uppercase tracking-widest text-xs italic">Nenhuma Escala Exposta</p>
                 </div>
                 <img id="renderImg" class="hidden w-full h-auto">
                 <embed id="renderPdf" class="hidden w-full h-full" type="application/pdf">
             </div>
         </div>
 
-        <div class="lg:col-span-6 flex flex-col gap-6">
+        <div class="lg:col-span-7 flex flex-col gap-6 overflow-hidden">
             
-            <div class="ai-terminal p-6 shadow-2xl">
-                <label class="text-[10px] font-black text-amber-500 uppercase tracking-widest block mb-3">Identificador de Trocas (Cole o texto abaixo)</label>
-                <textarea id="rawText" rows="2" 
-                    placeholder="Ex: Dra. Kelly entra no lugar da Dra. Silvia dia 15/02..."
-                    class="w-full bg-transparent text-white text-xl font-bold outline-none placeholder:text-slate-700 resize-none"></textarea>
-                <div class="flex justify-end mt-4">
-                    <button onclick="processarIA()" class="bg-white text-black px-10 py-3 rounded-full font-black text-xs uppercase tracking-widest hover:bg-amber-500 transition-all active:scale-95">
-                        Identificar e Registrar
-                    </button>
+            <div class="panel-right p-6 rounded-[32px] border border-slate-800 shadow-2xl">
+                <div class="flex justify-between items-center mb-4">
+                    <div class="flex items-center gap-2 text-amber-500">
+                        <i class="fa-solid fa-robot animate-pulse"></i>
+                        <span class="text-[10px] font-black uppercase tracking-widest">Painel de Comandos</span>
+                    </div>
+                    <button onclick="toggleManual()" class="text-[10px] font-bold text-slate-400 hover:text-white uppercase underline decoration-amber-500 underline-offset-4">Inserção Manual</button>
+                </div>
+
+                <div id="iaSection">
+                    <textarea id="rawText" rows="2" 
+                        placeholder="Ex: Dra. Paula entra no lugar da Dra. Silvia dia 22/02..."
+                        class="w-full bg-transparent text-white text-lg font-bold outline-none placeholder:text-slate-700 resize-none"></textarea>
+                    <button onclick="processarIA()" class="mt-4 w-full bg-white text-black py-3 rounded-xl font-black text-xs uppercase tracking-widest hover:bg-amber-500 transition-all">Identificar Automaticamente</button>
+                </div>
+
+                <div id="manualSection" class="hidden grid grid-cols-3 gap-3">
+                    <input id="mDia" placeholder="Dia (Ex: 15/02)" class="bg-slate-900 border border-slate-700 p-3 rounded-xl text-sm outline-none text-white font-bold">
+                    <input id="mSainte" placeholder="Dra. que sai" class="bg-slate-900 border border-slate-700 p-3 rounded-xl text-sm outline-none text-white font-bold">
+                    <input id="mEntrante" placeholder="Dra. que entra" class="bg-slate-900 border border-slate-700 p-3 rounded-xl text-sm outline-none text-white font-bold">
+                    <button onclick="registrarManual()" class="col-span-3 bg-amber-500 text-black py-3 rounded-xl font-black text-xs uppercase">Salvar Registro Manual</button>
                 </div>
             </div>
 
-            <div class="flex-grow overflow-y-auto pr-2">
-                <h3 class="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-4 ml-2">Substituições Identificadas</h3>
-                <div id="listaTrocas" class="space-y-4 text-white">
-                    </div>
+            <div id="iaStatusBox" class="ia-alert p-4 rounded-2xl text-[11px] font-bold flex items-center gap-3 hidden">
+                <i class="fa-solid fa-triangle-exclamation text-amber-500"></i>
+                <span id="iaStatusMsg"></span>
+            </div>
+
+            <div class="flex-grow overflow-y-auto pr-2 space-y-3">
+                <h3 class="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-4 ml-2">Histórico de Alterações</h3>
+                <div id="listaTrocas" class="space-y-3"></div>
             </div>
         </div>
     </main>
 
     <script>
-        let db = JSON.parse(localStorage.getItem('cad_pro_v1')) || [];
+        let db = JSON.parse(localStorage.getItem('cad_v11')) || [];
 
-        // FUNÇÃO DE UPLOAD CORRIGIDA
+        function toggleManual() {
+            document.getElementById('iaSection').classList.toggle('hidden');
+            document.getElementById('manualSection').classList.toggle('hidden');
+        }
+
         function uploadEscala(input) {
             const file = input.files[0];
             if (!file) return;
-
             const reader = new FileReader();
             reader.onload = (e) => {
-                const data = e.target.result;
-                localStorage.setItem('escala_data', data);
-                localStorage.setItem('escala_tipo', file.type);
-                exibirEscala();
+                localStorage.setItem('escala_bin', e.target.result);
+                localStorage.setItem('escala_mime', file.type);
+                renderEscala();
             };
             reader.readAsDataURL(file);
         }
 
-        function exibirEscala() {
-            const data = localStorage.getItem('escala_data');
-            const tipo = localStorage.getItem('escala_tipo');
+        function renderEscala() {
+            const data = localStorage.getItem('escala_bin');
+            const type = localStorage.getItem('escala_mime');
             if (!data) return;
-
-            document.getElementById('placeholder').style.display = 'none';
+            document.getElementById('placeholder').classList.add('hidden');
             const img = document.getElementById('renderImg');
             const pdf = document.getElementById('renderPdf');
-
-            if (tipo.includes('image')) {
-                img.src = data; img.classList.remove('hidden');
-                pdf.classList.add('hidden');
+            if (type.includes('image')) {
+                img.src = data; img.classList.remove('hidden'); pdf.classList.add('hidden');
             } else {
-                pdf.src = data; pdf.classList.remove('hidden');
-                img.classList.add('hidden');
+                pdf.src = data; pdf.classList.remove('hidden'); img.classList.add('hidden');
             }
         }
 
-        // IA SUPER INTELIGENTE DE IDENTIFICAÇÃO DE NOMES
         function processarIA() {
             const texto = document.getElementById('rawText').value;
             if (!texto) return;
-
-            // Busca nomes após Dra. ou Dr. (Identifica quem trocou com quem)
             const regexNomes = /(?:Dra?\.\s?)([A-ZÀ-Ú][a-zà-ú]+(?:\s[A-ZÀ-Ú][a-zà-ú]+)*)/g;
-            const nomesEncontrados = [...texto.matchAll(regexNomes)];
+            const matches = [...texto.matchAll(regexNomes)];
             const dataMatch = texto.match(/(\d{1,2}\/\d{1,2})/);
-
-            let entrante = "Identificando...";
-            let sainte = "Identificando...";
-
-            if (nomesEncontrados.length >= 2) {
-                // Lógica Inteligente: Quem vem primeiro na frase de troca geralmente é quem assume
-                // Ex: "Dra. A substitui Dra. B" ou "Dra. A no lugar da Dra. B"
-                entrante = "Dra. " + nomesEncontrados[0][1];
-                sainte = "Dra. " + nomesEncontrados[1][1];
+            
+            if (matches.length < 2) { 
+                erroIA("ERRO: O sistema não identificou as duas advogadas no texto."); 
+                return; 
             }
 
-            const novaTroca = {
-                id: Date.now(),
-                data: dataMatch ? dataMatch[0] : "FEV",
-                entrante: entrante,
-                sainte: sainte
-            };
-
-            db.unshift(novaTroca);
-            localStorage.setItem('cad_pro_v1', JSON.stringify(db));
+            salvarRegistro(dataMatch ? dataMatch[0] : "FEV", "Dra. " + matches[1][1], "Dra. " + matches[0][1]);
             document.getElementById('rawText').value = "";
-            renderizarTrocas();
+            analisarErros();
         }
 
-        function renderizarTrocas() {
-            const container = document.getElementById('listaTrocas');
-            container.innerHTML = db.length ? '' : '<p class="text-slate-700 italic text-center p-10 font-bold">NENHUMA TROCA NO SISTEMA</p>';
+        function registrarManual() {
+            const dia = document.getElementById('mDia').value;
+            const sainte = document.getElementById('mSainte').value;
+            const entrante = document.getElementById('mEntrante').value;
+            if(!dia || !sainte || !entrante) return;
+            salvarRegistro(dia, sainte, entrante);
+            document.getElementById('mDia').value = ""; document.getElementById('mSainte').value = ""; document.getElementById('mEntrante').value = "";
+            analisarErros();
+        }
 
+        function salvarRegistro(dia, sainte, entrante) {
+            db.unshift({ id: Date.now(), dia, sainte, entrante });
+            localStorage.setItem('cad_v11', JSON.stringify(db));
+            renderTrocas();
+        }
+
+        function renderTrocas() {
+            const container = document.getElementById('listaTrocas');
+            container.innerHTML = db.length ? '' : '<p class="text-slate-700 italic text-center p-10 font-bold">NENHUMA TROCA REGISTRADA</p>';
             db.forEach(t => {
                 container.innerHTML += `
-                    <div class="card-troca p-6 rounded-3xl flex items-center justify-between shadow-lg">
-                        <div class="flex items-center gap-6">
-                            <div class="bg-slate-900 border border-slate-700 p-3 rounded-2xl text-center min-w-[70px]">
-                                <span class="text-[9px] font-black text-amber-500 block uppercase leading-none">DIA</span>
-                                <span class="text-xl font-black">${t.data}</span>
+                    <div class="card-troca p-4 rounded-2xl flex items-center justify-between shadow-lg">
+                        <div class="flex items-center gap-5">
+                            <div class="text-center min-w-[50px] bg-slate-900 p-2 rounded-lg">
+                                <span class="text-lg font-black text-white">${t.dia}</span>
                             </div>
                             <div class="flex items-center gap-4">
-                                <div>
-                                    <span class="text-[8px] font-bold text-slate-500 uppercase block">Sai do Plantão</span>
-                                    <span class="text-sm font-medium text-slate-400"><s>${t.sainte}</s></span>
-                                </div>
-                                <i class="fa-solid fa-arrow-right-arrow-left text-amber-500 opacity-30"></i>
-                                <div>
-                                    <span class="text-[8px] font-black text-emerald-400 uppercase block tracking-widest">Vai no Lugar</span>
-                                    <span class="text-lg font-black text-white uppercase">${t.entrante}</span>
-                                </div>
+                                <div class="text-xs opacity-50 font-bold"><s>${t.sainte}</s></div>
+                                <i class="fa-solid fa-chevron-right text-amber-500 text-[10px]"></i>
+                                <div class="text-sm font-black text-white uppercase">${t.entrante}</div>
                             </div>
                         </div>
-                        <button onclick="excluir(${t.id})" class="text-slate-600 hover:text-red-500 transition-all ml-4">
-                            <i class="fa-solid fa-trash-can"></i>
-                        </button>
+                        <button onclick="excluir(${t.id})" class="text-slate-600 hover:text-red-500"><i class="fa-solid fa-trash-can"></i></button>
                     </div>
                 `;
             });
         }
 
-        function excluir(id) {
-            db = db.filter(x => x.id !== id);
-            localStorage.setItem('cad_pro_v1', JSON.stringify(db));
-            renderizarTrocas();
+        function analisarErros() {
+            const box = document.getElementById('iaStatusBox');
+            const msg = document.getElementById('iaStatusMsg');
+            if (db.length > 0) {
+                const ultima = db[0];
+                if (ultima.sainte.length < 5 || ultima.entrante.length < 5) {
+                    box.classList.remove('hidden');
+                    msg.innerText = "IA ALERTA: Nomes detectados podem estar incompletos. Verifique.";
+                } else {
+                    box.classList.add('hidden');
+                }
+            }
         }
 
-        // Inicialização
-        window.onload = () => {
-            exibirEscala();
-            renderizarTrocas();
-        };
+        function erroIA(m) {
+            const box = document.getElementById('iaStatusBox');
+            const msg = document.getElementById('iaStatusMsg');
+            box.classList.remove('hidden');
+            msg.innerText = m;
+            setTimeout(() => box.classList.add('hidden'), 4000);
+        }
+
+        function excluir(id) {
+            db = db.filter(x => x.id !== id);
+            localStorage.setItem('cad_v11', JSON.stringify(db));
+            renderTrocas();
+        }
+
+        window.onload = () => { renderEscala(); renderTrocas(); };
     </script>
 </body>
 </html>
