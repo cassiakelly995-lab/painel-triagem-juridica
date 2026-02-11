@@ -3,81 +3,90 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CAD - Santana de Parnaíba | Inteligência e Documentos</title>
+    <title>CAD Santana de Parnaíba - Escala e Trocas</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap');
-        body { font-family: 'Inter', sans-serif; background-color: #f1f5f9; }
+        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
         .gradient-cad { background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); }
-        .glass-card { background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.2); }
+        .escala-container { min-height: 400px; border: 2px dashed #cbd5e1; border-radius: 2rem; display: flex; align-items: center; justify-content: center; overflow: hidden; background: #fff; }
+        canvas { max-width: 100%; height: auto; }
     </style>
 </head>
-<body class="min-h-screen pb-20">
+<body class="pb-20">
 
-    <header class="gradient-cad text-white py-8 shadow-2xl mb-8">
-        <div class="container mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-6">
+    <header class="gradient-cad text-white py-6 shadow-2xl mb-8">
+        <div class="container mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-4">
             <div class="flex items-center gap-4">
-                <div class="bg-amber-500 p-3 rounded-2xl shadow-lg">
-                    <i class="fa-solid fa-scale-balanced text-slate-900 text-2xl"></i>
+                <div class="bg-amber-500 p-2.5 rounded-xl shadow-lg">
+                    <i class="fa-solid fa-scale-balanced text-slate-900 text-xl"></i>
                 </div>
                 <div>
-                    <h1 class="text-xl font-black uppercase tracking-tighter">Comissão de Dativos</h1>
-                    <p class="text-amber-400 text-xs font-bold uppercase tracking-widest">Santana de Parnaíba</p>
+                    <h1 class="text-lg font-black uppercase tracking-tight">Comissão de Dativos</h1>
+                    <p class="text-amber-400 text-[10px] font-bold uppercase tracking-[0.2em]">Santana de Parnaíba</p>
                 </div>
             </div>
-            <div class="bg-slate-800/50 px-6 py-2 rounded-full border border-slate-700 text-sm font-mono">
-                <span id="relogio"></span>
+            <div class="flex items-center gap-4">
+                <div class="text-right hidden md:block text-slate-400 text-xs font-mono">
+                    <p id="relogio"></p>
+                </div>
             </div>
         </div>
     </header>
 
-    <main class="container mx-auto px-4 grid grid-cols-1 lg:grid-cols-3 gap-8">
+    <main class="container mx-auto px-4 grid grid-cols-1 xl:grid-cols-12 gap-8">
         
-        <div class="lg:col-span-1 space-y-8">
+        <div class="xl:col-span-4 space-y-6">
             
-            <div class="bg-white p-6 rounded-[2rem] shadow-xl border border-indigo-50">
-                <h2 class="text-sm font-black text-indigo-900 uppercase tracking-widest mb-4 flex items-center gap-2">
-                    <i class="fa-solid fa-wand-magic-sparkles"></i> IA de Processamento
+            <div class="bg-white p-6 rounded-[2rem] shadow-xl border border-slate-200">
+                <h2 class="text-xs font-black text-slate-400 uppercase tracking-widest mb-4 flex items-center gap-2">
+                    <i class="fa-solid fa-file-arrow-up text-amber-500"></i> Atualizar Escala Mensal
                 </h2>
-                <textarea id="textoInteligente" rows="4" 
-                    placeholder="Cole aqui a mensagem do WhatsApp... (Ex: Dra. Ana vai no lugar da Dra. Julia dia 12/02)"
-                    class="w-full p-4 bg-slate-50 border-2 border-dashed border-slate-200 rounded-2xl outline-none focus:border-indigo-400 transition-all text-sm italic mb-3"></textarea>
-                <button onclick="iaProcessar()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-4 rounded-xl font-bold shadow-lg transition-all active:scale-95">
-                    Processar e Registrar
-                </button>
+                <input type="file" id="uploadFile" class="hidden" accept="image/*,application/pdf" onchange="processarArquivo(this)">
+                <label for="uploadFile" class="w-full flex flex-col items-center justify-center p-6 border-2 border-dashed border-slate-200 rounded-2xl cursor-pointer hover:bg-slate-50 transition-all">
+                    <i class="fa-solid fa-cloud-arrow-up text-slate-300 text-2xl mb-2"></i>
+                    <p class="text-xs font-bold text-slate-500 text-center">Clique para subir a Escala de Fevereiro (JPG ou PDF)</p>
+                </label>
             </div>
 
-            <div class="bg-white p-6 rounded-[2rem] shadow-xl border border-amber-50">
-                <h2 class="text-sm font-black text-amber-900 uppercase tracking-widest mb-4 flex items-center gap-2">
-                    <i class="fa-solid fa-file-pdf"></i> Escala Vigente (JPG/PDF)
+            <div class="bg-indigo-900 p-6 rounded-[2rem] shadow-xl text-white">
+                <h2 class="text-xs font-black text-indigo-300 uppercase tracking-widest mb-4 flex items-center gap-2">
+                    <i class="fa-solid fa-robot"></i> Lançamento Inteligente
                 </h2>
-                <div id="areaArquivo" class="border-2 border-dashed border-amber-200 rounded-2xl p-4 text-center cursor-pointer hover:bg-amber-50 transition-all">
-                    <input type="file" id="uploadEscala" class="hidden" accept="image/*,application/pdf" onchange="salvarArquivo(this)">
-                    <label for="uploadEscala" class="cursor-pointer">
-                        <i class="fa-solid fa-cloud-arrow-up text-amber-500 text-3xl mb-2"></i>
-                        <p class="text-xs text-slate-500 font-bold" id="nomeArquivo">Anexar Escala de Fevereiro</p>
-                    </label>
-                </div>
-                <div id="linkVisualizacao" class="mt-4 hidden">
-                    <a id="btnVerEscala" target="_blank" class="flex items-center justify-center gap-2 bg-slate-900 text-amber-400 py-3 rounded-xl font-bold text-xs uppercase tracking-widest">
-                        <i class="fa-solid fa-eye"></i> Visualizar Escala Salva
-                    </a>
-                </div>
+                <textarea id="textoIA" rows="4" 
+                    placeholder="Cole a mensagem aqui... Ex: Dra. Fernanda substitui a Dra. Claudia dia 22/02"
+                    class="w-full p-4 bg-white/10 border border-white/20 rounded-2xl outline-none focus:border-amber-500 transition-all text-sm italic placeholder:text-white/30 mb-4"></textarea>
+                <button onclick="iaRegistrar()" class="w-full bg-amber-500 hover:bg-amber-400 text-slate-900 py-4 rounded-xl font-black text-xs uppercase tracking-widest shadow-lg transition-all active:scale-95">
+                    Processar Mensagem
+                </button>
             </div>
         </div>
 
-        <div class="lg:col-span-2">
-            <div class="bg-white rounded-[2.5rem] shadow-xl overflow-hidden border border-slate-200">
-                <div class="p-8 border-b border-slate-100 flex justify-between items-center">
-                    <h3 class="font-black text-slate-800 uppercase text-sm tracking-widest">Controle de Substituições</h3>
-                    <div class="flex gap-2">
-                        <button onclick="limparTudo()" class="text-[10px] font-bold text-red-400 hover:text-red-600 uppercase">Limpar Tudo</button>
+        <div class="xl:col-span-8 space-y-8">
+            
+            <div class="bg-white p-4 rounded-[2.5rem] shadow-xl border border-slate-200">
+                <div class="flex justify-between items-center px-4 py-2 mb-2">
+                    <h3 class="font-black text-slate-800 uppercase text-xs tracking-widest">Escala Vigente</h3>
+                    <span id="statusEscala" class="text-[10px] font-bold text-slate-400">Nenhum arquivo carregado</span>
+                </div>
+                <div id="visualizador" class="escala-container">
+                    <div id="placeholderEscala" class="text-center p-10">
+                        <i class="fa-solid fa-image text-slate-200 text-6xl mb-4"></i>
+                        <p class="text-slate-400 font-medium">A escala aparecerá aqui após o upload</p>
                     </div>
+                    <img id="imgExibicao" class="hidden w-full h-full object-contain">
+                    <iframe id="pdfExibicao" class="hidden w-full h-[600px] border-none"></iframe>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-[2.5rem] shadow-xl overflow-hidden border border-slate-200">
+                <div class="p-6 bg-slate-50 border-b border-slate-100">
+                    <h3 class="font-black text-slate-400 text-[10px] uppercase tracking-widest">Alterações na Escala Original</h3>
                 </div>
                 <div class="overflow-x-auto">
                     <table class="w-full text-left">
-                        <tbody id="tabelaCorpo" class="divide-y divide-slate-50">
+                        <tbody id="listaTrocas" class="divide-y divide-slate-50">
                             </tbody>
                     </table>
                 </div>
@@ -86,97 +95,88 @@
     </main>
 
     <script>
-        let trocas = JSON.parse(localStorage.getItem('cad_parnaiba_trocas')) || [];
-        let escalaUrl = localStorage.getItem('cad_escala_url') || "";
+        let trocas = JSON.parse(localStorage.getItem('cad_trocas_v5')) || [];
+        
+        // Carregar arquivo salvo ao iniciar
+        window.onload = () => {
+            const salvo = localStorage.getItem('cad_arquivo_binario');
+            const tipo = localStorage.getItem('cad_arquivo_tipo');
+            if(salvo) exibirArquivo(salvo, tipo);
+            renderizarTrocas();
+        };
 
-        function iaProcessar() {
-            const input = document.getElementById('textoInteligente').value;
-            if(!input) return;
-
-            // IA Simples: Regex para capturar data e nomes
-            const dataMatch = input.match(/(\d{1,2}\/\d{1,2}(\/\d{2,4})?)/);
-            const data = dataMatch ? dataMatch[0] : new Date().toLocaleDateString('pt-BR');
-
-            // Lógica de nomes: Procura por "Dra. Nome" ou "Dr. Nome"
-            const nomes = input.match(/(Dr\.|Dra\.)\s?([A-Z][a-z]+(?:\s[A-Z][a-z]+)*)/g);
-            
-            let sainte = "Não identificado";
-            let entrante = "Não identificado";
-
-            if (nomes && nomes.length >= 2) {
-                // Geralmente quem "vai no lugar" ou "substitui" aparece primeiro em mensagens de aviso
-                // Mas aqui ajustamos: se contiver "no lugar de", o primeiro é entrante e o segundo sainte
-                if(input.toLowerCase().includes("no lugar de") || input.toLowerCase().includes("substitui")) {
-                    entrante = nomes[0];
-                    sainte = nomes[1];
-                } else {
-                    sainte = nomes[0];
-                    entrante = nomes[1];
-                }
-            }
-
-            const novaTroca = {
-                data: data,
-                sainte: sainte,
-                entrante: entrante,
-                original: input.substring(0, 50) + "..."
-            };
-
-            trocas.unshift(novaTroca);
-            localStorage.setItem('cad_parnaiba_trocas', JSON.stringify(trocas));
-            document.getElementById('textoInteligente').value = "";
-            renderizar();
-        }
-
-        function salvarArquivo(input) {
+        function processarArquivo(input) {
             const file = input.files[0];
+            if(!file) return;
+
             const reader = new FileReader();
-            reader.onload = function(e) {
-                escalaUrl = e.target.result;
-                localStorage.setItem('cad_escala_url', escalaUrl);
-                localStorage.setItem('cad_escala_nome', file.name);
-                verificarArquivo();
-            }
+            reader.onload = (e) => {
+                const base64 = e.target.result;
+                localStorage.setItem('cad_arquivo_binario', base64);
+                localStorage.setItem('cad_arquivo_tipo', file.type);
+                exibirArquivo(base64, file.type);
+                document.getElementById('statusEscala').innerText = "Vigente: " + file.name;
+            };
             reader.readAsDataURL(file);
         }
 
-        function verificarArquivo() {
-            const nome = localStorage.getItem('cad_escala_nome');
-            if(escalaUrl) {
-                document.getElementById('linkVisualizacao').classList.remove('hidden');
-                document.getElementById('nomeArquivo').innerText = "Vigente: " + nome;
-                document.getElementById('btnVerEscala').href = escalaUrl;
+        function exibirArquivo(src, tipo) {
+            const img = document.getElementById('imgExibicao');
+            const pdf = document.getElementById('pdfExibicao');
+            const placeholder = document.getElementById('placeholderEscala');
+
+            placeholder.classList.add('hidden');
+            
+            if(tipo.includes('image')) {
+                img.src = src;
+                img.classList.remove('hidden');
+                pdf.classList.add('hidden');
+            } else {
+                pdf.src = src;
+                pdf.classList.remove('hidden');
+                img.classList.add('hidden');
             }
         }
 
-        function renderizar() {
-            const corpo = document.getElementById('tabelaCorpo');
-            corpo.innerHTML = trocas.length ? "" : "<tr><td class='p-20 text-center text-slate-400 italic'>Nenhum registro encontrado.</td></tr>";
+        function iaRegistrar() {
+            const txt = document.getElementById('textoIA').value;
+            if(!txt) return;
+
+            const dataMatch = txt.match(/(\d{1,2}\/\d{1,2})/);
+            const nomes = txt.match(/(Dr\.|Dra\.)\s?([A-Z][a-z]+)/g);
+
+            let sainte = nomes && nomes.length > 1 ? nomes[1] : "Não identificado";
+            let entrante = nomes && nomes.length > 0 ? nomes[0] : "Não identificado";
+
+            const nova = {
+                data: dataMatch ? dataMatch[0] : "--/--",
+                sainte: sainte,
+                entrante: entrante
+            };
+
+            trocas.unshift(nova);
+            localStorage.setItem('cad_trocas_v5', JSON.stringify(trocas));
+            document.getElementById('textoIA').value = "";
+            renderizarTrocas();
+        }
+
+        function renderizarTrocas() {
+            const lista = document.getElementById('listaTrocas');
+            lista.innerHTML = trocas.length ? "" : "<tr><td class='p-10 text-center text-slate-300 italic'>Nenhuma alteração registrada.</td></tr>";
             
             trocas.forEach((t, i) => {
-                corpo.innerHTML += `
-                    <tr class="group hover:bg-slate-50 transition-all">
-                        <td class="px-8 py-6">
-                            <span class="text-[10px] font-black text-slate-400 uppercase block">Data</span>
-                            <span class="font-bold text-slate-700">${t.data}</span>
-                        </td>
-                        <td class="px-8 py-6">
-                            <div class="flex items-center gap-6">
-                                <div class="bg-red-50 p-3 rounded-xl border border-red-100 min-w-[120px]">
-                                    <span class="text-[9px] font-black text-red-400 uppercase block">Sai</span>
-                                    <span class="font-bold text-slate-600">${t.sainte}</span>
-                                </div>
-                                <i class="fa-solid fa-arrow-right-long text-slate-300"></i>
-                                <div class="bg-emerald-50 p-3 rounded-xl border border-emerald-100 min-w-[120px]">
-                                    <span class="text-[9px] font-black text-emerald-500 uppercase block">Entra</span>
-                                    <span class="font-bold text-slate-900">${t.entrante}</span>
-                                </div>
+                lista.innerHTML += `
+                    <tr class="hover:bg-slate-50 transition-all">
+                        <td class="px-8 py-5 font-black text-slate-400 text-xs">${t.data}</td>
+                        <td class="px-8 py-5">
+                            <div class="flex items-center gap-4">
+                                <span class="text-red-400 font-bold text-sm"><s>${t.sainte}</s></span>
+                                <i class="fa-solid fa-arrow-right text-slate-300 text-xs"></i>
+                                <span class="text-emerald-600 font-black text-sm underline underline-offset-4">${t.entrante}</span>
                             </div>
                         </td>
-                        <td class="px-8 py-6 text-right">
-                            <button onclick="excluir(${i})" class="text-slate-300 hover:text-red-500 transition-colors p-2">
-                                <i class="fa-solid fa-trash-can"></i>
-                            </button>
+                        <td class="px-8 py-5 text-right">
+                            <button onclick="excluir(${i})" class="text-slate-200 hover:text-red-500 transition-colors"><i class="fa-solid fa-trash-can"></i></button>
                         </td>
                     </tr>
                 `;
@@ -184,29 +184,15 @@
         }
 
         function excluir(i) {
-            if(confirm("Excluir esta troca?")) {
-                trocas.splice(i, 1);
-                localStorage.setItem('cad_parnaiba_trocas', JSON.stringify(trocas));
-                renderizar();
-            }
+            trocas.splice(i, 1);
+            localStorage.setItem('cad_trocas_v5', JSON.stringify(trocas));
+            renderizarTrocas();
         }
 
-        function limparTudo() {
-            if(confirm("Isso apagará TODO o histórico de trocas. Confirmar?")) {
-                trocas = [];
-                localStorage.clear();
-                location.reload();
-            }
-        }
-
-        function relogio() {
+        setInterval(() => {
             const d = new Date();
-            document.getElementById('relogio').innerText = d.toLocaleDateString('pt-BR') + " | " + d.toLocaleTimeString('pt-BR');
-        }
-
-        setInterval(relogio, 1000);
-        verificarArquivo();
-        renderizar();
+            document.getElementById('relogio').innerText = d.toLocaleDateString() + ' | ' + d.toLocaleTimeString();
+        }, 1000);
     </script>
 </body>
 </html>
