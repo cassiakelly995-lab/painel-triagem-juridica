@@ -3,202 +3,184 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CAD PREMIUM | BLACK EDITION</title>
+    <title>CAD SANTANA | PAINEL DA CÁSSIA</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&display=swap');
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #000000; color: #ffffff; height: 100vh; overflow: hidden; }
-        
-        .glass-dark { background: rgba(17, 24, 39, 0.7); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.05); border-radius: 32px; }
-        .neon-amber { border: 1px solid rgba(251, 191, 36, 0.2); box-shadow: 0 0 30px rgba(251, 191, 36, 0.05); }
-        
-        /* Viewer de PDF customizado */
-        .pdf-frame { width: 100%; height: 100%; border-radius: 24px; border: none; background: #111; }
-        .escala-container { height: calc(100vh - 140px); position: relative; }
-
-        /* Estilo Manual Interativo */
-        .input-manual { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; padding: 12px; font-size: 14px; outline: none; transition: 0.3s; }
-        .input-manual:focus { border-color: #fbbf24; background: rgba(251, 191, 36, 0.05); }
-        
-        .card-troca { background: linear-gradient(180deg, #111827 0%, #000000 100%); border: 1px solid rgba(255,255,255,0.05); border-radius: 24px; transition: 0.4s; }
-        .card-troca:hover { border-color: #fbbf24; transform: scale(1.01); }
-        
-        ::-webkit-scrollbar { width: 4px; }
-        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 10px; }
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;700;800&display=swap');
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #000; color: #fff; height: 100vh; overflow: hidden; }
+        .glass-box { background: #0a0a0a; border: 1px solid #1a1a1a; border-radius: 24px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        .input-clean { background: #111; border: 1px solid #222; border-radius: 12px; padding: 12px; font-weight: 600; color: #fff; outline: none; }
+        .input-clean:focus { border-color: #fbbf24; background: #161616; }
+        .card-registro { background: linear-gradient(to right, #0a0a0a, #000); border: 1px solid #1a1a1a; border-left: 4px solid #fbbf24; border-radius: 16px; transition: 0.3s; }
+        .card-registro:hover { transform: scale(1.01); border-color: #333; }
+        iframe { width: 100%; height: 100%; border-radius: 16px; background: #000; border: none; }
+        ::-webkit-scrollbar { width: 5px; }
+        ::-webkit-scrollbar-thumb { background: #222; border-radius: 10px; }
     </style>
 </head>
 <body class="p-6">
 
-    <header class="max-w-[1800px] mx-auto flex justify-between items-center mb-8">
-        <div class="flex items-center gap-5">
-            <div class="bg-amber-500 text-black w-14 h-14 rounded-2xl flex items-center justify-center shadow-[0_0_40px_rgba(245,158,11,0.2)]">
-                <i class="fa-solid fa-gavel text-2xl"></i>
+    <header class="max-w-[1700px] mx-auto flex justify-between items-center mb-8">
+        <div class="flex items-center gap-4">
+            <div class="bg-amber-500 text-black p-3 rounded-xl shadow-[0_0_20px_rgba(245,158,11,0.2)]">
+                <i class="fa-solid fa-gavel text-xl"></i>
             </div>
             <div>
-                <h1 class="text-2xl font-black uppercase tracking-tighter italic">CAD Intelligence</h1>
-                <p class="text-amber-500 text-[10px] font-bold tracking-[0.5em] uppercase opacity-70">Santana de Parnaíba • Admin</p>
+                <h1 class="text-xl font-extrabold uppercase italic tracking-tighter text-white">CAD Santana de Parnaíba</h1>
+                <p class="text-[9px] font-black text-amber-500 uppercase tracking-[0.4em] opacity-80">Gestão de Triagem • Cássia</p>
             </div>
         </div>
         
         <div class="flex items-center gap-4">
-            <input type="file" id="pdfUp" class="hidden" accept="application/pdf" onchange="handlePDF(this)">
-            <button onclick="document.getElementById('pdfUp').click()" class="bg-white text-black px-8 py-3 rounded-full text-xs font-black uppercase hover:bg-amber-500 transition-all shadow-xl">
-                <i class="fa-solid fa-file-pdf mr-2"></i> Fixar Escala PDF
+            <input type="file" id="upEscala" class="hidden" accept="application/pdf" onchange="processarPDF(this)">
+            <button onclick="document.getElementById('upEscala').click()" class="bg-white text-black px-8 py-3 rounded-full text-[10px] font-black uppercase hover:bg-amber-500 transition-all active:scale-95 shadow-lg">
+                <i class="fa-solid fa-file-arrow-up mr-2"></i> Subir Escala PDF
             </button>
         </div>
     </header>
 
-    <main class="max-w-[1800px] mx-auto grid grid-cols-1 lg:grid-cols-12 gap-10 h-[calc(100vh-160px)]">
+    <main class="max-w-[1700px] mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8 h-[calc(100vh-140px)]">
         
-        <div class="lg:col-span-7 flex flex-col gap-4">
-            <div class="flex justify-between items-center px-4">
-                <span class="text-[10px] font-black text-slate-500 uppercase tracking-widest italic">Documento Oficial</span>
-                <span id="pdfStatus" class="hidden text-emerald-400 text-[10px] font-bold uppercase tracking-widest"><i class="fa-solid fa-circle-check"></i> PDF Sincronizado</span>
-            </div>
-            <div class="escala-container glass-dark neon-amber overflow-hidden">
-                <div id="pdfVazio" class="h-full flex flex-col items-center justify-center opacity-20">
-                    <i class="fa-solid fa-file-invoice text-7xl mb-6"></i>
-                    <p class="text-sm font-black uppercase tracking-[0.2em]">Nenhum PDF carregado</p>
+        <div class="lg:col-span-7 flex flex-col gap-3">
+            <span class="text-[9px] font-black text-slate-600 uppercase tracking-widest px-2 italic">Documento Oficial de Fevereiro</span>
+            <div class="glass-box flex-grow overflow-hidden relative border-amber-500/10">
+                <div id="msgVazio" class="absolute inset-0 flex flex-col items-center justify-center opacity-10">
+                    <i class="fa-solid fa-file-invoice text-8xl mb-4"></i>
+                    <p class="font-black uppercase tracking-[0.5em]">Aguardando PDF</p>
                 </div>
-                <iframe id="pdfViewer" class="pdf-frame hidden"></iframe>
+                <iframe id="pdfFrame" class="hidden"></iframe>
             </div>
         </div>
 
-        <div class="lg:col-span-5 flex flex-col gap-8 overflow-hidden">
+        <div class="lg:col-span-5 flex flex-col gap-6 overflow-hidden">
             
-            <div class="glass-dark p-8 neon-amber">
+            <div class="glass-box p-8 border-amber-500/10">
                 <h2 class="text-[10px] font-black text-amber-500 uppercase tracking-widest mb-6 flex items-center gap-2">
-                    <i class="fa-solid fa-pen-nib"></i> Registro Manual de Troca
+                    <i class="fa-solid fa-pen-to-square"></i> Registrar Substituição Manual
                 </h2>
                 
-                <div class="grid grid-cols-2 gap-4">
-                    <div class="flex flex-col gap-2">
-                        <label class="text-[9px] font-black text-slate-500 uppercase ml-1">Dia do Plantão</label>
-                        <input type="text" id="mDia" placeholder="Ex: 15/02" class="input-manual text-white font-bold">
+                <div class="space-y-4">
+                    <div class="flex flex-col gap-1.5">
+                        <label class="text-[9px] font-bold text-slate-500 uppercase ml-1">Dia do Plantão</label>
+                        <input type="text" id="campoDia" placeholder="Ex: 15/02" class="input-clean">
                     </div>
-                    <div class="flex flex-col gap-2">
-                        <label class="text-[9px] font-black text-slate-500 uppercase ml-1">Advogada que Sai</label>
-                        <input type="text" id="mSainte" placeholder="Dra. Nome" class="input-manual text-slate-400">
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="flex flex-col gap-1.5">
+                            <label class="text-[9px] font-bold text-slate-500 uppercase ml-1">Dra. que SAI</label>
+                            <input type="text" id="campoSai" placeholder="Dra. Nome" class="input-clean text-slate-400 font-normal">
+                        </div>
+                        <div class="flex flex-col gap-1.5">
+                            <label class="text-[9px] font-bold text-emerald-500 uppercase ml-1">Dra. que ENTRA</label>
+                            <input type="text" id="campoEntra" placeholder="Dra. Nome" class="input-clean border-emerald-900/30">
+                        </div>
                     </div>
-                    <div class="flex flex-col gap-2 col-span-2">
-                        <label class="text-[9px] font-black text-emerald-500 uppercase ml-1">Advogada que Assume</label>
-                        <input type="text" id="mEntrante" placeholder="Dra. Nome" class="input-manual text-white font-black border-emerald-500/20">
-                    </div>
+                    <button onclick="registrar()" class="w-full bg-amber-500 text-black py-4 rounded-xl font-black text-xs uppercase tracking-widest hover:bg-amber-400 transition-all shadow-xl mt-2">
+                        Salvar Alteração
+                    </button>
                 </div>
-
-                <button onclick="salvarManual()" class="w-full mt-6 bg-amber-500 text-black py-4 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-amber-400 transition-all shadow-[0_10px_30px_rgba(245,158,11,0.2)]">
-                    Confirmar Substituição
-                </button>
             </div>
 
-            <div class="flex-grow overflow-y-auto pr-3">
-                <div class="flex justify-between items-center mb-6 px-2">
-                    <h3 class="text-[10px] font-black text-slate-600 uppercase tracking-widest">Registros de Fevereiro</h3>
-                    <button onclick="limparTudo()" class="text-[9px] font-bold text-red-900 hover:text-red-500 uppercase transition-colors">Zerar Painel</button>
+            <div class="flex-grow overflow-y-auto pr-2">
+                <div class="flex justify-between items-center mb-4 px-2">
+                    <h3 class="text-[10px] font-black text-slate-700 uppercase tracking-widest italic">Trocas Confirmadas</h3>
+                    <button onclick="resetar()" class="text-[9px] font-bold text-red-900 hover:text-red-500 uppercase">Limpar</button>
                 </div>
-                <div id="listaTrocas" class="space-y-5">
-                    </div>
+                <div id="lista" class="space-y-4"></div>
             </div>
         </div>
     </main>
 
     <script>
-        let db = JSON.parse(localStorage.getItem('cad_v40')) || [];
+        let trocas = JSON.parse(localStorage.getItem('cad_v50')) || [];
 
-        // Gerenciamento de PDF
-        function handlePDF(input) {
+        // FUNÇÃO DE UPLOAD GERAL
+        function processarPDF(input) {
             const file = input.files[0];
-            if (file && file.type === "application/pdf") {
+            if (file) {
                 const reader = new FileReader();
                 reader.onload = (e) => {
-                    localStorage.setItem('pdf_base64_v40', e.target.result);
-                    renderPDF();
+                    localStorage.setItem('pdf_fevereiro', e.target.result);
+                    renderizarPDF();
                 };
                 reader.readAsDataURL(file);
-            } else {
-                alert("Por favor, selecione um arquivo PDF válido.");
             }
         }
 
-        function renderPDF() {
-            const data = localStorage.getItem('pdf_base64_v40');
+        function renderizarPDF() {
+            const data = localStorage.getItem('pdf_fevereiro');
             if (data) {
-                document.getElementById('pdfVazio').style.display = 'none';
-                document.getElementById('pdfStatus').classList.remove('hidden');
-                const viewer = document.getElementById('pdfViewer');
-                viewer.src = data;
-                viewer.classList.remove('hidden');
+                document.getElementById('msgVazio').style.display = 'none';
+                const frame = document.getElementById('pdfFrame');
+                frame.src = data;
+                frame.classList.remove('hidden');
             }
         }
 
-        // Lógica de Registro Manual
-        function salvarManual() {
-            const dia = document.getElementById('mDia').value;
-            const sainte = document.getElementById('mSainte').value;
-            const entrante = document.getElementById('mEntrante').value;
+        // REGISTRO 100% MANUAL
+        function registrar() {
+            const dia = document.getElementById('campoDia').value;
+            const sai = document.getElementById('campoSai').value;
+            const entra = document.getElementById('campoEntra').value;
 
-            if (dia && sainte && entrante) {
-                const nova = { id: Date.now(), dia, sainte, entrante };
-                db.unshift(nova);
-                localStorage.setItem('cad_v40', JSON.stringify(db));
+            if (dia && sai && entra) {
+                trocas.unshift({ id: Date.now(), dia, sai, entra });
+                localStorage.setItem('cad_v50', JSON.stringify(trocas));
                 
                 // Limpar campos
-                document.getElementById('mDia').value = "";
-                document.getElementById('mSainte').value = "";
-                document.getElementById('mEntrante').value = "";
+                document.getElementById('campoDia').value = "";
+                document.getElementById('campoSai').value = "";
+                document.getElementById('campoEntra').value = "";
                 
-                renderLista();
+                desenharLista();
             } else {
-                alert("Antônio avisa: Preencha todos os campos para registrar.");
+                alert("Preencha o dia e os nomes das advogadas.");
             }
         }
 
-        function renderLista() {
-            const container = document.getElementById('listaTrocas');
-            container.innerHTML = db.length ? '' : '<div class="text-center py-20 opacity-10 font-black uppercase tracking-[0.5em]">Sem Registros</div>';
+        function desenharLista() {
+            const box = document.getElementById('lista');
+            box.innerHTML = trocas.length ? '' : '<p class="text-center py-10 text-white/5 font-black uppercase text-xs tracking-widest">Nenhuma troca registrada</p>';
 
-            db.forEach(t => {
-                container.innerHTML += `
-                    <div class="card-troca p-6 flex items-center justify-between">
-                        <div class="flex items-center gap-8">
-                            <div class="bg-amber-500 text-black px-4 py-2 rounded-xl text-center shadow-lg">
-                                <span class="text-[9px] font-black block uppercase leading-none mb-1">DIA</span>
-                                <span class="text-xl font-black italic leading-none">${t.dia}</span>
+            trocas.forEach(t => {
+                box.innerHTML += `
+                    <div class="card-registro p-5 flex items-center justify-between">
+                        <div class="flex items-center gap-6">
+                            <div class="bg-amber-500 text-black w-14 py-2 rounded-xl text-center font-black">
+                                <span class="text-[8px] block leading-none opacity-60">FEV</span>
+                                <span class="text-lg leading-none italic">${t.dia}</span>
                             </div>
-                            <div class="flex items-center gap-6">
+                            <div class="flex items-center gap-4">
                                 <div class="flex flex-col">
-                                    <span class="text-[8px] font-black text-slate-600 uppercase mb-1 tracking-widest">Removida</span>
-                                    <span class="text-sm font-bold text-slate-500 italic"><s>${t.sainte}</s></span>
+                                    <span class="text-[8px] font-bold text-white/20 uppercase tracking-widest">Removida</span>
+                                    <span class="text-xs font-bold text-white/40 italic"><s>${t.sai}</s></span>
                                 </div>
-                                <div class="text-amber-500/30 text-xl animate-pulse">
-                                    <i class="fa-solid fa-chevron-right"></i>
-                                </div>
+                                <i class="fa-solid fa-arrow-right text-amber-500/20 text-xs"></i>
                                 <div class="flex flex-col">
-                                    <span class="text-[8px] font-black text-emerald-500 uppercase mb-1 tracking-widest">Assume Plantão</span>
-                                    <span class="text-lg font-black text-white uppercase tracking-tight italic border-b-2 border-emerald-500/50">${t.entrante}</span>
+                                    <span class="text-[8px] font-black text-emerald-500 uppercase tracking-widest">Assume</span>
+                                    <span class="text-base font-black text-white italic underline decoration-emerald-500/30">${t.entra}</span>
                                 </div>
                             </div>
                         </div>
-                        <button onclick="remover(${t.id})" class="text-slate-800 hover:text-red-500 transition-all"><i class="fa-solid fa-circle-xmark text-xl"></i></button>
+                        <button onclick="apagar(${t.id})" class="text-white/10 hover:text-red-500 transition-all"><i class="fa-solid fa-xmark"></i></button>
                     </div>
                 `;
             });
         }
 
-        function remover(id) {
-            db = db.filter(x => x.id !== id);
-            localStorage.setItem('cad_v40', JSON.stringify(db));
-            renderLista();
+        function apagar(id) {
+            trocas = trocas.filter(x => x.id !== id);
+            localStorage.setItem('cad_v50', JSON.stringify(trocas));
+            desenharLista();
         }
 
-        function limparTudo() {
-            if(confirm("Antônio confirma: Deseja apagar todo o histórico?")) {
-                db = []; localStorage.removeItem('cad_v40'); renderLista();
+        function resetar() {
+            if(confirm("Deseja apagar o histórico de trocas?")) {
+                trocas = []; localStorage.removeItem('cad_v50'); desenharLista();
             }
         }
 
-        window.onload = () => { renderPDF(); renderLista(); };
+        window.onload = () => { renderizarPDF(); desenharLista(); };
     </script>
 </body>
 </html>
