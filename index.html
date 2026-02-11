@@ -3,113 +3,70 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CAD Santana de Parnaíba</title>
+    <title>CAD Santana de Parnaíba | Oficial</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&display=swap');
-        body { 
-            font-family: 'Plus Jakarta Sans', sans-serif; 
-            background-color: #f8fafc; 
-            color: #1e293b;
-            margin: 0;
-            height: 100vh;
-            display: flex;
-            flex-direction: column;
-        }
-        .header-glass { background: #ffffff; border-bottom: 1px solid #e2e8f0; }
-        .escala-container { 
-            background: #ffffff; 
-            border: 1px solid #e2e8f0; 
-            border-radius: 16px; 
-            height: 100%;
-            overflow: auto;
-            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
-        }
-        .painel-controle {
-            background: #ffffff;
-            border-radius: 20px;
-            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1);
-            border: 1px solid #e2e8f0;
-        }
-        .card-troca {
-            border-left: 4px solid #f59e0b;
-            background: #ffffff;
-            transition: all 0.2s;
-            border: 1px solid #e2e8f0;
-            border-left-width: 4px;
-        }
-        .card-troca:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
-        ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: #fdfdfd; color: #1e293b; margin: 0; height: 100vh; overflow: hidden; }
+        .escala-container { border: 1px solid #e2e8f0; border-radius: 20px; background: #fff; height: 100%; overflow-y: auto; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.05); }
+        .input-card { background: #ffffff; border: 1px solid #e2e8f0; border-radius: 24px; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.04); }
+        .card-registro { border: 1px solid #f1f5f9; background: #fff; border-left: 4px solid #f59e0b; transition: 0.2s; }
+        .card-registro:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
     </style>
 </head>
-<body>
+<body class="flex flex-col">
 
-    <header class="header-glass py-4 px-8 flex justify-between items-center">
+    <nav class="py-4 px-8 border-b border-slate-100 flex justify-between items-center bg-white/80 backdrop-blur-md sticky top-0 z-50">
         <div class="flex items-center gap-3">
-            <div class="bg-slate-900 p-2 rounded-lg text-amber-400">
-                <i class="fa-solid fa-scale-balanced"></i>
-            </div>
-            <div>
-                <h1 class="text-sm font-extrabold uppercase tracking-tight">CAD Santana de Parnaíba</h1>
-                <p class="text-[10px] font-bold text-slate-400 uppercase">Gestão de Plantão Inteligente</p>
-            </div>
+            <div class="bg-slate-900 p-2 rounded-xl text-amber-400 shadow-lg"><i class="fa-solid fa-scale-balanced"></i></div>
+            <h1 class="text-sm font-extrabold uppercase tracking-tight">CAD Santana de Parnaíba</h1>
         </div>
-        <div id="relogio" class="text-[11px] font-mono text-slate-400"></div>
-    </header>
+        <div id="clock" class="text-[10px] font-bold text-slate-400 uppercase tracking-widest"></div>
+    </nav>
 
-    <main class="flex-grow p-6 grid grid-cols-1 lg:grid-cols-12 gap-6 overflow-hidden">
+    <main class="flex-grow p-6 grid grid-cols-1 lg:grid-cols-12 gap-8 overflow-hidden">
         
         <div class="lg:col-span-7 flex flex-col gap-3">
-            <div class="flex justify-between items-center px-1">
-                <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Escala Oficial de Fevereiro</span>
-                <span class="text-[10px] text-amber-600 font-bold bg-amber-50 px-2 py-0.5 rounded">Visualização Pública</span>
-            </div>
-            <div class="escala-container relative">
+            <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest px-2 italic">Documento Oficial de Triagem</span>
+            <div class="escala-container">
                 <img src="escala.jpg" alt="Escala de Fevereiro" 
-                     onerror="this.parentElement.innerHTML='<div class=\'h-full flex flex-col items-center justify-center p-10 text-center\'><i class=\'fa-solid fa-image-slash text-slate-200 text-5xl mb-4\'></i><p class=\'text-slate-400 font-bold text-xs uppercase\'>A imagem escala.jpg ainda não foi subida no GitHub</p></div>'" 
+                     onerror="this.parentElement.innerHTML='<div class=\'h-full flex flex-col items-center justify-center p-10 opacity-30 text-center\'><i class=\'fa-solid fa-cloud-arrow-up text-5xl mb-4\'></i><p class=\'text-xs font-bold uppercase\'>Aguardando arquivo escala.jpg no GitHub</p></div>'" 
                      class="w-full h-auto">
             </div>
         </div>
 
         <div class="lg:col-span-5 flex flex-col gap-6 overflow-hidden">
             
-            <div class="painel-controle p-6">
-                <div class="flex items-center gap-2 mb-4">
-                    <i class="fa-solid fa-bolt-lightning text-amber-500"></i>
-                    <span class="text-[10px] font-black uppercase text-slate-500 tracking-widest">Registro Automático</span>
+            <div class="input-card p-8">
+                <div class="flex items-center gap-2 mb-6">
+                    <span class="bg-amber-100 text-amber-600 p-1.5 rounded-md text-[10px]"><i class="fa-solid fa-bolt"></i></span>
+                    <h2 class="text-[10px] font-black text-slate-500 uppercase tracking-widest">Registro de Troca Inteligente</h2>
                 </div>
-                
+
                 <textarea id="textoIA" rows="2" 
-                    placeholder="Dra. Juliana trocou com Dra. Beatriz dia 15/02..."
-                    class="w-full text-lg font-medium text-slate-800 outline-none placeholder:text-slate-300 resize-none mb-4"></textarea>
+                    placeholder="Dra. Paula substitui Dra. Silvia no dia 15/02..."
+                    class="w-full text-xl font-medium text-slate-800 outline-none placeholder:text-slate-300 resize-none mb-6"></textarea>
                 
-                <div id="alertaErro" class="hidden mb-4 p-3 bg-red-50 border border-red-100 text-red-600 text-[11px] font-bold rounded-xl italic">
-                    <i class="fa-solid fa-triangle-exclamation mr-2"></i> IA: Verifique os nomes e a data (Ex: 15/02).
+                <div class="flex flex-col gap-3">
+                    <button onclick="analisar()" class="w-full bg-slate-900 text-white py-4 rounded-2xl font-bold text-xs uppercase tracking-widest hover:bg-slate-800 transition-all shadow-xl active:scale-95">
+                        Identificar e Salvar
+                    </button>
+                    <button onclick="document.getElementById('m-box').classList.toggle('hidden')" class="text-[10px] font-bold text-slate-400 uppercase hover:text-slate-600 transition-all">Inserção Manual</button>
                 </div>
 
-                <div class="flex gap-2">
-                    <button onclick="processarIA()" class="flex-grow bg-slate-900 text-white py-3 rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-slate-800 transition-all active:scale-95 shadow-lg">
-                        Registrar Troca
-                    </button>
-                    <button onclick="document.getElementById('mSection').classList.toggle('hidden')" class="bg-slate-100 text-slate-600 px-4 rounded-xl text-[10px] font-bold uppercase hover:bg-slate-200 transition-all">
-                        Manual
-                    </button>
-                </div>
-
-                <div id="mSection" class="hidden grid grid-cols-2 gap-2 mt-4">
-                    <input id="mD" placeholder="Dia" class="p-2 border border-slate-200 rounded-lg text-xs font-bold outline-none">
-                    <input id="mS" placeholder="Sai" class="p-2 border border-slate-200 rounded-lg text-xs font-bold outline-none">
-                    <input id="mE" placeholder="Assume" class="p-2 border border-slate-200 rounded-lg text-xs font-bold outline-none col-span-2">
-                    <button onclick="salvarManual()" class="col-span-2 bg-amber-500 text-white py-2 rounded-lg font-black text-[10px] uppercase">Salvar</button>
+                <div id="m-box" class="hidden grid grid-cols-2 gap-2 mt-4 pt-4 border-t border-slate-50">
+                    <input id="mD" placeholder="Data" class="p-2 border border-slate-100 rounded-lg text-xs outline-none focus:border-amber-400">
+                    <input id="mS" placeholder="Sai" class="p-2 border border-slate-100 rounded-lg text-xs outline-none focus:border-amber-400">
+                    <input id="mE" placeholder="Assume" class="p-2 border border-slate-100 rounded-lg text-xs outline-none focus:border-amber-400 col-span-2">
+                    <button onclick="saveManual()" class="col-span-2 bg-amber-500 text-white py-2 rounded-lg font-black text-[10px] uppercase">Registrar</button>
                 </div>
             </div>
 
-            <div class="flex-grow overflow-y-auto space-y-3">
-                <div class="flex justify-between items-center px-2 mb-1">
-                    <h3 class="text-[10px] font-black text-slate-400 uppercase tracking-widest italic">Trocas Confirmadas</h3>
-                    <button onclick="limpar()" class="text-[9px] font-bold text-slate-300 hover:text-red-400 uppercase">Limpar Tudo</button>
+            <div class="flex-grow overflow-y-auto space-y-4 pr-2">
+                <div class="flex justify-between items-center px-2">
+                    <h3 class="text-[10px] font-black text-slate-400 uppercase tracking-widest italic">Trocas Realizadas</h3>
+                    <button onclick="limparTudo()" class="text-[9px] font-bold text-red-300 hover:text-red-500 uppercase">Limpar Tudo</button>
                 </div>
                 <div id="lista" class="space-y-3"></div>
             </div>
@@ -117,78 +74,63 @@
     </main>
 
     <script>
-        let trocas = JSON.parse(localStorage.getItem('cad_v14')) || [];
+        let trocas = JSON.parse(localStorage.getItem('cad_final_v1')) || [];
 
-        function processarIA() {
-            const txt = document.getElementById('textoIA').value;
-            const alerta = document.getElementById('alertaErro');
-            if(!txt) return;
+        function analisar() {
+            const t = document.getElementById('textoIA').value;
+            if(!t) return;
 
-            const regexNomes = /(?:Dra?\.\s?)([A-ZÀ-Ú][a-zà-ú]+(?:\s[A-ZÀ-Ú][a-zà-ú]+)*)/g;
-            const matches = [...txt.matchAll(regexNomes)];
-            const dataMatch = txt.match(/(\d{1,2}\/\d{1,2})/);
+            const n = [...t.matchAll(/(?:Dra?\.\s?)([A-ZÀ-Ú][a-zà-ú]+(?:\s[A-ZÀ-Ú][a-zà-ú]+)*)/g)];
+            const d = t.match(/(\d{1,2}\/\d{1,2})/);
 
-            if(matches.length < 2 || !dataMatch) {
-                alerta.classList.remove('hidden');
-                setTimeout(() => alerta.classList.add('hidden'), 4000);
-                return;
-            }
-
-            // A inteligência: "A trocou com B" -> B assume, A sai.
-            salvar(dataMatch[0], "Dra. " + matches[1][1], "Dra. " + matches[0][1]);
-            document.getElementById('textoIA').value = "";
-        }
-
-        function salvarManual() {
-            const d = document.getElementById('mD').value;
-            const s = document.getElementById('mS').value;
-            const e = document.getElementById('mE').value;
-            if(d && s && e) {
-                salvar(d, s, e);
-                document.getElementById('mSection').classList.add('hidden');
+            if(n.length >= 2 && d) {
+                // A primeira mencionada assume, a segunda sai
+                gravar(d[0], "Dra. " + n[1][1], "Dra. " + n[0][1]);
+                document.getElementById('textoIA').value = "";
+            } else {
+                alert("IA: Não identifiquei os nomes ou a data. Tente o modo manual.");
             }
         }
 
-        function salvar(dia, sainte, entrante) {
+        function saveManual() {
+            const d = document.getElementById('mD').value, s = document.getElementById('mS').value, e = document.getElementById('mE').value;
+            if(d && s && e) { gravar(d, s, e); document.getElementById('m-box').classList.add('hidden'); }
+        }
+
+        function gravar(dia, sainte, entrante) {
             trocas.unshift({ id: Date.now(), dia, sainte, entrante });
-            localStorage.setItem('cad_v14', JSON.stringify(trocas));
+            localStorage.setItem('cad_final_v1', JSON.stringify(trocas));
             render();
         }
 
         function render() {
-            const container = document.getElementById('lista');
-            container.innerHTML = trocas.length ? '' : '<div class="text-center py-20 opacity-20"><i class="fa-solid fa-list-check text-4xl mb-2"></i><p class="text-[10px] font-black uppercase tracking-widest">Nenhuma alteração</p></div>';
-
+            const c = document.getElementById('lista');
+            c.innerHTML = trocas.length ? '' : '<div class="text-center py-20 text-slate-300 font-bold uppercase text-[10px] tracking-widest">Sem registros</div>';
             trocas.forEach(t => {
-                container.innerHTML += `
-                    <div class="card-troca p-4 flex items-center justify-between">
-                        <div class="flex items-center gap-4">
-                            <div class="text-center bg-slate-50 border border-slate-100 px-3 py-1 rounded-lg">
-                                <span class="text-[9px] font-black text-slate-400 block uppercase">FEV</span>
-                                <span class="text-sm font-black text-slate-800">${t.dia}</span>
+                c.innerHTML += `
+                    <div class="card-registro p-5 rounded-2xl flex items-center justify-between">
+                        <div class="flex items-center gap-6">
+                            <div class="text-center bg-slate-50 border border-slate-100 px-3 py-1.5 rounded-xl">
+                                <span class="text-[8px] font-black text-slate-400 block uppercase mb-0.5">FEV</span>
+                                <span class="text-base font-black text-slate-700">${t.dia}</span>
                             </div>
                             <div class="flex flex-col">
-                                <span class="text-[8px] font-bold text-slate-300 uppercase">Sai: <s class="text-slate-400">${t.sainte}</s></span>
-                                <span class="text-xs font-black text-slate-800 uppercase tracking-tighter">Entra: <span class="text-emerald-600 underline">${t.entrante}</span></span>
+                                <span class="text-[9px] font-bold text-slate-300 uppercase leading-none mb-1">Sai: <s class="text-slate-400">${t.sainte}</s></span>
+                                <span class="text-sm font-extrabold text-slate-800 uppercase tracking-tighter">Entra: <span class="text-emerald-600 underline">${t.entrante}</span></span>
                             </div>
                         </div>
-                        <button onclick="excluir(${t.id})" class="text-slate-200 hover:text-red-400 transition-colors"><i class="fa-solid fa-xmark text-sm"></i></button>
+                        <button onclick="del(${t.id})" class="text-slate-200 hover:text-red-400 transition-all"><i class="fa-solid fa-xmark"></i></button>
                     </div>
                 `;
             });
         }
 
-        function excluir(id) {
-            trocas = trocas.filter(t => t.id !== id);
-            localStorage.setItem('cad_v14', JSON.stringify(trocas));
-            render();
-        }
-
-        function limpar() { if(confirm("Limpar histórico?")) { trocas = []; localStorage.removeItem('cad_v14'); render(); } }
+        function del(id) { trocas = trocas.filter(x => x.id !== id); localStorage.setItem('cad_final_v1', JSON.stringify(trocas)); render(); }
+        function limparTudo() { if(confirm("Deseja apagar tudo?")) { trocas = []; localStorage.removeItem('cad_final_v1'); render(); } }
 
         setInterval(() => {
             const d = new Date();
-            document.getElementById('relogio').innerText = d.toLocaleDateString('pt-BR') + ' • ' + d.toLocaleTimeString('pt-BR');
+            document.getElementById('clock').innerText = d.toLocaleDateString('pt-BR') + ' • ' + d.toLocaleTimeString('pt-BR');
         }, 1000);
 
         render();
