@@ -3,125 +3,119 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SISTEMA CAD - INTELIGÊNCIA E CONTROLE</title>
+    <title>CAD Santana de Parnaíba | Intelligence Premium</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap');
-        body { font-family: 'Inter', sans-serif; background-color: #020617; color: #f8fafc; overflow: hidden; }
-        .main-grid { height: calc(100vh - 80px); }
-        .escala-container { background: #000; border: 2px solid #1e293b; border-radius: 24px; overflow: auto; }
-        .panel-right { background: rgba(15, 23, 42, 0.5); backdrop-filter: blur(10px); }
-        .card-troca { border-left: 4px solid #fbbf24; background: #1e293b; transition: 0.3s; }
-        .ia-alert { background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.3); color: #fca5a5; }
-        ::-webkit-scrollbar { width: 5px; }
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&display=swap');
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #020617; color: #f8fafc; overflow: hidden; }
+        .glass-panel { background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.05); }
+        .escala-container { height: calc(100vh - 120px); border-radius: 30px; border: 2px solid #1e293b; background: #000; overflow: auto; position: relative; }
+        .card-sub { background: linear-gradient(145deg, #1e293b, #0f172a); border-radius: 20px; border-left: 4px solid #fbbf24; transition: 0.3s; }
+        .card-sub:hover { transform: translateY(-3px); box-shadow: 0 10px 30px -10px rgba(0,0,0,0.5); }
+        ::-webkit-scrollbar { width: 4px; }
         ::-webkit-scrollbar-thumb { background: #334155; border-radius: 10px; }
+        .shimmer { background: linear-gradient(90deg, #1e293b 0%, #334155 50%, #1e293b 100%); background-size: 200% 100%; animation: shimmer 2s infinite; }
+        @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
     </style>
 </head>
-<body>
+<body class="p-4 md:p-8">
 
-    <header class="h-20 flex items-center px-8 border-b border-slate-800 bg-slate-950">
-        <div class="container mx-auto flex justify-between items-center">
-            <div class="flex items-center gap-4">
-                <div class="bg-amber-500 text-black p-2 rounded-lg shadow-lg">
-                    <i class="fa-solid fa-shield-halved text-xl"></i>
-                </div>
-                <div>
-                    <h1 class="text-lg font-black uppercase tracking-tighter">CAD Santana de Parnaíba</h1>
-                    <p class="text-amber-500 text-[9px] font-bold tracking-[0.3em] uppercase italic">Gestão e Triagem Inteligente</p>
-                </div>
-            </div>
-            
-            <div class="flex gap-4">
-                <button onclick="document.getElementById('fileInput').click()" class="bg-amber-500 text-black px-6 py-2 rounded-full text-[10px] font-black uppercase transition-all flex items-center gap-2">
-                    <i class="fa-solid fa-file-export"></i> Expor Escala de Fevereiro
-                </button>
-                <input type="file" id="fileInput" class="hidden" accept="image/*,application/pdf" onchange="uploadEscala(this)">
-            </div>
-        </div>
-    </header>
-
-    <main class="container mx-auto p-4 main-grid grid grid-cols-1 lg:grid-cols-12 gap-6">
+    <main class="max-w-[1600px] mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8 h-full">
         
-        <div class="lg:col-span-5 flex flex-col gap-3">
-            <div class="flex items-center justify-between px-2">
-                <span class="text-[10px] font-black text-slate-500 uppercase tracking-widest italic">Documento Oficial de Triagem</span>
-            </div>
-            <div id="escalaContainer" class="escala-container h-full flex items-center justify-center relative">
-                <div id="placeholder" class="text-center opacity-30 p-10">
-                    <i class="fa-solid fa-image text-7xl mb-4"></i>
-                    <p class="font-bold uppercase tracking-widest text-xs italic">Nenhuma Escala Exposta</p>
+        <div class="lg:col-span-5 flex flex-col gap-4">
+            <div class="flex items-center justify-between px-4">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 bg-amber-500 rounded-xl flex items-center justify-center text-black shadow-lg shadow-amber-500/20">
+                        <i class="fa-solid fa-calendar-check"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-sm font-extrabold uppercase tracking-widest leading-none">Escala Oficial</h1>
+                        <span class="text-[10px] text-amber-500 font-bold uppercase tracking-[0.3em]">Fevereiro 2026</span>
+                    </div>
                 </div>
-                <img id="renderImg" class="hidden w-full h-auto">
-                <embed id="renderPdf" class="hidden w-full h-full" type="application/pdf">
+                <button onclick="document.getElementById('fileUp').click()" class="text-[10px] font-black uppercase bg-slate-800 px-4 py-2 rounded-full border border-slate-700 hover:bg-slate-700 transition-all">
+                    <i class="fa-solid fa-upload mr-2"></i> Fixar Escala
+                </button>
+                <input type="file" id="fileUp" class="hidden" accept="image/*,application/pdf" onchange="forceUpload(this)">
+            </div>
+
+            <div id="viewer" class="escala-container flex items-center justify-center">
+                <div id="msgVazio" class="text-center p-10">
+                    <div class="w-20 h-20 bg-slate-900 rounded-full flex items-center justify-center mx-auto mb-4 border border-slate-800">
+                        <i class="fa-solid fa-image text-slate-700 text-3xl"></i>
+                    </div>
+                    <p class="text-xs font-bold text-slate-500 uppercase tracking-widest">Nenhuma escala exposta no momento</p>
+                </div>
+                <img id="escalaImg" class="hidden w-full h-auto">
+                <iframe id="escalaPdf" class="hidden w-full h-full border-none"></iframe>
             </div>
         </div>
 
-        <div class="lg:col-span-7 flex flex-col gap-6 overflow-hidden">
+        <div class="lg:col-span-7 flex flex-col gap-6">
             
-            <div class="panel-right p-6 rounded-[32px] border border-slate-800 shadow-2xl">
-                <div class="flex justify-between items-center mb-4">
-                    <div class="flex items-center gap-2 text-amber-500">
-                        <i class="fa-solid fa-robot animate-pulse"></i>
-                        <span class="text-[10px] font-black uppercase tracking-widest">Painel de Comandos</span>
+            <div class="glass-panel p-8 rounded-[40px] shadow-2xl">
+                <div class="flex justify-between items-center mb-6">
+                    <span class="text-[10px] font-black text-amber-500 uppercase tracking-[0.4em]">Cérebro de Triagem</span>
+                    <div class="flex gap-2">
+                        <div class="w-2 h-2 rounded-full bg-red-500 animate-pulse"></div>
+                        <div class="w-2 h-2 rounded-full bg-amber-500 animate-pulse" style="animation-delay: 0.2s"></div>
+                        <div class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" style="animation-delay: 0.4s"></div>
                     </div>
-                    <button onclick="toggleManual()" class="text-[10px] font-bold text-slate-400 hover:text-white uppercase underline decoration-amber-500 underline-offset-4">Inserção Manual</button>
                 </div>
-
-                <div id="iaSection">
-                    <textarea id="rawText" rows="2" 
-                        placeholder="Ex: Dra. Paula entra no lugar da Dra. Silvia dia 22/02..."
-                        class="w-full bg-transparent text-white text-lg font-bold outline-none placeholder:text-slate-700 resize-none"></textarea>
-                    <button onclick="processarIA()" class="mt-4 w-full bg-white text-black py-3 rounded-xl font-black text-xs uppercase tracking-widest hover:bg-amber-500 transition-all">Identificar Automaticamente</button>
-                </div>
-
-                <div id="manualSection" class="hidden grid grid-cols-3 gap-3">
-                    <input id="mDia" placeholder="Dia (Ex: 15/02)" class="bg-slate-900 border border-slate-700 p-3 rounded-xl text-sm outline-none text-white font-bold">
-                    <input id="mSainte" placeholder="Dra. que sai" class="bg-slate-900 border border-slate-700 p-3 rounded-xl text-sm outline-none text-white font-bold">
-                    <input id="mEntrante" placeholder="Dra. que entra" class="bg-slate-900 border border-slate-700 p-3 rounded-xl text-sm outline-none text-white font-bold">
-                    <button onclick="registrarManual()" class="col-span-3 bg-amber-500 text-black py-3 rounded-xl font-black text-xs uppercase">Salvar Registro Manual</button>
+                
+                <textarea id="textoIA" rows="2" 
+                    placeholder="Ex: Dra. Juliana trocou com Dra. Beatriz dia 15/02..."
+                    class="w-full bg-transparent text-white text-xl font-medium outline-none placeholder:text-slate-700 resize-none mb-6"></textarea>
+                
+                <div class="flex items-center justify-between border-t border-slate-800 pt-6">
+                    <div class="text-[10px] text-slate-500 font-bold max-w-[200px]">
+                        A IA identifica quem sai, quem assume e a data automaticamente.
+                    </div>
+                    <button onclick="processarTroca()" class="bg-white text-black px-12 py-4 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-amber-500 transition-all shadow-xl active:scale-95">
+                        Registrar Troca
+                    </button>
                 </div>
             </div>
 
-            <div id="iaStatusBox" class="ia-alert p-4 rounded-2xl text-[11px] font-bold flex items-center gap-3 hidden">
-                <i class="fa-solid fa-triangle-exclamation text-amber-500"></i>
-                <span id="iaStatusMsg"></span>
-            </div>
-
-            <div class="flex-grow overflow-y-auto pr-2 space-y-3">
-                <h3 class="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-4 ml-2">Histórico de Alterações</h3>
-                <div id="listaTrocas" class="space-y-3"></div>
+            <div class="flex-grow overflow-y-auto space-y-4 pr-2">
+                <div class="flex items-center justify-between px-2 mb-2">
+                    <h2 class="text-[10px] font-black text-slate-500 uppercase tracking-widest italic">Histórico de Substituições</h2>
+                    <button onclick="limparTudo()" class="text-[9px] font-bold text-red-500/50 hover:text-red-500 uppercase">Limpar Histórico</button>
+                </div>
+                <div id="listaTrocas" class="space-y-4">
+                    </div>
             </div>
         </div>
     </main>
 
     <script>
-        let db = JSON.parse(localStorage.getItem('cad_v11')) || [];
+        let trocas = JSON.parse(localStorage.getItem('cad_v12')) || [];
 
-        function toggleManual() {
-            document.getElementById('iaSection').classList.toggle('hidden');
-            document.getElementById('manualSection').classList.toggle('hidden');
-        }
-
-        function uploadEscala(input) {
+        // Upload Potencializado
+        function forceUpload(input) {
             const file = input.files[0];
             if (!file) return;
+
             const reader = new FileReader();
             reader.onload = (e) => {
-                localStorage.setItem('escala_bin', e.target.result);
-                localStorage.setItem('escala_mime', file.type);
+                const base64 = e.target.result;
+                localStorage.setItem('escala_img_v12', base64);
+                localStorage.setItem('escala_type_v12', file.type);
                 renderEscala();
             };
             reader.readAsDataURL(file);
         }
 
         function renderEscala() {
-            const data = localStorage.getItem('escala_bin');
-            const type = localStorage.getItem('escala_mime');
+            const data = localStorage.getItem('escala_img_v12');
+            const type = localStorage.getItem('escala_type_v12');
             if (!data) return;
-            document.getElementById('placeholder').classList.add('hidden');
-            const img = document.getElementById('renderImg');
-            const pdf = document.getElementById('renderPdf');
+
+            document.getElementById('msgVazio').classList.add('hidden');
+            const img = document.getElementById('escalaImg');
+            const pdf = document.getElementById('escalaPdf');
+
             if (type.includes('image')) {
                 img.src = data; img.classList.remove('hidden'); pdf.classList.add('hidden');
             } else {
@@ -129,87 +123,90 @@
             }
         }
 
-        function processarIA() {
-            const texto = document.getElementById('rawText').value;
-            if (!texto) return;
+        // IA de Identificação de Nomes (Trocou com...)
+        function processarTroca() {
+            const txt = document.getElementById('textoIA').value;
+            if (!txt) return;
+
             const regexNomes = /(?:Dra?\.\s?)([A-ZÀ-Ú][a-zà-ú]+(?:\s[A-ZÀ-Ú][a-zà-ú]+)*)/g;
-            const matches = [...texto.matchAll(regexNomes)];
-            const dataMatch = texto.match(/(\d{1,2}\/\d{1,2})/);
-            
-            if (matches.length < 2) { 
-                erroIA("ERRO: O sistema não identificou as duas advogadas no texto."); 
-                return; 
+            const matches = [...txt.matchAll(regexNomes)];
+            const dataMatch = txt.match(/(\d{1,2}\/\d{1,2})/);
+
+            let sainte = "---";
+            let entrante = "---";
+
+            if (matches.length >= 2) {
+                // Identifica o padrão "A trocou com B" -> B é quem assume
+                if (txt.toLowerCase().includes("trocou com") || txt.toLowerCase().includes("substitui")) {
+                    entrante = "Dra. " + matches[0][1];
+                    sainte = "Dra. " + matches[1][1];
+                } else {
+                    entrante = "Dra. " + matches[0][1];
+                    sainte = "Dra. " + matches[1][1];
+                }
             }
 
-            salvarRegistro(dataMatch ? dataMatch[0] : "FEV", "Dra. " + matches[1][1], "Dra. " + matches[0][1]);
-            document.getElementById('rawText').value = "";
-            analisarErros();
-        }
+            const nova = {
+                id: Date.now(),
+                data: dataMatch ? dataMatch[0] : "FEV",
+                sainte,
+                entrante,
+                hora: new Date().toLocaleTimeString('pt-BR', {hour: '2-digit', minute:'2-digit'})
+            };
 
-        function registrarManual() {
-            const dia = document.getElementById('mDia').value;
-            const sainte = document.getElementById('mSainte').value;
-            const entrante = document.getElementById('mEntrante').value;
-            if(!dia || !sainte || !entrante) return;
-            salvarRegistro(dia, sainte, entrante);
-            document.getElementById('mDia').value = ""; document.getElementById('mSainte').value = ""; document.getElementById('mEntrante').value = "";
-            analisarErros();
-        }
-
-        function salvarRegistro(dia, sainte, entrante) {
-            db.unshift({ id: Date.now(), dia, sainte, entrante });
-            localStorage.setItem('cad_v11', JSON.stringify(db));
+            trocas.unshift(nova);
+            localStorage.setItem('cad_v12', JSON.stringify(trocas));
+            document.getElementById('textoIA').value = "";
             renderTrocas();
         }
 
         function renderTrocas() {
             const container = document.getElementById('listaTrocas');
-            container.innerHTML = db.length ? '' : '<p class="text-slate-700 italic text-center p-10 font-bold">NENHUMA TROCA REGISTRADA</p>';
-            db.forEach(t => {
+            container.innerHTML = trocas.length ? '' : '<div class="p-10 text-center text-slate-800 font-black italic">SISTEMA EM STANDBY...</div>';
+
+            trocas.forEach(t => {
                 container.innerHTML += `
-                    <div class="card-troca p-4 rounded-2xl flex items-center justify-between shadow-lg">
-                        <div class="flex items-center gap-5">
-                            <div class="text-center min-w-[50px] bg-slate-900 p-2 rounded-lg">
-                                <span class="text-lg font-black text-white">${t.dia}</span>
+                    <div class="card-sub p-6 flex items-center justify-between">
+                        <div class="flex items-center gap-8">
+                            <div class="text-center bg-slate-950 p-3 rounded-2xl min-w-[70px] border border-slate-800">
+                                <span class="text-[9px] font-black text-amber-500 block uppercase mb-1 tracking-tighter">DIA</span>
+                                <span class="text-xl font-black text-white">${t.data}</span>
                             </div>
-                            <div class="flex items-center gap-4">
-                                <div class="text-xs opacity-50 font-bold"><s>${t.sainte}</s></div>
-                                <i class="fa-solid fa-chevron-right text-amber-500 text-[10px]"></i>
-                                <div class="text-sm font-black text-white uppercase">${t.entrante}</div>
+                            <div class="flex items-center gap-6">
+                                <div>
+                                    <span class="text-[8px] font-black text-slate-500 uppercase block tracking-widest">Sainte</span>
+                                    <span class="text-sm font-bold text-slate-400"><s>${t.sainte}</s></span>
+                                </div>
+                                <div class="w-8 h-8 rounded-full bg-slate-900 flex items-center justify-center border border-slate-800">
+                                    <i class="fa-solid fa-arrow-right text-amber-500 text-[10px]"></i>
+                                </div>
+                                <div>
+                                    <span class="text-[8px] font-black text-emerald-400 uppercase block tracking-widest">Assume o lugar</span>
+                                    <span class="text-lg font-black text-white uppercase">${t.entrante}</span>
+                                </div>
                             </div>
                         </div>
-                        <button onclick="excluir(${t.id})" class="text-slate-600 hover:text-red-500"><i class="fa-solid fa-trash-can"></i></button>
+                        <div class="flex items-center gap-4">
+                            <span class="text-[9px] font-bold text-slate-600 font-mono">${t.hora}</span>
+                            <button onclick="excluir(${t.id})" class="text-slate-700 hover:text-red-500 transition-all"><i class="fa-solid fa-circle-xmark"></i></button>
+                        </div>
                     </div>
                 `;
             });
         }
 
-        function analisarErros() {
-            const box = document.getElementById('iaStatusBox');
-            const msg = document.getElementById('iaStatusMsg');
-            if (db.length > 0) {
-                const ultima = db[0];
-                if (ultima.sainte.length < 5 || ultima.entrante.length < 5) {
-                    box.classList.remove('hidden');
-                    msg.innerText = "IA ALERTA: Nomes detectados podem estar incompletos. Verifique.";
-                } else {
-                    box.classList.add('hidden');
-                }
-            }
-        }
-
-        function erroIA(m) {
-            const box = document.getElementById('iaStatusBox');
-            const msg = document.getElementById('iaStatusMsg');
-            box.classList.remove('hidden');
-            msg.innerText = m;
-            setTimeout(() => box.classList.add('hidden'), 4000);
-        }
-
         function excluir(id) {
-            db = db.filter(x => x.id !== id);
-            localStorage.setItem('cad_v11', JSON.stringify(db));
+            trocas = trocas.filter(x => x.id !== id);
+            localStorage.setItem('cad_v12', JSON.stringify(trocas));
             renderTrocas();
+        }
+
+        function limparTudo() {
+            if(confirm("Deseja apagar todos os registros?")) {
+                trocas = [];
+                localStorage.removeItem('cad_v12');
+                renderTrocas();
+            }
         }
 
         window.onload = () => { renderEscala(); renderTrocas(); };
