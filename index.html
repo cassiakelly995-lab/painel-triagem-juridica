@@ -3,197 +3,337 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CAD SANTANA | OAB-SP ELITE</title>
+    <title>CAD SANTANA | GESTÃO MARISTELA</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;700;800&display=swap');
         
         :root {
             --oab-blue: #1a3052; /* Azul Manto Sagrado */
             --oab-gold: #c5a36b; /* Dourado OAB */
-            --oab-light: #f4f7fa; /* Fundo suave estilo imagem */
+            --oab-bg: #f3f5f9;   /* Cinza suave da imagem */
         }
 
         body { 
             font-family: 'Plus Jakarta Sans', sans-serif; 
-            background-color: var(--oab-light); 
-            color: var(--oab-blue); 
-            height: 100vh; 
-            overflow: hidden; 
+            background-color: var(--oab-bg); 
+            color: var(--oab-blue);
+            height: 100vh;
             display: flex;
             flex-direction: column;
+            overflow: hidden;
         }
 
-        /* HEADER INSTITUCIONAL */
+        /* Topo Premium */
         header { 
             background-color: var(--oab-blue); 
-            border-bottom: 4px solid var(--oab-gold); 
-            padding: 1rem 2rem;
+            border-bottom: 5px solid var(--oab-gold);
+            padding: 25px 40px;
         }
 
-        .logo-container img {
-            height: 60px; /* Ajuste para o logo da OAB Santana */
-            filter: brightness(0) invert(1); /* Deixa o logo branco para contrastar com o azul */
-        }
-
-        /* PAINÉIS */
-        .panel-card { 
-            background: white; 
-            border-radius: 20px; 
-            box-shadow: 0 10px 30px rgba(26, 48, 82, 0.08); 
-            border: 1px solid rgba(26, 48, 82, 0.05);
-            display: flex;
-            flex-direction: column;
-        }
-
-        .panel-header {
-            background: var(--oab-blue);
-            color: white;
-            padding: 12px 20px;
-            border-radius: 18px 18px 0 0;
-            font-size: 10px;
-            font-weight: 800;
-            text-transform: uppercase;
-            letter-spacing: 1.5px;
-        }
-
-        .input-oab {
-            background: #f8fafc;
-            border: 1.5px solid #e2e8f0;
-            border-radius: 12px;
-            padding: 12px 15px;
-            width: 100%;
-            font-size: 13px;
-            transition: 0.3s;
-        }
-        .input-oab:focus { border-color: var(--oab-gold); outline: none; background: white; }
-
-        .btn-gold {
-            background: var(--oab-gold);
-            color: white;
-            font-weight: 800;
-            text-transform: uppercase;
-            padding: 14px;
-            border-radius: 12px;
-            font-size: 11px;
-            transition: 0.3s;
-            letter-spacing: 1px;
-        }
-        .btn-gold:hover { background: #b08e56; transform: translateY(-2px); }
-
-        .registro-item {
-            background: white;
-            border-radius: 15px;
-            padding: 15px;
-            margin-bottom: 12px;
-            border-left: 6px solid var(--oab-gold);
-            box-shadow: 0 4px 10px rgba(0,0,0,0.03);
+        .header-content {
+            max-width: 1700px;
+            margin: 0 auto;
             display: flex;
             align-items: center;
             justify-content: space-between;
         }
-        .item-falta { border-left-color: #ef4444; }
 
-        embed { width: 100%; height: 100%; border-radius: 0 0 18px 18px; }
+        .logo-box img {
+            height: 75px; /* Tamanho elegante para o logo */
+            width: auto;
+        }
+
+        .divider {
+            height: 60px;
+            width: 1px;
+            background: rgba(255,255,255,0.2);
+            margin: 0 30px;
+        }
+
+        /* Cards Estilo Imagem */
+        .card-main {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.05);
+            display: flex;
+            flex-direction: column;
+            border: 1px solid #e1e8f0;
+        }
+
+        .card-header {
+            background: var(--oab-blue);
+            color: white;
+            padding: 12px 20px;
+            border-radius: 11px 11px 0 0;
+            font-size: 11px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        /* Inputs Modernos */
+        .input-group label {
+            font-size: 9px;
+            font-weight: 800;
+            text-transform: uppercase;
+            color: #94a3b8;
+            margin-bottom: 4px;
+            display: block;
+            margin-left: 5px;
+        }
+
+        .input-oab {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 12px 15px;
+            width: 100%;
+            font-size: 13px;
+            font-weight: 600;
+            transition: 0.2s;
+        }
+
+        .input-oab:focus {
+            border-color: var(--oab-gold);
+            background: white;
+            outline: none;
+        }
+
+        .btn-action {
+            background: var(--oab-gold);
+            color: white;
+            font-weight: 800;
+            text-transform: uppercase;
+            padding: 15px;
+            border-radius: 8px;
+            font-size: 12px;
+            transition: 0.3s;
+            box-shadow: 0 4px 15px rgba(197, 163, 107, 0.2);
+        }
+
+        .btn-action:hover { background: #b08e56; transform: translateY(-1px); }
+
+        /* Lista de Trocas/Faltas */
+        .item-row {
+            background: white;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-left: 5px solid var(--oab-gold);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-top: 1px solid #f1f5f9;
+            border-right: 1px solid #f1f5f9;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        .row-falta { border-left-color: #ef4444; }
+
+        embed { width: 100%; height: 100%; border-radius: 0 0 11px 11px; }
+        
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
     </style>
 </head>
 <body>
 
     <header>
-        <div class="max-w-[1700px] mx-auto flex justify-between items-center">
-            <div class="flex items-center gap-8">
-                <div class="logo-container">
-                    <img src="https://raw.githubusercontent.com/cassiakelly995-lab/painel-triagem-juridica/main/santana-parnaiba-branco-e1744639876196-768x231.png" alt="OAB Santana de Parnaíba">
+        <div class="header-content">
+            <div class="flex items-center">
+                <div class="logo-box">
+                    <img src="https://raw.githubusercontent.com/cassiakelly995-lab/painel-triagem-juridica/main/santana-parnaiba-branco-e1744639876196-768x231.png" alt="OAB Santana">
                 </div>
-                <div class="h-12 w-[1px] bg-white/20"></div>
+                <div class="divider"></div>
                 <div>
-                    <h2 class="text-white font-black text-lg tracking-tighter uppercase italic leading-tight">CAD Santana de Parnaíba</h2>
-                    <p class="text-amber-400 text-[10px] font-bold uppercase tracking-widest">
+                    <h1 class="text-white text-2xl font-black uppercase italic tracking-tighter leading-none">CAD Santana de Parnaíba</h1>
+                    <p class="text-amber-400 text-[10px] font-bold uppercase tracking-[0.3em] mt-2">
                         Presidência: <span class="text-white">Dra. Maristela Gonçalves</span>
                     </p>
                 </div>
             </div>
             
-            <input type="file" id="upPDF" class="hidden" accept="application/pdf" onchange="handlePDF(this)">
-            <button onclick="document.getElementById('upPDF').click()" class="bg-white/10 hover:bg-white text-white hover:text-blue-900 border border-white/30 px-6 py-2.5 rounded-full text-[10px] font-black uppercase transition-all shadow-lg">
-                <i class="fa-solid fa-cloud-arrow-up mr-2"></i> Atualizar Escala
+            <input type="file" id="pdfInput" class="hidden" accept="application/pdf" onchange="loadPDF(this)">
+            <button onclick="document.getElementById('pdfInput').click()" class="bg-white/10 hover:bg-white/20 text-white border border-white/30 px-6 py-2 rounded-full text-[10px] font-extrabold uppercase transition-all">
+                <i class="fa-solid fa-sync-alt mr-2"></i> Atualizar Escala
             </button>
         </div>
     </header>
 
-    <main class="max-w-[1700px] mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8 p-8 flex-grow overflow-hidden">
+    <main class="max-w-[1700px] mx-auto grid grid-cols-12 gap-8 p-10 flex-grow overflow-hidden">
         
-        <div class="lg:col-span-7 flex flex-col h-full">
-            <div class="panel-card h-full">
-                <div class="panel-header flex justify-between items-center">
+        <div class="col-span-7 flex flex-col h-full">
+            <div class="card-main h-full">
+                <div class="card-header">
                     <span>Documento Oficial de Triagem</span>
-                    <i class="fa-solid fa-file-contract opacity-50 text-sm"></i>
+                    <i class="fa-solid fa-file-pdf"></i>
                 </div>
-                <div id="pdfBox" class="flex-grow relative bg-slate-50 flex items-center justify-center">
-                    <div id="vazio" class="text-center opacity-20">
-                        <i class="fa-solid fa-file-pdf text-7xl mb-4"></i>
-                        <p class="font-black uppercase text-[10px] tracking-widest">Aguardando PDF da Escala</p>
+                <div id="pdfViewer" class="flex-grow relative bg-slate-50 flex items-center justify-center">
+                    <div id="placeholder" class="text-center opacity-20">
+                        <i class="fa-solid fa-cloud-arrow-up text-7xl mb-4"></i>
+                        <p class="font-black text-[10px] uppercase tracking-widest">Carregue a escala em PDF</p>
                     </div>
                 </div>
             </div>
         </div>
 
-        <div class="lg:col-span-5 flex flex-col gap-6 overflow-hidden">
+        <div class="col-span-5 flex flex-col gap-8 overflow-hidden">
             
-            <div class="panel-card p-6">
-                <div class="flex gap-6 mb-6 border-b border-slate-100 pb-3">
-                    <button onclick="setTab('troca')" id="tabT" class="text-[11px] font-black uppercase tracking-widest border-b-2 border-oab-gold" style="border-color: var(--oab-gold);">Trocas</button>
-                    <button onclick="setTab('falta')" id="tabF" class="text-[11px] font-black uppercase tracking-widest text-slate-400">Faltas</button>
+            <div class="card-main p-8">
+                <div class="flex gap-6 mb-8 border-b border-slate-100 pb-2">
+                    <button onclick="changeTab('troca')" id="tabT" class="text-[11px] font-black uppercase tracking-widest border-b-2 border-oab-gold" style="border-color: var(--oab-gold);">Registro de Trocas</button>
+                    <button onclick="changeTab('falta')" id="tabF" class="text-[11px] font-black uppercase tracking-widest text-slate-400">Faltas</button>
                 </div>
 
-                <div id="formTroca" class="space-y-4">
+                <div id="formTroca" class="space-y-5">
                     <div class="grid grid-cols-4 gap-4">
-                        <div class="col-span-1">
-                            <label class="text-[9px] font-bold uppercase text-slate-400 block mb-1">Dia</label>
-                            <input type="text" id="tDia" placeholder="15/02" class="input-oab">
+                        <div class="col-span-1 input-group">
+                            <label>Dia</label>
+                            <input type="text" id="tDia" placeholder="00/00" class="input-oab">
                         </div>
-                        <div class="col-span-3">
-                            <label class="text-[9px] font-bold uppercase text-slate-400 block mb-1">Advogado(a) que SAI</label>
-                            <input type="text" id="tSai" placeholder="Nome do profissional" class="input-oab">
+                        <div class="col-span-3 input-group">
+                            <label>Advogado(a) que SAI</label>
+                            <input type="text" id="tSai" placeholder="Nome Completo" class="input-oab">
                         </div>
                     </div>
-                    <div>
-                        <label class="text-[9px] font-bold uppercase text-slate-400 block mb-1">Advogado(a) que ENTRA</label>
-                        <input type="text" id="tEntra" placeholder="Nome do profissional" class="input-oab">
+                    <div class="input-group">
+                        <label>Advogado(a) que ENTRA</label>
+                        <input type="text" id="tEntra" placeholder="Nome Completo" class="input-oab">
                     </div>
-                    <button onclick="addTroca()" class="w-full btn-gold shadow-md">Confirmar Troca na Triagem</button>
+                    <button onclick="saveTroca()" class="w-full btn-action">Salvar Registro</button>
                 </div>
 
-                <div id="formFalta" class="hidden space-y-4">
+                <div id="formFalta" class="hidden space-y-5">
                     <div class="grid grid-cols-4 gap-4">
-                        <div class="col-span-1">
-                            <label class="text-[9px] font-bold uppercase text-slate-400 block mb-1">Dia</label>
-                            <input type="text" id="fDia" placeholder="15/02" class="input-oab">
+                        <div class="col-span-1 input-group">
+                            <label>Dia</label>
+                            <input type="text" id="fDia" placeholder="00/00" class="input-oab">
                         </div>
-                        <div class="col-span-3">
-                            <label class="text-[9px] font-bold uppercase text-slate-400 block mb-1">Advogado(a) Faltante</label>
-                            <input type="text" id="fNome" placeholder="Nome do profissional" class="input-oab">
+                        <div class="col-span-3 input-group">
+                            <label>Advogado(a) Faltante</label>
+                            <input type="text" id="fNome" placeholder="Nome Completo" class="input-oab">
                         </div>
                     </div>
-                    <button onclick="addFalta()" class="w-full bg-red-600 text-white font-black py-4 rounded-xl text-[11px] uppercase shadow-md hover:bg-red-700 transition-all">Registrar Falta</button>
+                    <button onclick="saveFalta()" class="w-full bg-red-600 text-white font-black py-4 rounded-lg text-[11px] uppercase shadow-lg hover:bg-red-700 transition-all">Registrar Falta</button>
                 </div>
             </div>
 
-            <div class="flex-grow overflow-y-auto pr-2">
-                <div class="flex justify-between items-center mb-4">
-                    <h3 class="text-[10px] font-black uppercase text-slate-400 tracking-tighter">Histórico de Ocorrências</h3>
-                    <button onclick="limpar()" class="text-[9px] font-bold text-slate-300 hover:text-red-500 uppercase">Limpar Tudo</button>
+            <div class="flex-grow overflow-y-auto pr-3">
+                <div class="flex justify-between items-center mb-5">
+                    <h3 class="text-[10px] font-black uppercase text-slate-400 tracking-tighter">Trocas Realizadas</h3>
+                    <button onclick="clearAll()" class="text-[9px] font-bold text-slate-300 hover:text-red-500 uppercase">Limpar Histórico</button>
                 </div>
-                <div id="listaItems"></div>
+                <div id="historyList"></div>
             </div>
         </div>
     </main>
 
     <script>
-        let db = JSON.parse(localStorage.getItem('cad_oab_v2')) || [];
+        let logs = JSON.parse(localStorage.getItem('cad_elite_v1')) || [];
 
-        function setTab(t) {
-            document.getElementById('formTroca').classList.toggle('hidden', t !== 'troca');
-            document.getElementById('formFalta').classList.toggle('hidden', t !== 'falta');
-            document.getElementById('tabT').style.borderColor = t === 'troca' ? 'var(--oab-gold)'
+        function changeTab(type) {
+            document.getElementById('formTroca').classList.toggle('hidden', type !== 'troca');
+            document.getElementById('formFalta').classList.toggle('hidden', type !== 'falta');
+            document.getElementById('tabT').style.borderColor = type === 'troca' ? 'var(--oab-gold)' : 'transparent';
+            document.getElementById('tabF').style.borderColor = type === 'falta' ? '#ef4444' : 'transparent';
+        }
+
+        function loadPDF(input) {
+            const file = input.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    localStorage.setItem('cad_pdf_elite', e.target.result);
+                    displayPDF();
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function displayPDF() {
+            const data = localStorage.getItem('cad_pdf_elite');
+            if (data) {
+                document.getElementById('placeholder').style.display = 'none';
+                const parts = data.split(',');
+                const byteString = atob(parts[1]);
+                const ab = new ArrayBuffer(byteString.length);
+                const ia = new Uint8Array(ab);
+                for (let i = 0; i < byteString.length; i++) ia[i] = byteString.charCodeAt(i);
+                const blob = new Blob([ab], {type: 'application/pdf'});
+                const url = URL.createObjectURL(blob);
+                document.getElementById('pdfViewer').innerHTML = `<embed src="${url}#toolbar=0&navpanes=0" type="application/pdf">`;
+            }
+        }
+
+        function saveTroca() {
+            const d = document.getElementById('tDia').value;
+            const s = document.getElementById('tSai').value;
+            const e = document.getElementById('tEntra').value;
+            if (d && s && e) {
+                logs.unshift({ id: Date.now(), type: 'troca', d, s, e });
+                persist();
+                document.querySelectorAll('#formTroca input').forEach(i => i.value = '');
+            }
+        }
+
+        function saveFalta() {
+            const d = document.getElementById('fDia').value;
+            const n = document.getElementById('fNome').value;
+            if (d && n) {
+                logs.unshift({ id: Date.now(), type: 'falta', d, n });
+                persist();
+                document.querySelectorAll('#formFalta input').forEach(i => i.value = '');
+            }
+        }
+
+        function persist() {
+            localStorage.setItem('cad_elite_v1', JSON.stringify(logs));
+            drawList();
+        }
+
+        function drawList() {
+            const box = document.getElementById('historyList');
+            box.innerHTML = logs.length ? '' : '<p class="text-center py-10 opacity-20 uppercase font-black text-[10px]">Aguardando registros...</p>';
+            logs.forEach(item => {
+                if(item.type === 'troca') {
+                    box.innerHTML += `
+                        <div class="item-row">
+                            <div class="flex items-center gap-4">
+                                <div class="bg-blue-50 text-blue-900 px-3 py-1.5 rounded-lg font-black text-[11px]">${item.d}</div>
+                                <div class="text-[11px] uppercase font-semibold">
+                                    <span class="text-slate-400 italic"><s>${item.s}</s></span>
+                                    <i class="fa-solid fa-arrow-right mx-2 text-oab-gold opacity-50"></i>
+                                    <span class="text-oab-blue font-black underline decoration-oab-gold/30">${item.e}</span>
+                                </div>
+                            </div>
+                            <button onclick="remove(${item.id})" class="text-slate-200 hover:text-red-500"><i class="fa-solid fa-xmark"></i></button>
+                        </div>`;
+                } else {
+                    box.innerHTML += `
+                        <div class="item-row row-falta">
+                            <div class="flex items-center gap-4">
+                                <div class="bg-red-50 text-red-600 px-3 py-1.5 rounded-lg font-black text-[11px]">${item.d}</div>
+                                <div class="text-[11px] uppercase font-black text-red-600">AUSÊNCIA: ${item.n}</div>
+                            </div>
+                            <button onclick="remove(${item.id})" class="text-slate-200 hover:text-red-500"><i class="fa-solid fa-xmark"></i></button>
+                        </div>`;
+                }
+            });
+        }
+
+        function remove(id) {
+            logs = logs.filter(x => x.id !== id);
+            persist();
+        }
+
+        function clearAll() { if(confirm("Zerar todo o histórico?")) { logs = []; persist(); } }
+
+        window.onload = () => { displayPDF(); drawList(); };
+    </script>
+</body>
+</html>
