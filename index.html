@@ -3,172 +3,291 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CAD SANTANA | GESTÃO DRA. MARISTELA</title>
+    <title>CAD SANTANA | OAB-SP STYLE</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;700;800&display=swap');
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #000; color: #fff; height: 100vh; overflow: hidden; }
-        .glass-box { background: #0a0a0a; border: 1px solid #1a1a1a; border-radius: 24px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
-        .input-clean { background: #111; border: 1px solid #222; border-radius: 12px; padding: 12px; font-weight: 600; color: #fff; outline: none; transition: 0.2s; }
-        .input-clean:focus { border-color: #fbbf24; background: #161616; }
-        .card-registro { background: linear-gradient(to right, #0a0a0a, #000); border: 1px solid #1a1a1a; border-left: 4px solid #fbbf24; border-radius: 16px; transition: 0.3s; }
-        .card-falta { border-left-color: #ef4444; }
-        embed { width: 100%; height: 100%; border-radius: 16px; background: #000; }
-        ::-webkit-scrollbar { width: 5px; }
-        ::-webkit-scrollbar-thumb { background: #222; border-radius: 10px; }
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&display=swap');
+        
+        :root {
+            --oab-blue: #1a3052; /* Azul Manto Sagrado */
+            --oab-gold: #c5a36b; /* Dourado OAB */
+            --oab-light: #eef1f6; /* Fundo suave da imagem */
+        }
+
+        body { 
+            font-family: 'Plus Jakarta Sans', sans-serif; 
+            background-color: var(--oab-light); 
+            color: var(--oab-blue); 
+            height: 100vh; 
+            overflow: hidden; 
+        }
+
+        /* Topo Institucional */
+        header { background-color: var(--oab-blue); border-bottom: 4px solid var(--oab-gold); }
+
+        /* Painéis Estilo Imagem */
+        .panel-card { 
+            background: white; 
+            border: 1px solid #d1d9e6; 
+            border-radius: 20px; 
+            box-shadow: 0 10px 25px rgba(26, 48, 82, 0.05); 
+        }
+
+        .panel-header {
+            background: var(--oab-blue);
+            color: white;
+            padding: 12px 20px;
+            border-radius: 15px 15px 0 0;
+            font-size: 11px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* Inputs e Botões */
+        .input-oab {
+            background: #f8fafc;
+            border: 1px solid #d1d9e6;
+            border-radius: 10px;
+            padding: 10px 15px;
+            width: 100%;
+            outline: none;
+            transition: 0.3s;
+        }
+        .input-oab:focus { border-color: var(--oab-gold); box-shadow: 0 0 0 3px rgba(197, 163, 107, 0.1); }
+
+        .btn-gold {
+            background: var(--oab-gold);
+            color: white;
+            font-weight: 800;
+            text-transform: uppercase;
+            padding: 12px;
+            border-radius: 10px;
+            transition: 0.3s;
+            font-size: 11px;
+        }
+        .btn-gold:hover { background: #b08e56; transform: translateY(-2px); }
+
+        /* Lista de Registros */
+        .registro-item {
+            border-left: 5px solid var(--oab-gold);
+            background: white;
+            border-radius: 12px;
+            margin-bottom: 10px;
+            padding: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.02);
+        }
+        .item-falta { border-left-color: #e11d48; }
+
+        embed { width: 100%; height: 100%; border-radius: 0 0 15px 15px; }
+        
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
     </style>
 </head>
-<body class="p-6">
+<body class="flex flex-col">
 
-    <header class="max-w-[1700px] mx-auto flex justify-between items-end mb-8">
-        <div class="flex items-center gap-5">
-            <div class="bg-amber-500 text-black p-4 rounded-2xl shadow-[0_0_25px_rgba(245,158,11,0.2)]">
-                <i class="fa-solid fa-gavel text-2xl"></i>
+    <header class="p-6 text-white shadow-2xl">
+        <div class="max-w-[1700px] mx-auto flex justify-between items-center">
+            <div class="flex items-center gap-6">
+                <div class="bg-white p-3 rounded-xl shadow-inner">
+                    <i class="fa-solid fa-scale-balanced text-3xl" style="color: var(--oab-blue);"></i>
+                </div>
+                <div>
+                    <h1 class="text-2xl font-extrabold tracking-tighter uppercase italic">CAD Santana de Parnaíba</h1>
+                    <p class="text-amber-400 text-xs font-bold uppercase tracking-widest">
+                        Presidência: <span class="text-white">Dra. Maristela Gonçalves</span>
+                    </p>
+                </div>
             </div>
-            <div>
-                <h1 class="text-2xl font-extrabold uppercase italic tracking-tighter text-white leading-none">CAD Santana de Parnaíba</h1>
-                <p class="text-[10px] font-bold text-amber-500 uppercase tracking-[0.3em] mt-2">
-                    Presidência: <span class="text-white">Dra. Maristela Gonçalves</span>
-                </p>
-                <p class="text-[8px] font-black text-slate-500 uppercase tracking-[0.4em] mt-1">Gestão de Triagem • Admin Cássia</p>
+            
+            <div class="flex gap-3">
+                <input type="file" id="upPDF" class="hidden" accept="application/pdf" onchange="handlePDF(this)">
+                <button onclick="document.getElementById('upPDF').click()" class="bg-white/10 hover:bg-white/20 border border-white/20 px-6 py-2 rounded-full text-[10px] font-bold uppercase transition-all">
+                    <i class="fa-solid fa-file-pdf mr-2"></i> Atualizar Escala
+                </button>
             </div>
-        </div>
-        
-        <div class="flex items-center gap-4">
-            <input type="file" id="upEscala" class="hidden" accept="application/pdf" onchange="subirNovoPDF(this)">
-            <button onclick="document.getElementById('upEscala').click()" class="bg-white text-black px-8 py-3 rounded-full text-[10px] font-black uppercase hover:bg-amber-400 transition-all active:scale-95 shadow-lg">
-                <i class="fa-solid fa-sync mr-2"></i> Atualizar Escala PDF
-            </button>
         </div>
     </header>
 
-    <main class="max-w-[1700px] mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8 h-[calc(100vh-160px)]">
+    <main class="max-w-[1700px] mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8 p-8 flex-grow overflow-hidden">
         
-        <div class="lg:col-span-6 flex flex-col gap-3">
-            <span class="text-[9px] font-black text-slate-600 uppercase tracking-widest px-2 italic">Escala de Triagem em Vigência</span>
-            <div class="glass-box flex-grow overflow-hidden relative border-amber-500/10" id="containerPDF">
-                <div id="msgVazio" class="absolute inset-0 flex flex-col items-center justify-center opacity-10">
-                    <i class="fa-solid fa-file-pdf text-8xl mb-4"></i>
-                    <p class="font-black uppercase tracking-[0.5em]">Sem PDF carregado</p>
+        <div class="lg:col-span-7 flex flex-col h-full">
+            <div class="panel-card flex-grow flex flex-col overflow-hidden">
+                <div class="panel-header flex justify-between">
+                    <span>Escala de Triagem em Vigência</span>
+                    <i class="fa-solid fa-eye"></i>
+                </div>
+                <div id="pdfBox" class="flex-grow relative bg-slate-100">
+                    <div id="vazio" class="absolute inset-0 flex flex-col items-center justify-center text-slate-400">
+                        <i class="fa-solid fa-file-invoice text-6xl mb-4"></i>
+                        <p class="font-bold uppercase text-[10px] tracking-widest">Aguardando arquivo PDF</p>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <div class="lg:col-span-6 flex flex-col gap-6 overflow-hidden">
-            <div class="glass-box p-6 border-amber-500/10">
-                <div class="flex gap-4 mb-6">
-                    <button onclick="aba('troca')" id="btnTroca" class="text-[10px] font-black uppercase tracking-widest pb-2 border-b-2 border-amber-500">Trocas</button>
-                    <button onclick="aba('falta')" id="btnFalta" class="text-[10px] font-black uppercase tracking-widest pb-2 border-b-2 border-transparent text-slate-500">Faltas</button>
+        <div class="lg:col-span-5 flex flex-col gap-6 overflow-hidden">
+            
+            <div class="panel-card p-6">
+                <div class="flex gap-4 mb-6 border-b border-slate-100 pb-2">
+                    <button onclick="setTab('troca')" id="tabT" class="text-[10px] font-bold uppercase tracking-widest border-b-2 border-oab-gold" style="border-color: var(--oab-gold);">Troca</button>
+                    <button onclick="setTab('falta')" id="tabF" class="text-[10px] font-bold uppercase tracking-widest text-slate-400">Falta</button>
                 </div>
-                
+
                 <div id="formTroca" class="space-y-4">
-                    <div class="grid grid-cols-3 gap-3">
-                        <input type="text" id="tDia" placeholder="Dia" class="input-clean">
-                        <input type="text" id="tSai" placeholder="Dra. que SAI" class="input-clean text-slate-500">
-                        <input type="text" id="tEntra" placeholder="Dra. que ENTRA" class="input-clean border-emerald-900/20">
+                    <div class="grid grid-cols-4 gap-3">
+                        <div class="col-span-1">
+                            <label class="text-[9px] font-bold uppercase text-slate-400 ml-1">Dia</label>
+                            <input type="text" id="tDia" placeholder="00/00" class="input-oab">
+                        </div>
+                        <div class="col-span-3">
+                            <label class="text-[9px] font-bold uppercase text-slate-400 ml-1">Advogado(a) que SAI</label>
+                            <input type="text" id="tSai" placeholder="Nome completo" class="input-oab">
+                        </div>
                     </div>
-                    <button onclick="registrarTroca()" class="w-full bg-amber-500 text-black py-3 rounded-xl font-black text-[10px] uppercase hover:bg-amber-400">Salvar Registro</button>
+                    <div>
+                        <label class="text-[9px] font-bold uppercase text-slate-400 ml-1">Advogado(a) que ENTRA</label>
+                        <input type="text" id="tEntra" placeholder="Nome completo" class="input-oab border-emerald-200">
+                    </div>
+                    <button onclick="addTroca()" class="w-full btn-gold">Salvar Registro de Troca</button>
                 </div>
 
                 <div id="formFalta" class="hidden space-y-4">
-                    <div class="grid grid-cols-2 gap-3">
-                        <input type="text" id="fDia" placeholder="Dia" class="input-clean">
-                        <input type="text" id="fNome" placeholder="Nome da Advogada" class="input-clean border-red-900/20">
+                    <div class="grid grid-cols-4 gap-3">
+                        <div class="col-span-1">
+                            <label class="text-[9px] font-bold uppercase text-slate-400 ml-1">Dia</label>
+                            <input type="text" id="fDia" placeholder="00/00" class="input-oab">
+                        </div>
+                        <div class="col-span-3">
+                            <label class="text-[9px] font-bold uppercase text-slate-400 ml-1">Advogado(a) faltante</label>
+                            <input type="text" id="fNome" placeholder="Nome completo" class="input-oab border-red-200">
+                        </div>
                     </div>
-                    <button onclick="registrarFalta()" class="w-full bg-red-600 text-white py-3 rounded-xl font-black text-[10px] uppercase hover:bg-red-500">Registrar Falta</button>
+                    <button onclick="addFalta()" class="w-full bg-red-800 text-white font-bold py-3 rounded-lg text-[10px] uppercase hover:bg-red-900 transition-all">Registrar Falta</button>
                 </div>
             </div>
 
             <div class="flex-grow overflow-y-auto pr-2">
-                <div id="lista" class="space-y-3"></div>
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-[10px] font-extrabold uppercase text-slate-500 tracking-tighter">Ocorrências Registradas</h3>
+                    <button onclick="limpar()" class="text-[9px] font-bold text-slate-300 hover:text-red-500 uppercase">Zerar</button>
+                </div>
+                <div id="listaItems"></div>
             </div>
         </div>
     </main>
 
     <script>
-        let registros = JSON.parse(localStorage.getItem('cad_final_v1')) || [];
+        let db = JSON.parse(localStorage.getItem('cad_oab_v1')) || [];
 
-        function aba(tipo) {
-            document.getElementById('formTroca').classList.toggle('hidden', tipo !== 'troca');
-            document.getElementById('formFalta').classList.toggle('hidden', tipo !== 'falta');
-            document.getElementById('btnTroca').className = tipo === 'troca' ? 'text-[10px] font-black uppercase tracking-widest pb-2 border-b-2 border-amber-500' : 'text-[10px] font-black uppercase tracking-widest pb-2 border-b-2 border-transparent text-slate-500';
-            document.getElementById('btnFalta').className = tipo === 'falta' ? 'text-[10px] font-black uppercase tracking-widest pb-2 border-b-2 border-red-500 text-red-500' : 'text-[10px] font-black uppercase tracking-widest pb-2 border-b-2 border-transparent text-slate-500';
+        function setTab(t) {
+            document.getElementById('formTroca').classList.toggle('hidden', t !== 'troca');
+            document.getElementById('formFalta').classList.toggle('hidden', t !== 'falta');
+            document.getElementById('tabT').style.borderColor = t === 'troca' ? 'var(--oab-gold)' : 'transparent';
+            document.getElementById('tabF').style.borderColor = t === 'falta' ? '#e11d48' : 'transparent';
         }
 
-        function subirNovoPDF(input) {
+        function handlePDF(input) {
             const file = input.files[0];
             if (file) {
-                localStorage.removeItem('pdf_data_final');
                 const reader = new FileReader();
                 reader.onload = (e) => {
-                    const base64 = e.target.result;
-                    localStorage.setItem('pdf_data_final', base64);
-                    exibirPDF(base64);
+                    localStorage.setItem('oab_pdf_base64', e.target.result);
+                    renderPDF();
                 };
                 reader.readAsDataURL(file);
             }
         }
 
-        function exibirPDF(base64Data) {
-            const pdfData = base64Data || localStorage.getItem('pdf_data_final');
-            if (pdfData) {
-                document.getElementById('msgVazio').classList.add('hidden');
-                const container = document.getElementById('containerPDF');
-                const byteCharacters = atob(pdfData.split(',')[1]);
-                const byteNumbers = new Array(byteCharacters.length);
-                for (let i = 0; i < byteCharacters.length; i++) byteNumbers[i] = byteCharacters.charCodeAt(i);
-                const byteArray = new Uint8Array(byteNumbers);
-                const blob = new Blob([byteArray], {type: 'application/pdf'});
+        function renderPDF() {
+            const data = localStorage.getItem('oab_pdf_base64');
+            if (data) {
+                document.getElementById('vazio').style.display = 'none';
+                const blob = dataURLtoBlob(data);
                 const url = URL.createObjectURL(blob);
-                container.innerHTML = `<embed src="${url}#toolbar=0" type="application/pdf" width="100%" height="100%">`;
+                document.getElementById('pdfBox').innerHTML = `<embed src="${url}#toolbar=0" type="application/pdf">`;
             }
         }
 
-        function registrarTroca() {
-            const dia = document.getElementById('tDia').value;
-            const sai = document.getElementById('tSai').value;
-            const entra = document.getElementById('tEntra').value;
-            if (dia && sai && entra) {
-                registros.unshift({ id: Date.now(), tipo: 'troca', dia, sai, entra });
-                salvar();
-                document.getElementById('tDia').value = ""; document.getElementById('tSai').value = ""; document.getElementById('tEntra').value = "";
+        function dataURLtoBlob(data) {
+            const parts = data.split(',');
+            const byteString = atob(parts[1]);
+            const mimeString = parts[0].split(':')[1].split(';')[0];
+            const ab = new ArrayBuffer(byteString.length);
+            const ia = new Uint8Array(ab);
+            for (let i = 0; i < byteString.length; i++) ia[i] = byteString.charCodeAt(i);
+            return new Blob([ab], {type: mimeString});
+        }
+
+        function addTroca() {
+            const d = document.getElementById('tDia').value;
+            const s = document.getElementById('tSai').value;
+            const e = document.getElementById('tEntra').value;
+            if (d && s && e) {
+                db.unshift({ id: Date.now(), tipo: 'troca', d, s, e });
+                save();
+                document.querySelectorAll('#formTroca input').forEach(i => i.value = '');
             }
         }
 
-        function registrarFalta() {
-            const dia = document.getElementById('fDia').value;
-            const nome = document.getElementById('fNome').value;
-            if (dia && nome) {
-                registros.unshift({ id: Date.now(), tipo: 'falta', dia, nome });
-                salvar();
-                document.getElementById('fDia').value = ""; document.getElementById('fNome').value = "";
+        function addFalta() {
+            const d = document.getElementById('fDia').value;
+            const n = document.getElementById('fNome').value;
+            if (d && n) {
+                db.unshift({ id: Date.now(), tipo: 'falta', d, n });
+                save();
+                document.querySelectorAll('#formFalta input').forEach(i => i.value = '');
             }
         }
 
-        function salvar() {
-            localStorage.setItem('cad_final_v1', JSON.stringify(registros));
+        function save() {
+            localStorage.setItem('cad_oab_v1', JSON.stringify(db));
             renderLista();
         }
 
         function renderLista() {
-            const box = document.getElementById('lista');
-            box.innerHTML = registros.length ? '' : '<p class="text-center py-10 text-white/5 font-black uppercase text-xs">Sem ocorrências registradas</p>';
-            registros.forEach(r => {
-                if(r.tipo === 'troca') {
-                    box.innerHTML += `<div class="card-registro p-4 flex items-center justify-between"><div class="flex items-center gap-4"><div class="bg-amber-500 text-black w-12 py-1.5 rounded-lg text-center font-black text-sm italic">${r.dia}</div><div class="flex items-center gap-3"><span class="text-[10px] text-white/30 italic"><s>${r.sai}</s></span><i class="fa-solid fa-right-long text-amber-500/20 text-[10px]"></i><span class="text-sm font-black text-white italic underline decoration-emerald-500/30">${r.entra}</span></div></div><button onclick="apagar(${r.id})" class="text-white/10 hover:text-red-500"><i class="fa-solid fa-xmark"></i></button></div>`;
+            const box = document.getElementById('listaItems');
+            box.innerHTML = db.length ? '' : '<p class="text-center py-10 opacity-20 uppercase font-black text-xs">Sem registros</p>';
+            db.forEach(item => {
+                if(item.tipo === 'troca') {
+                    box.innerHTML += `
+                        <div class="registro-item">
+                            <div class="flex items-center gap-4">
+                                <div class="bg-slate-100 text-slate-600 px-3 py-1 rounded-md font-bold text-xs">${item.d}</div>
+                                <div class="text-xs uppercase font-semibold">
+                                    <span class="text-slate-400"><s>${item.s}</s></span>
+                                    <i class="fa-solid fa-arrow-right mx-2 text-gold opacity-30"></i>
+                                    <span class="text-oab-blue font-black">${item.e}</span>
+                                </div>
+                            </div>
+                            <button onclick="del(${item.id})" class="text-slate-200 hover:text-red-500"><i class="fa-solid fa-trash-can"></i></button>
+                        </div>`;
                 } else {
-                    box.innerHTML += `<div class="card-registro card-falta p-4 flex items-center justify-between"><div class="flex items-center gap-4"><div class="bg-red-600 text-white w-12 py-1.5 rounded-lg text-center font-black text-sm italic">${r.dia}</div><div class="flex flex-col"><span class="text-[8px] font-black text-red-500 uppercase tracking-widest leading-none mb-1">Falta</span><span class="text-sm font-black text-white italic uppercase">${r.nome}</span></div></div><button onclick="apagar(${r.id})" class="text-white/10 hover:text-red-500"><i class="fa-solid fa-xmark"></i></button></div>`;
+                    box.innerHTML += `
+                        <div class="registro-item item-falta">
+                            <div class="flex items-center gap-4">
+                                <div class="bg-red-50 text-red-600 px-3 py-1 rounded-md font-bold text-xs">${item.d}</div>
+                                <div class="text-xs uppercase font-black text-red-600">Falta: ${item.n}</div>
+                            </div>
+                            <button onclick="del(${item.id})" class="text-slate-200 hover:text-red-500"><i class="fa-solid fa-trash-can"></i></button>
+                        </div>`;
                 }
             });
         }
 
-        function apagar(id) {
-            registros = registros.filter(x => x.id !== id);
-            salvar();
+        function del(id) {
+            db = db.filter(x => x.id !== id);
+            save();
         }
 
-        window.onload = () => { exibirPDF(); renderLista(); };
+        function limpar() { if(confirm("Deseja zerar o histórico?")) { db = []; save(); } }
+
+        window.onload = () => { renderPDF(); renderLista(); };
     </script>
 </body>
 </html>
