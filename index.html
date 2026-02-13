@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CAD SANTANA | V8 PDF ONLY</title>
+    <title>CAD SANTANA | V8 ELITE EDITION</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <style>
@@ -26,10 +26,11 @@
         .is-admin .admin-only { display: block !important; }
         
         iframe#pdfFrame { width: 100%; height: 100%; border: none; }
-        
         .registro-item { background: rgba(255, 255, 255, 0.03); border-left: 3px solid var(--oab-gold); padding: 10px; border-radius: 8px; margin-bottom: 8px; font-size: 11px; }
-        ::-webkit-scrollbar { width: 4px; }
-        ::-webkit-scrollbar-thumb { background: var(--oab-gold); border-radius: 10px; }
+        
+        /* Botão flutuante de download na escala */
+        .download-float { position: absolute; bottom: 20px; right: 20px; background: var(--oab-gold); color: black; padding: 12px; border-radius: 50%; box-shadow: 0 4px 15px rgba(0,0,0,0.5); cursor: pointer; transition: 0.3s; z-index: 10; display: none; }
+        .download-float:hover { transform: scale(1.1); }
     </style>
 </head>
 <body id="mainBody">
@@ -57,8 +58,11 @@
         <div class="escala-fixa" id="escalaContainer">
             <div class="flex flex-col items-center justify-center h-full text-slate-400 opacity-20">
                 <i class="fa-solid fa-file-pdf text-6xl mb-4"></i>
-                <p class="font-black uppercase text-[10px]">Carregue o PDF da Escala</p>
+                <p class="font-black uppercase text-[10px]">Aguardando PDF</p>
             </div>
+        </div>
+        <div id="btnDownload" class="download-float" onclick="downloadEscala()" title="Baixar Escala">
+            <i class="fa-solid fa-download"></i>
         </div>
 
         <div class="painel-lateral">
@@ -67,7 +71,7 @@
                 <div class="mb-4">
                     <input type="file" id="pdfInput" class="hidden" accept=".pdf" onchange="loadPDF(this)">
                     <button onclick="document.getElementById('pdfInput').click()" class="w-full border border-gold/40 text-[#c5a36b] text-[9px] font-black py-2 rounded-lg hover:bg-gold/10">
-                        <i class="fa-solid fa-file-arrow-up mr-2"></i> CARREGAR ESCALA (PDF)
+                        <i class="fa-solid fa-file-arrow-up mr-2"></i> CARREGAR NOVA ESCALA (PDF)
                     </button>
                 </div>
 
@@ -91,7 +95,10 @@
             </div>
 
             <div class="glass-box flex-grow overflow-hidden flex flex-col">
-                <span class="label-gold">Relatório de Ocorrências</span>
+                <div class="flex justify-between items-center mb-2">
+                    <span class="label-gold !mb-0">Relatório de Ocorrências</span>
+                    <button onclick="window.print()" class="text-[9px] font-black text-gold/50 hover:text-gold uppercase"><i class="fa-solid fa-print"></i></button>
+                </div>
                 <div id="lista" class="overflow-y-auto flex-grow pr-2"></div>
             </div>
         </div>
@@ -101,11 +108,8 @@
         const PIN = "CAD2026"; 
         let store = JSON.parse(localStorage.getItem('cad_v8_final')) || [];
 
-        function login() {
-            if(prompt("🔒 Senha Admin:") === PIN) { sessionStorage.setItem('isAdmin', 'true'); sync(); }
-        }
+        function login() { if(prompt("🔒 Senha Admin:") === PIN) { sessionStorage.setItem('isAdmin', 'true'); sync(); } }
         function logout() { sessionStorage.removeItem('isAdmin'); sync(); }
-        
         function sync() {
             const adm = sessionStorage.getItem('isAdmin') === 'true';
             document.getElementById('mainBody').className = adm ? 'is-admin' : '';
@@ -113,7 +117,6 @@
             drawList();
         }
 
-        // FUNÇÃO DE CARREGAMENTO PDF BLINDADA
         function loadPDF(input) {
             const file = input.files[0];
             if (file) {
@@ -121,6 +124,7 @@
                 reader.onload = function(e) {
                     const pdfData = e.target.result;
                     localStorage.setItem('escala_pdf_raw', pdfData);
+                    localStorage.setItem('escala_nome', file.name);
                     renderPDF();
                 };
                 reader.readAsDataURL(file);
@@ -130,9 +134,20 @@
         function renderPDF() {
             const data = localStorage.getItem('escala_pdf_raw');
             if (data) {
-                // Usando iframe para maior compatibilidade com visualização de PDF
-                document.getElementById('escalaContainer').innerHTML = 
-                `<iframe src="${data}#toolbar=0&navpanes=0&view=FitH" id="pdfFrame"></iframe>`;
+                document.getElementById('escalaContainer').innerHTML = `<iframe src="${data}#toolbar=0&navpanes=0&view=FitH" id="pdfFrame"></iframe>`;
+                document.getElementById('btnDownload').style.display = 'block';
+            }
+        }
+
+        // FUNÇÃO DE DOWNLOAD CORRIGIDA
+        function downloadEscala() {
+            const data = localStorage.getItem('escala_pdf_raw');
+            const nome = localStorage.getItem('escala_nome') || 'escala_oab.pdf';
+            if (data) {
+                const link = document.createElement('a');
+                link.href = data;
+                link.download = nome;
+                link.click();
             }
         }
 
@@ -163,7 +178,7 @@
                 box.innerHTML += `<div class="registro-item ${!isT ? 'border-red-600 bg-red-600/5' : ''}">
                     <div class="flex justify-between items-center text-[11px] uppercase">
                         <div><b class="${isT?'text-gold':'text-red-500'}">[${i.d}]</b> ${isT ? `<s>${i.s}</s> → <b>${i.e}</b>` : `<b>FALTA: ${i.n}</b>`}</div>
-                        ${sessionStorage.getItem('isAdmin') ? `<button onclick="del(${i.id})" class="text-white/10 hover:text-red-500"><i class="fa-solid fa-trash"></i></button>` : ''}
+                        ${sessionStorage.getItem('isAdmin') ? `<button onclick="del(${i.id})" class="text-white/10 hover:text-red-500 ml-2"><i class="fa-solid fa-trash"></i></button>` : ''}
                     </div>
                 </div>`;
             });
