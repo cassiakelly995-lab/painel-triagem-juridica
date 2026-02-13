@@ -3,245 +3,172 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CAD SANTANA | ELITE EDITION</title>
+    <title>CAD SANTANA | SEGURANÇA MÁXIMA</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&display=swap');
-        
-        :root {
-            --oab-dark: #0f172a; /* Azul Oxford Profundo */
-            --oab-gold: #d4af37; /* Dourado Champagne */
-            --oab-card: #1e293b; /* Azul de Contraste para os Cards */
-        }
-
-        body { 
-            font-family: 'Plus Jakarta Sans', sans-serif; 
-            background-color: var(--oab-dark); 
-            color: #f1f5f9; 
-            height: 100vh; 
-            overflow: hidden; 
-        }
-
-        /* Topo Institucional */
-        header { 
-            background: linear-gradient(to right, #0f172a, #1e293b);
-            border-bottom: 2px solid var(--oab-gold); 
-        }
-
-        /* Cards com Transparência Elegante (Glassmorphism) */
-        .panel-card { 
-            background: rgba(30, 41, 59, 0.7); 
-            border: 1px solid rgba(212, 175, 55, 0.1); 
-            border-radius: 16px; 
-            backdrop-filter: blur(10px);
-        }
-
-        .panel-header {
-            background: rgba(212, 175, 55, 0.1);
-            color: var(--oab-gold);
-            padding: 10px 20px;
-            border-radius: 16px 16px 0 0;
-            font-size: 10px;
-            font-weight: 800;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            border-bottom: 1px solid rgba(212, 175, 55, 0.1);
-        }
-
-        /* Inputs de Luxo */
-        .input-oab {
-            background: rgba(15, 23, 42, 0.5);
-            border: 1px solid rgba(212, 175, 55, 0.2);
-            border-radius: 8px;
-            padding: 12px 15px;
-            width: 100%;
-            color: white;
-            outline: none;
-            transition: 0.3s;
-        }
-        .input-oab:focus { border-color: var(--oab-gold); background: rgba(15, 23, 42, 0.8); }
-
-        .btn-gold {
-            background: var(--oab-gold);
-            color: #0f172a;
-            font-weight: 800;
-            text-transform: uppercase;
-            padding: 14px;
-            border-radius: 8px;
-            transition: 0.3s;
-            font-size: 11px;
-            letter-spacing: 1px;
-        }
-        .btn-gold:hover { background: #f1c40f; transform: scale(1.02); }
-
-        /* Itens da Lista */
-        .registro-item {
-            background: rgba(255, 255, 255, 0.03);
-            border-left: 4px solid var(--oab-gold);
-            border-radius: 10px;
-            margin-bottom: 8px;
-            padding: 15px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            transition: 0.2s;
-        }
-        .registro-item:hover { background: rgba(255, 255, 255, 0.05); }
-        .item-falta { border-left-color: #ef4444; }
-
-        embed { width: 100%; height: 100%; border-radius: 0 0 16px 16px; filter: contrast(1.1); }
-        
-        ::-webkit-scrollbar { width: 4px; }
-        ::-webkit-scrollbar-thumb { background: var(--oab-gold); border-radius: 10px; }
+        :root { --oab-dark: #0f172a; --oab-gold: #d4af37; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: var(--oab-dark); color: #f1f5f9; height: 100vh; overflow: hidden; }
+        header { background: linear-gradient(to right, #0f172a, #1e293b); border-bottom: 2px solid var(--oab-gold); }
+        .panel-card { background: rgba(30, 41, 59, 0.7); border: 1px solid rgba(212, 175, 55, 0.1); border-radius: 16px; backdrop-filter: blur(10px); }
+        .panel-header { background: rgba(212, 175, 55, 0.1); color: var(--oab-gold); padding: 10px 20px; border-radius: 16px 16px 0 0; font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 2px; }
+        .input-oab { background: rgba(15, 23, 42, 0.5); border: 1px solid rgba(212, 175, 55, 0.2); border-radius: 8px; padding: 12px 15px; width: 100%; color: white; outline: none; }
+        .btn-gold { background: var(--oab-gold); color: #0f172a; font-weight: 800; text-transform: uppercase; padding: 14px; border-radius: 8px; font-size: 11px; }
+        .registro-item { background: rgba(255, 255, 255, 0.03); border-left: 4px solid var(--oab-gold); border-radius: 10px; margin-bottom: 8px; padding: 15px; display: flex; align-items: center; justify-content: space-between; }
+        .admin-only { display: none !important; }
+        .is-admin .admin-only { display: block !important; }
+        .is-admin .admin-flex { display: flex !important; }
+        embed { width: 100%; height: 100%; border-radius: 0 0 16px 16px; }
     </style>
 </head>
-<body class="flex flex-col">
+<body class="flex flex-col" id="appBody">
 
     <header class="p-5 text-white shadow-2xl">
         <div class="max-w-[1700px] mx-auto flex justify-between items-center">
             <div class="flex items-center gap-6">
                 <div class="bg-white/5 p-3 rounded-2xl border border-gold/20">
-                    <i class="fa-solid fa-scale-balanced text-3xl text-gold" style="color: var(--oab-gold);"></i>
+                    <i class="fa-solid fa-scale-balanced text-3xl" style="color: var(--oab-gold);"></i>
                 </div>
                 <div>
                     <h1 class="text-2xl font-extrabold tracking-tighter uppercase italic leading-none">CAD Santana de Parnaíba</h1>
-                    <p class="text-gold/80 text-[10px] font-bold uppercase tracking-[0.4em] mt-2" style="color: var(--oab-gold);">
-                        Presidência: <span class="text-white">Dra. Maristela Gonçalves</span>
-                    </p>
+                    <p class="text-[10px] font-bold uppercase tracking-[0.4em] mt-2" style="color: var(--oab-gold);">Presidência: <span class="text-white">Dra. Maristela Gonçalves</span></p>
                 </div>
             </div>
-            
-            <div class="flex gap-4">
-                <input type="file" id="upPDF" class="hidden" accept="application/pdf" onchange="handlePDF(this)">
-                <button onclick="document.getElementById('upPDF').click()" class="bg-transparent hover:bg-gold text-gold hover:text-dark border border-gold/40 px-6 py-2 rounded-full text-[10px] font-black uppercase transition-all" style="border-color: var(--oab-gold); color: var(--oab-gold);">
-                    <i class="fa-solid fa-file-export mr-2"></i> Importar Escala
-                </button>
+            <div class="flex gap-4 items-center">
+                <button id="lockBtn" onclick="authAdmin()" class="text-gold text-xs font-black uppercase hover:scale-105 transition-all"><i class="fa-solid fa-lock mr-2"></i> Acesso Restrito</button>
+                <button id="unlockBtn" onclick="logoutAdmin()" class="admin-only text-red-500 text-xs font-black uppercase hover:scale-105 transition-all"><i class="fa-solid fa-unlock mr-2"></i> Sair do Admin</button>
+                <div class="admin-only">
+                    <input type="file" id="upPDF" class="hidden" accept="application/pdf" onchange="handlePDF(this)">
+                    <button onclick="document.getElementById('upPDF').click()" class="bg-transparent text-gold border border-gold/40 px-6 py-2 rounded-full text-[10px] font-black uppercase hover:bg-gold hover:text-dark">Atualizar Escala</button>
+                </div>
             </div>
         </div>
     </header>
 
     <main class="max-w-[1700px] mx-auto grid grid-cols-12 gap-8 p-10 flex-grow overflow-hidden">
-        
         <div class="col-span-7 flex flex-col h-full">
             <div class="panel-card flex-grow flex flex-col overflow-hidden">
-                <div class="panel-header">Documento de Triagem em Vigência</div>
-                <div id="pdfBox" class="flex-grow relative flex items-center justify-center bg-black/20">
-                    <div id="vazio" class="opacity-10 text-center">
-                        <i class="fa-solid fa-file-invoice text-7xl mb-4"></i>
-                        <p class="font-bold uppercase text-[10px] tracking-widest">Aguardando PDF</p>
-                    </div>
+                <div class="panel-header text-center">Visualização da Escala Oficial</div>
+                <div id="pdfBox" class="flex-grow relative flex items-center justify-center bg-black/20 text-white/10">
+                    <i class="fa-solid fa-file-pdf text-8xl"></i>
                 </div>
             </div>
         </div>
 
         <div class="col-span-5 flex flex-col gap-6 overflow-hidden">
-            <div class="panel-card p-8">
-                <div class="flex gap-6 mb-8">
-                    <button onclick="setTab('troca')" id="tabT" class="text-[11px] font-black uppercase tracking-widest border-b-2" style="border-color: var(--oab-gold); color: var(--oab-gold);">Trocas</button>
-                    <button onclick="setTab('falta')" id="tabF" class="text-[11px] font-black uppercase tracking-widest text-slate-500">Faltas</button>
+            <div class="panel-card p-8 admin-only">
+                <div class="flex gap-6 mb-6">
+                    <button id="tabT" onclick="setTab('troca')" class="text-[11px] font-black uppercase border-b-2 border-gold text-gold">Trocas</button>
+                    <button id="tabF" onclick="setTab('falta')" class="text-[11px] font-black uppercase text-slate-500">Faltas</button>
                 </div>
-
-                <div id="formTroca" class="space-y-5">
-                    <div class="grid grid-cols-4 gap-4">
-                        <input type="text" id="tDia" placeholder="Dia" class="input-oab col-span-1">
+                <div id="formTroca" class="space-y-4">
+                    <div class="grid grid-cols-4 gap-3">
+                        <input type="text" id="tDia" placeholder="Dia" class="input-oab col-span-1 text-center">
                         <input type="text" id="tSai" placeholder="Advogado(a) que SAI" class="input-oab col-span-3">
                     </div>
                     <input type="text" id="tEntra" placeholder="Advogado(a) que ENTRA" class="input-oab">
-                    <button onclick="addTroca()" class="w-full btn-gold shadow-lg shadow-gold/10">Confirmar Registro</button>
+                    <button onclick="addTroca()" class="w-full btn-gold">Registrar Alteração</button>
                 </div>
-
-                <div id="formFalta" class="hidden space-y-5">
-                    <div class="grid grid-cols-4 gap-4">
-                        <input type="text" id="fDia" placeholder="Dia" class="input-oab col-span-1">
-                        <input type="text" id="fNome" placeholder="Advogado(a) faltante" class="input-oab col-span-3">
+                <div id="formFalta" class="hidden space-y-4">
+                    <div class="grid grid-cols-4 gap-3">
+                        <input type="text" id="fDia" placeholder="Dia" class="input-oab col-span-1 text-center">
+                        <input type="text" id="fNome" placeholder="Advogado(a) Faltante" class="input-oab col-span-3">
                     </div>
-                    <button onclick="addFalta()" class="w-full bg-red-600/20 text-red-500 border border-red-500/30 py-4 rounded-lg text-[11px] uppercase font-black hover:bg-red-600 hover:text-white transition-all">Registrar Falta</button>
+                    <button onclick="addFalta()" class="w-full bg-red-600 text-white py-4 rounded-lg text-[11px] font-black uppercase">Registrar Falta</button>
                 </div>
             </div>
-
             <div class="flex-grow overflow-y-auto pr-3">
+                <h3 class="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-4">Relatório de Ocorrências</h3>
                 <div id="listaItems" class="space-y-2"></div>
             </div>
         </div>
     </main>
 
     <script>
-        let db = JSON.parse(localStorage.getItem('cad_v8_god')) || [];
+        const MASTER_KEY = "CAD2026"; // Senha Única
+        let db = JSON.parse(localStorage.getItem('cad_secure_v8')) || [];
 
-        function setTab(t) {
-            document.getElementById('formTroca').classList.toggle('hidden', t !== 'troca');
-            document.getElementById('formFalta').classList.toggle('hidden', t !== 'falta');
-            document.getElementById('tabT').style.color = t === 'troca' ? 'var(--oab-gold)' : '#64748b';
-            document.getElementById('tabT').style.borderColor = t === 'troca' ? 'var(--oab-gold)' : 'transparent';
-            document.getElementById('tabF').style.color = t === 'falta' ? '#ef4444' : '#64748b';
-            document.getElementById('tabF').style.borderColor = t === 'falta' ? '#ef4444' : 'transparent';
+        function authAdmin() {
+            const input = prompt("🔐 Identificação Requerida:");
+            if(input === MASTER_KEY) {
+                sessionStorage.setItem('isAdmin', 'true');
+                applySecurity();
+            } else { alert("Acesso Negado."); }
+        }
+
+        function logoutAdmin() {
+            sessionStorage.removeItem('isAdmin');
+            applySecurity();
+        }
+
+        function applySecurity() {
+            const isAdm = sessionStorage.getItem('isAdmin') === 'true';
+            document.getElementById('appBody').className = isAdm ? 'flex flex-col is-admin' : 'flex flex-col';
+            document.getElementById('lockBtn').style.display = isAdm ? 'none' : 'block';
+            renderLista();
         }
 
         function handlePDF(input) {
             const file = input.files[0];
-            if (file) {
+            if (file && sessionStorage.getItem('isAdmin')) {
                 const reader = new FileReader();
-                reader.onload = (e) => {
-                    localStorage.setItem('pdf_v8_data', e.target.result);
-                    renderPDF();
-                };
+                reader.onload = (e) => { localStorage.setItem('pdf_secure', e.target.result); renderPDF(); };
                 reader.readAsDataURL(file);
             }
         }
 
         function renderPDF() {
-            const data = localStorage.getItem('pdf_v8_data');
-            if (data) {
-                document.getElementById('vazio').style.display = 'none';
-                document.getElementById('pdfBox').innerHTML = `<embed src="${data}#toolbar=0" type="application/pdf">`;
-            }
+            const data = localStorage.getItem('pdf_secure');
+            if (data) document.getElementById('pdfBox').innerHTML = `<embed src="${data}#toolbar=0" type="application/pdf">`;
         }
 
         function addTroca() {
-            const d = document.getElementById('tDia').value;
-            const s = document.getElementById('tSai').value;
-            const e = document.getElementById('tEntra').value;
-            if (d && s && e) {
-                db.unshift({ id: Date.now(), tipo: 'troca', d, s, e });
-                save();
-                document.querySelectorAll('input').forEach(i => i.value = '');
-            }
+            if(sessionStorage.getItem('isAdmin') !== 'true') return;
+            const d = document.getElementById('tDia').value, s = document.getElementById('tSai').value, e = document.getElementById('tEntra').value;
+            if (d && s && e) { db.unshift({ id: Date.now(), tipo: 'troca', d, s, e }); save(); }
         }
 
         function addFalta() {
-            const d = document.getElementById('fDia').value;
-            const n = document.getElementById('fNome').value;
-            if (d && n) {
-                db.unshift({ id: Date.now(), tipo: 'falta', d, n });
-                save();
-                document.querySelectorAll('input').forEach(i => i.value = '');
-            }
+            if(sessionStorage.getItem('isAdmin') !== 'true') return;
+            const d = document.getElementById('fDia').value, n = document.getElementById('fNome').value;
+            if (d && n) { db.unshift({ id: Date.now(), tipo: 'falta', d, n }); save(); }
         }
 
         function save() {
-            localStorage.setItem('cad_v8_god', JSON.stringify(db));
+            localStorage.setItem('cad_secure_v8', JSON.stringify(db));
+            document.querySelectorAll('input').forEach(i => i.value = '');
             renderLista();
         }
 
         function renderLista() {
             const box = document.getElementById('listaItems');
-            box.innerHTML = db.length ? '' : '<p class="text-center py-10 opacity-10 uppercase font-black text-xs tracking-widest">Painel Limpo</p>';
+            const isAdm = sessionStorage.getItem('isAdmin') === 'true';
+            box.innerHTML = db.length ? '' : '<p class="text-center py-10 opacity-10 uppercase font-black text-xs">Sem Ocorrências</p>';
             db.forEach(item => {
-                const isTroca = item.tipo === 'troca';
-                box.innerHTML += `
-                    <div class="registro-item ${!isTroca ? 'item-falta' : ''}">
-                        <div class="text-[11px] uppercase font-semibold flex items-center gap-3">
-                            <span class="text-gold font-black bg-gold/10 px-2 py-1 rounded" style="color: var(--oab-gold);">${item.d}</span>
-                            ${isTroca ? `<span class="opacity-40"><s>${item.s}</s></span> <i class="fa-solid fa-chevron-right text-[8px] text-gold/30"></i> <span class="font-black text-white italic underline decoration-gold/20">${item.e}</span>` : `<span class="text-red-500 font-black tracking-tighter">FALTA REGISTRADA: ${item.n}</span>`}
-                        </div>
-                        <button onclick="del(${item.id})" class="text-white/10 hover:text-red-500 transition-all"><i class="fa-solid fa-trash-can text-[10px]"></i></button>
-                    </div>`;
+                const isT = item.tipo === 'troca';
+                box.innerHTML += `<div class="registro-item ${!isT ? 'border-red-500' : ''}">
+                    <div class="text-[11px] uppercase font-bold">
+                        <span class="text-gold mr-3">[${item.d}]</span>
+                        ${isT ? `<s>${item.s}</s> → <span class="text-white">${item.e}</span>` : `<span class="text-red-500">FALTA: ${item.n}</span>`}
+                    </div>
+                    ${isAdm ? `<button onclick="del(${item.id})" class="text-white/10 hover:text-red-500"><i class="fa-solid fa-trash-can"></i></button>` : ''}
+                </div>`;
             });
         }
 
-        function del(id) { db = db.filter(x => x.id !== id); save(); }
-        window.onload = () => { renderPDF(); renderLista(); };
+        function del(id) { 
+            if(confirm("Deseja realmente apagar este registro oficial?")) {
+                db = db.filter(x => x.id !== id); save(); 
+            }
+        }
+
+        function setTab(t) {
+            document.getElementById('formTroca').classList.toggle('hidden', t !== 'troca');
+            document.getElementById('formFalta').classList.toggle('hidden', t !== 'falta');
+        }
+
+        window.onload = () => { applySecurity(); renderPDF(); };
     </script>
 </body>
 </html>
