@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CAD SANTANA | V8 GOD MODE</title>
+    <title>CAD SANTANA | V8 PDF ONLY</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <style>
@@ -11,17 +11,25 @@
         :root { --oab-dark: #070b14; --oab-gold: #c5a36b; --oab-card: #111827; }
         body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: var(--oab-dark); color: #f1f5f9; height: 100vh; overflow: hidden; display: flex; flex-direction: column; }
         header { background: #0f172a; border-bottom: 2px solid var(--oab-gold); padding: 10px 40px; flex-shrink: 0; }
+        
         .layout-master { display: flex; justify-content: center; align-items: center; gap: 40px; padding: 30px; flex-grow: 1; height: calc(100vh - 80px); }
-        .escala-fixa { width: 65vh; height: 85vh; background: white; box-shadow: 0 0 50px rgba(0,0,0,0.7); border-radius: 4px; overflow: hidden; flex-shrink: 0; display: flex; justify-content: center; align-items: center; }
+        .escala-fixa { width: 65vh; height: 85vh; background: white; box-shadow: 0 0 50px rgba(0,0,0,0.7); border-radius: 4px; overflow: hidden; flex-shrink: 0; position: relative; }
         .painel-lateral { width: 420px; height: 85vh; display: flex; flex-direction: column; gap: 15px; flex-shrink: 0; }
+        
         .glass-box { background: var(--oab-card); border: 1px solid rgba(197, 163, 107, 0.15); border-radius: 16px; padding: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.4); }
         .label-gold { color: var(--oab-gold); font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 12px; display: block; border-bottom: 1px solid rgba(197, 163, 107, 0.1); padding-bottom: 5px; }
+        
         .input-oab { background: #070b14; border: 1px solid rgba(197, 163, 107, 0.2); border-radius: 8px; padding: 8px 12px; width: 100%; color: white; margin-bottom: 8px; font-size: 12px; outline: none; }
-        .btn-salvar { background: var(--oab-gold); color: #000; font-weight: 900; text-transform: uppercase; padding: 10px; border-radius: 8px; width: 100%; font-size: 10px; cursor: pointer; }
+        .btn-salvar { background: var(--oab-gold); color: #000; font-weight: 900; text-transform: uppercase; padding: 10px; border-radius: 8px; width: 100%; font-size: 10px; }
+
         .admin-only { display: none !important; }
         .is-admin .admin-only { display: block !important; }
-        #viewArea { width: 100%; height: 100%; display: flex; justify-content: center; align-items: center; }
-        .escala-media { max-width: 100%; max-height: 100%; object-fit: contain; }
+        
+        iframe#pdfFrame { width: 100%; height: 100%; border: none; }
+        
+        .registro-item { background: rgba(255, 255, 255, 0.03); border-left: 3px solid var(--oab-gold); padding: 10px; border-radius: 8px; margin-bottom: 8px; font-size: 11px; }
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-thumb { background: var(--oab-gold); border-radius: 10px; }
     </style>
 </head>
 <body id="mainBody">
@@ -45,41 +53,40 @@
     </header>
 
     <main class="layout-master">
-        <div class="escala-fixa">
-            <div id="viewArea">
-                <div class="flex flex-col items-center justify-center opacity-20 text-slate-400">
-                    <i class="fa-solid fa-file-image text-6xl mb-4"></i>
-                    <p class="font-black uppercase text-[10px]">Carregue a Escala no Painel</p>
-                </div>
+        
+        <div class="escala-fixa" id="escalaContainer">
+            <div class="flex flex-col items-center justify-center h-full text-slate-400 opacity-20">
+                <i class="fa-solid fa-file-pdf text-6xl mb-4"></i>
+                <p class="font-black uppercase text-[10px]">Carregue o PDF da Escala</p>
             </div>
         </div>
 
         <div class="painel-lateral">
             <div class="glass-box admin-only">
-                <span class="label-gold">Painel de Controle</span>
+                <span class="label-gold">Administração</span>
                 <div class="mb-4">
-                    <input type="file" id="fileInput" class="hidden" accept="image/*,application/pdf" onchange="processFile(this)">
-                    <button onclick="document.getElementById('fileInput').click()" class="w-full border border-gold/40 text-[#c5a36b] text-[9px] font-black py-2 rounded-lg hover:bg-gold/10 uppercase">
-                        <i class="fa-solid fa-upload mr-2"></i> Selecionar Escala (Imagem ou PDF)
+                    <input type="file" id="pdfInput" class="hidden" accept=".pdf" onchange="loadPDF(this)">
+                    <button onclick="document.getElementById('pdfInput').click()" class="w-full border border-gold/40 text-[#c5a36b] text-[9px] font-black py-2 rounded-lg hover:bg-gold/10">
+                        <i class="fa-solid fa-file-arrow-up mr-2"></i> CARREGAR ESCALA (PDF)
                     </button>
                 </div>
-                
+
                 <div class="flex gap-2 mb-3">
                     <button onclick="setTab('T')" id="tabT" class="flex-1 text-[9px] font-black border-b-2 border-gold text-gold py-1">TROCA</button>
                     <button onclick="setTab('F')" id="tabF" class="flex-1 text-[9px] font-black border-b-2 border-transparent text-slate-500 py-1">FALTA</button>
                 </div>
 
                 <div id="formTroca">
-                    <input type="text" id="inDiaT" placeholder="Dia/Mês" class="input-oab">
-                    <input type="text" id="inSai" placeholder="Sai: Advogado(a)" class="input-oab">
-                    <input type="text" id="inEntra" placeholder="Entra: Advogado(a)" class="input-oab">
-                    <button onclick="add('troca')" class="btn-salvar">Salvar Troca</button>
+                    <input type="text" id="inDiaT" placeholder="Data" class="input-oab">
+                    <input type="text" id="inSai" placeholder="Advogado que SAI" class="input-oab">
+                    <input type="text" id="inEntra" placeholder="Advogado que ENTRA" class="input-oab">
+                    <button onclick="add('troca')" class="btn-salvar">Confirmar Troca</button>
                 </div>
 
                 <div id="formFalta" class="hidden">
-                    <input type="text" id="inDiaF" placeholder="Dia/Mês" class="input-oab">
+                    <input type="text" id="inDiaF" placeholder="Data" class="input-oab">
                     <input type="text" id="inNomeF" placeholder="Nome do Faltante" class="input-oab">
-                    <button onclick="add('falta')" class="btn-salvar !bg-red-700 !text-white">Salvar Falta</button>
+                    <button onclick="add('falta')" class="btn-salvar !bg-red-700 !text-white">Registrar Falta</button>
                 </div>
             </div>
 
@@ -92,10 +99,13 @@
 
     <script>
         const PIN = "CAD2026"; 
-        let store = JSON.parse(localStorage.getItem('cad_v8_db')) || [];
+        let store = JSON.parse(localStorage.getItem('cad_v8_final')) || [];
 
-        function login() { if(prompt("🔒 Senha Admin:") === PIN) { sessionStorage.setItem('isAdmin', 'true'); sync(); } }
+        function login() {
+            if(prompt("🔒 Senha Admin:") === PIN) { sessionStorage.setItem('isAdmin', 'true'); sync(); }
+        }
         function logout() { sessionStorage.removeItem('isAdmin'); sync(); }
+        
         function sync() {
             const adm = sessionStorage.getItem('isAdmin') === 'true';
             document.getElementById('mainBody').className = adm ? 'is-admin' : '';
@@ -103,33 +113,26 @@
             drawList();
         }
 
-        // PROCESSAMENTO DE ARQUIVO MELHORADO
-        function processFile(input) {
+        // FUNÇÃO DE CARREGAMENTO PDF BLINDADA
+        function loadPDF(input) {
             const file = input.files[0];
             if (file) {
                 const reader = new FileReader();
                 reader.onload = function(e) {
-                    const content = e.target.result;
-                    const isPDF = file.type.includes('pdf');
-                    localStorage.setItem('escala_content', content);
-                    localStorage.setItem('escala_is_pdf', isPDF);
-                    renderEscala();
+                    const pdfData = e.target.result;
+                    localStorage.setItem('escala_pdf_raw', pdfData);
+                    renderPDF();
                 };
                 reader.readAsDataURL(file);
             }
         }
 
-        function renderEscala() {
-            const content = localStorage.getItem('escala_content');
-            const isPDF = localStorage.getItem('escala_is_pdf') === 'true';
-            const area = document.getElementById('viewArea');
-            
-            if (content) {
-                if (isPDF) {
-                    area.innerHTML = `<embed src="${content}#toolbar=0&navpanes=0&view=FitH" type="application/pdf" class="escala-media">`;
-                } else {
-                    area.innerHTML = `<img src="${content}" class="escala-media">`;
-                }
+        function renderPDF() {
+            const data = localStorage.getItem('escala_pdf_raw');
+            if (data) {
+                // Usando iframe para maior compatibilidade com visualização de PDF
+                document.getElementById('escalaContainer').innerHTML = 
+                `<iframe src="${data}#toolbar=0&navpanes=0&view=FitH" id="pdfFrame"></iframe>`;
             }
         }
 
@@ -148,7 +151,7 @@
                 const d = document.getElementById('inDiaF').value, n = document.getElementById('inNomeF').value;
                 if (d && n) store.unshift({ id: Date.now(), tipo, d, n });
             }
-            localStorage.setItem('cad_v8_db', JSON.stringify(store));
+            localStorage.setItem('cad_v8_final', JSON.stringify(store));
             drawList();
         }
 
@@ -157,17 +160,17 @@
             box.innerHTML = store.length ? '' : '<p class="text-center py-10 opacity-10 text-[10px] font-black">SEM REGISTROS</p>';
             store.forEach(i => {
                 const isT = i.tipo === 'troca';
-                box.innerHTML += `<div class="registro-item ${!isT ? 'border-red-500 bg-red-500/5' : ''}">
+                box.innerHTML += `<div class="registro-item ${!isT ? 'border-red-600 bg-red-600/5' : ''}">
                     <div class="flex justify-between items-center text-[11px] uppercase">
                         <div><b class="${isT?'text-gold':'text-red-500'}">[${i.d}]</b> ${isT ? `<s>${i.s}</s> → <b>${i.e}</b>` : `<b>FALTA: ${i.n}</b>`}</div>
-                        ${sessionStorage.getItem('isAdmin') ? `<button onclick="del(${i.id})" class="text-white/10 hover:text-red-500 ml-2"><i class="fa-solid fa-trash"></i></button>` : ''}
+                        ${sessionStorage.getItem('isAdmin') ? `<button onclick="del(${i.id})" class="text-white/10 hover:text-red-500"><i class="fa-solid fa-trash"></i></button>` : ''}
                     </div>
                 </div>`;
             });
         }
-        function del(id) { if(confirm("Apagar?")) { store = store.filter(x => x.id !== id); localStorage.setItem('cad_v8_db', JSON.stringify(store)); drawList(); } }
+        function del(id) { if(confirm("Apagar?")) { store = store.filter(x => x.id !== id); localStorage.setItem('cad_v8_final', JSON.stringify(store)); drawList(); } }
 
-        window.onload = () => { sync(); renderEscala(); };
+        window.onload = () => { sync(); renderPDF(); };
     </script>
 </body>
 </html>
