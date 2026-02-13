@@ -14,7 +14,7 @@
         
         .layout-master { display: flex; justify-content: center; align-items: center; gap: 40px; padding: 30px; flex-grow: 1; height: calc(100vh - 80px); }
         
-        /* Moldura A4 */
+        /* ÁREA DA ESCALA - FOCO TOTAL NA VISUALIZAÇÃO */
         .escala-fixa { 
             width: 65vh; 
             height: 85vh; 
@@ -29,18 +29,19 @@
             align-items: center;
         }
         
+        iframe, object, embed { width: 100%; height: 100%; border: none; display: block; }
+
         .painel-lateral { width: 420px; height: 85vh; display: flex; flex-direction: column; gap: 15px; flex-shrink: 0; }
         .glass-box { background: var(--oab-card); border: 1px solid rgba(197, 163, 107, 0.15); border-radius: 16px; padding: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.4); }
         .label-gold { color: var(--oab-gold); font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 12px; display: block; border-bottom: 1px solid rgba(197, 163, 107, 0.1); padding-bottom: 5px; }
         
         .input-oab { background: #070b14; border: 1px solid rgba(197, 163, 107, 0.2); border-radius: 8px; padding: 8px 12px; width: 100%; color: white; margin-bottom: 8px; font-size: 12px; outline: none; }
-        .btn-salvar { background: var(--oab-gold); color: #000; font-weight: 900; text-transform: uppercase; padding: 10px; border-radius: 8px; width: 100%; font-size: 10px; cursor: pointer; }
+        .btn-salvar { background: var(--oab-gold); color: #000; font-weight: 900; text-transform: uppercase; padding: 10px; border-radius: 8px; width: 100%; font-size: 10px; cursor: pointer; transition: 0.3s; }
+        .btn-salvar:hover { filter: brightness(1.2); }
 
         .admin-only { display: none !important; }
         .is-admin .admin-only { display: block !important; }
         
-        /* Visualizador */
-        #pdfViewer { width: 100%; height: 100%; border: none; }
         .registro-item { background: rgba(255, 255, 255, 0.03); border-left: 3px solid var(--oab-gold); padding: 10px; border-radius: 8px; margin-bottom: 8px; font-size: 11px; }
     </style>
 </head>
@@ -66,20 +67,20 @@
 
     <main class="layout-master">
         
-        <div class="escala-fixa" id="pdfArea">
-            <div class="flex flex-col items-center justify-center opacity-20 text-slate-500">
+        <div class="escala-fixa" id="containerEscala">
+            <div id="loaderInfo" class="text-center opacity-20 text-slate-500">
                 <i class="fa-solid fa-file-pdf text-6xl mb-4"></i>
-                <p class="font-black uppercase text-[10px]">Aguardando Escala</p>
+                <p class="font-black uppercase text-[10px]">Aguardando Escala Oficial</p>
             </div>
         </div>
 
         <div class="painel-lateral">
             <div class="glass-box admin-only">
-                <span class="label-gold">Controle</span>
+                <span class="label-gold">Administração</span>
                 <div class="mb-4">
-                    <input type="file" id="fileIn" class="hidden" accept=".pdf" onchange="uploadPDF(this)">
-                    <button onclick="document.getElementById('fileIn').click()" class="w-full border border-gold/40 text-[#c5a36b] text-[9px] font-black py-2 rounded-lg hover:bg-gold/10 uppercase">
-                        <i class="fa-solid fa-upload mr-2"></i> Carregar PDF
+                    <input type="file" id="pdfInput" class="hidden" accept="application/pdf" onchange="processarPDF(this)">
+                    <button onclick="document.getElementById('pdfInput').click()" class="w-full border border-gold/40 text-[#c5a36b] text-[9px] font-black py-2 rounded-lg hover:bg-gold/10 uppercase italic">
+                        <i class="fa-solid fa-upload mr-2"></i> Carregar Escala PDF
                     </button>
                 </div>
 
@@ -89,93 +90,112 @@
                 </div>
 
                 <div id="formTroca">
-                    <input type="text" id="inDiaT" placeholder="Data" class="input-oab">
-                    <input type="text" id="inSai" placeholder="Sai" class="input-oab">
-                    <input type="text" id="inEntra" placeholder="Entra" class="input-oab">
-                    <button onclick="registrar('troca')" class="btn-salvar">Confirmar Troca</button>
+                    <input type="text" id="inDiaT" placeholder="Data (Ex: 15/02)" class="input-oab">
+                    <input type="text" id="inSai" placeholder="Advogado que sai" class="input-oab">
+                    <input type="text" id="inEntra" placeholder="Advogado que entra" class="input-oab">
+                    <button onclick="salvar('troca')" class="btn-salvar w-full">Confirmar Troca</button>
                 </div>
 
                 <div id="formFalta" class="hidden">
                     <input type="text" id="inDiaF" placeholder="Data" class="input-oab">
-                    <input type="text" id="inNomeF" placeholder="Nome do Faltante" class="input-oab">
-                    <button onclick="registrar('falta')" class="btn-salvar !bg-red-700 !text-white">Salvar Falta</button>
+                    <input type="text" id="inNomeF" placeholder="Nome do Advogado" class="input-oab">
+                    <button onclick="salvar('falta')" class="btn-salvar w-full !bg-red-700 !text-white">Registrar Falta</button>
                 </div>
             </div>
 
             <div class="glass-box flex-grow overflow-hidden flex flex-col">
-                <span class="label-gold">Histórico</span>
-                <div id="lista" class="overflow-y-auto flex-grow pr-2"></div>
+                <span class="label-gold">Histórico de Alterações</span>
+                <div id="listaOcorrencias" class="overflow-y-auto flex-grow pr-2"></div>
             </div>
         </div>
     </main>
 
     <script>
-        const PIN = "CAD2026"; 
-        let store = JSON.parse(localStorage.getItem('cad_v8_db')) || [];
+        const SENHA = "CAD2026"; 
+        let bancoDados = JSON.parse(localStorage.getItem('cad_v8_db')) || [];
 
-        function login() { if(prompt("Senha:") === PIN) { sessionStorage.setItem('isAdmin', 'true'); sync(); } }
-        function logout() { sessionStorage.removeItem('isAdmin'); sync(); }
-        function sync() {
-            const adm = sessionStorage.getItem('isAdmin') === 'true';
-            document.getElementById('mainBody').className = adm ? 'is-admin' : '';
-            document.getElementById('btnLock').style.display = adm ? 'none' : 'block';
-            drawList();
+        function login() { if(prompt("Senha de Administrador:") === SENHA) { sessionStorage.setItem('logado', 'true'); checkLogin(); } }
+        function logout() { sessionStorage.removeItem('logado'); checkLogin(); }
+        
+        function checkLogin() {
+            const isAdm = sessionStorage.getItem('logado') === 'true';
+            document.getElementById('mainBody').className = isAdm ? 'is-admin' : '';
+            document.getElementById('btnLock').style.display = isAdm ? 'none' : 'block';
+            renderLista();
         }
 
-        function uploadPDF(input) {
-            const file = input.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
+        // --- FUNÇÃO DE CARREGAMENTO DEFINITIVA ---
+        function processarPDF(input) {
+            const arquivo = input.files[0];
+            if (arquivo) {
+                const leitor = new FileReader();
+                leitor.onload = function(e) {
                     const base64 = e.target.result;
-                    localStorage.setItem('escala_saved', base64);
-                    render(base64);
+                    localStorage.setItem('escala_base64', base64);
+                    exibirPDF(base64);
                 };
-                reader.readAsDataURL(file);
+                leitor.readAsDataURL(arquivo);
             }
         }
 
-        function render(data) {
-            if (!data) return;
-            const area = document.getElementById('pdfArea');
-            area.innerHTML = `<embed src="${data}#toolbar=0&navpanes=0&view=FitH" type="application/pdf" id="pdfViewer">`;
+        function exibirPDF(urlData) {
+            if (!urlData) return;
+            const viewer = document.getElementById('containerEscala');
+            // Força o navegador a tratar como um objeto de aplicação
+            viewer.innerHTML = `<object data="${urlData}" type="application/pdf">
+                                    <embed src="${urlData}" type="application/pdf" />
+                                </object>`;
         }
 
-        function setTab(t) {
-            document.getElementById('formTroca').classList.toggle('hidden', t === 'F');
-            document.getElementById('formFalta').classList.toggle('hidden', t === 'T');
-            document.getElementById('tabT').className = t === 'T' ? 'flex-1 text-[9px] font-black border-b-2 border-gold text-gold py-1' : 'flex-1 text-[9px] font-black border-b-2 border-transparent text-slate-500 py-1';
-            document.getElementById('tabF').className = t === 'F' ? 'flex-1 text-[9px] font-black border-b-2 border-red-500 text-red-500 py-1' : 'flex-1 text-[9px] font-black border-b-2 border-transparent text-slate-500 py-1';
+        function setTab(tipo) {
+            document.getElementById('formTroca').classList.toggle('hidden', tipo === 'F');
+            document.getElementById('formFalta').classList.toggle('hidden', tipo === 'T');
+            document.getElementById('tabT').className = tipo === 'T' ? 'flex-1 text-[9px] font-black border-b-2 border-gold text-gold py-1' : 'flex-1 text-[9px] font-black border-b-2 border-transparent text-slate-500 py-1';
+            document.getElementById('tabF').className = tipo === 'F' ? 'flex-1 text-[9px] font-black border-b-2 border-red-500 text-red-500 py-1' : 'flex-1 text-[9px] font-black border-b-2 border-transparent text-slate-500 py-1';
         }
 
-        function registrar(tipo) {
+        function salvar(tipo) {
+            let item = {};
             if (tipo === 'troca') {
                 const d = document.getElementById('inDiaT').value, s = document.getElementById('inSai').value, e = document.getElementById('inEntra').value;
-                if (d && s && e) store.unshift({ id: Date.now(), tipo, d, s, e });
+                if (d && s && e) item = { id: Date.now(), tipo, d, s, e };
             } else {
                 const d = document.getElementById('inDiaF').value, n = document.getElementById('inNomeF').value;
-                if (d && n) store.unshift({ id: Date.now(), tipo, d, n });
+                if (d && n) item = { id: Date.now(), tipo, d, n };
             }
-            localStorage.setItem('cad_v8_db', JSON.stringify(store));
-            drawList();
+            if (item.id) {
+                bancoDados.unshift(item);
+                localStorage.setItem('cad_v8_db', JSON.stringify(bancoDados));
+                renderLista();
+                document.querySelectorAll('input').forEach(i => i.value = '');
+            }
         }
 
-        function drawList() {
-            const box = document.getElementById('lista');
-            box.innerHTML = store.length ? '' : '<p class="text-center py-10 opacity-10 text-[10px] font-black">VAZIO</p>';
-            store.forEach(i => {
-                const isT = i.tipo === 'troca';
-                box.innerHTML += `<div class="registro-item ${!isT ? 'border-red-500' : ''}">
-                    <div class="flex justify-between items-center text-[11px] uppercase">
-                        <div><b class="${isT?'text-gold':'text-red-500'}">[${i.d}]</b> ${isT ? `<s>${i.s}</s> → <b>${i.e}</b>` : `<b>FALTA: ${i.n}</b>`}</div>
-                        ${sessionStorage.getItem('isAdmin') ? `<button onclick="del(${i.id})" class="opacity-20 hover:text-red-500"><i class="fa-solid fa-trash"></i></button>` : ''}
+        function renderLista() {
+            const container = document.getElementById('listaOcorrencias');
+            container.innerHTML = bancoDados.length ? '' : '<p class="text-center py-10 opacity-10 text-[10px] font-black uppercase">Nenhum registro</p>';
+            bancoDados.forEach(i => {
+                const troca = i.tipo === 'troca';
+                container.innerHTML += `
+                <div class="registro-item ${!troca ? 'border-red-500 bg-red-500/5' : ''}">
+                    <div class="flex justify-between items-center">
+                        <div class="text-[11px] uppercase">
+                            <b class="${troca ? 'text-gold' : 'text-red-500'}">[${i.d}]</b> 
+                            ${troca ? `<s>${i.s}</s> → <b>${i.e}</b>` : `<b>FALTA: ${i.n}</b>`}
+                        </div>
+                        ${sessionStorage.getItem('logado') ? `<button onclick="remover(${i.id})" class="opacity-20 hover:text-red-500"><i class="fa-solid fa-trash-can"></i></button>` : ''}
                     </div>
                 </div>`;
             });
         }
-        function del(id) { if(confirm("Apagar?")) { store = store.filter(x => x.id !== id); localStorage.setItem('cad_v8_db', JSON.stringify(store)); drawList(); } }
 
-        window.onload = () => { sync(); render(localStorage.getItem('escala_saved')); };
+        function remover(id) { if(confirm("Remover este registro?")) { bancoDados = bancoDados.filter(x => x.id !== id); localStorage.setItem('cad_v8_db', JSON.stringify(bancoDados)); renderLista(); } }
+
+        window.onload = () => { 
+            checkLogin(); 
+            const salvo = localStorage.getItem('escala_base64');
+            if(salvo) exibirPDF(salvo);
+        };
     </script>
 </body>
 </html>
