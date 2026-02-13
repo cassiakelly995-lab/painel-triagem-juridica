@@ -3,114 +3,186 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CAD SANTANA | MODO FULL SCREEN</title>
+    <title>CAD SANTANA | FORMATO A4 ELITE</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&display=swap');
-        :root { --oab-dark: #090e1a; --oab-gold: #d4af37; }
         
+        :root { 
+            --oab-dark: #0f172a; 
+            --oab-gold: #d4af37; 
+            --oab-card: #1e293b;
+        }
+
         body { 
             font-family: 'Plus Jakarta Sans', sans-serif; 
             background-color: var(--oab-dark); 
             color: #f1f5f9; 
             height: 100vh; 
+            overflow: hidden;
             display: flex;
             flex-direction: column;
-            overflow: hidden; 
         }
 
-        /* Header Premium */
         header { 
-            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            background: linear-gradient(to right, #0f172a, #1e293b);
             border-bottom: 2px solid var(--oab-gold);
-            padding: 1.25rem 2.5rem;
-            z-index: 50;
+            padding: 15px 40px;
         }
 
-        /* Estilização da Escala em Tela Cheia */
-        .pdf-container {
-            flex-grow: 1;
-            height: calc(100vh - 120px); /* Ajuste dinâmico para ocupar a tela toda */
-            background: rgba(30, 41, 59, 0.5);
-            border-radius: 12px;
-            overflow: hidden;
+        /* Container Principal */
+        .main-wrapper {
+            display: grid;
+            grid-template-cols: 1fr 400px;
+            gap: 30px;
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 30px;
+            height: calc(100vh - 100px);
+            width: 100%;
+        }
+
+        /* Área do PDF em Formato A4 */
+        .a4-container {
+            background: #1e293b;
+            border-radius: 8px;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            overflow-y: auto;
+            padding: 20px;
             border: 1px solid rgba(212, 175, 55, 0.1);
         }
 
-        embed { width: 100%; height: 100%; }
-
-        /* Painel Lateral de Ocorrências (Flutuante para não atrapalhar o PDF) */
-        .side-panel {
-            position: absolute;
-            right: 20px;
-            top: 100px;
-            width: 320px;
-            max-height: 80vh;
-            z-index: 40;
-            background: rgba(15, 23, 42, 0.9);
-            backdrop-filter: blur(15px);
-            border: 1px solid rgba(212, 175, 55, 0.2);
-            border-radius: 20px;
-            padding: 20px;
-            box-shadow: -10px 0 30px rgba(0,0,0,0.5);
+        .a4-page {
+            width: 100%;
+            max-width: 800px; /* Proporção A4 aproximada */
+            height: 1100px; 
+            background: white;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+            border-radius: 4px;
+            overflow: hidden;
         }
 
-        .input-oab { background: rgba(0,0,0,0.3); border: 1px solid rgba(212, 175, 55, 0.2); border-radius: 8px; padding: 10px; width: 100%; color: white; outline: none; font-size: 13px; }
-        .btn-gold { background: var(--oab-gold); color: #0f172a; font-weight: 800; padding: 12px; border-radius: 8px; width: 100%; margin-top: 10px; text-transform: uppercase; font-size: 11px; }
+        /* Painel Lateral */
+        .info-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .glass-card {
+            background: rgba(30, 41, 59, 0.7);
+            border: 1px solid rgba(212, 175, 55, 0.1);
+            border-radius: 16px;
+            padding: 25px;
+            backdrop-filter: blur(10px);
+        }
+
+        .panel-header {
+            color: var(--oab-gold);
+            font-size: 11px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 20px;
+            border-bottom: 1px solid rgba(212, 175, 55, 0.1);
+            padding-bottom: 10px;
+        }
+
+        .input-oab {
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid rgba(212, 175, 55, 0.2);
+            border-radius: 8px;
+            padding: 12px;
+            width: 100%;
+            color: white;
+            margin-bottom: 10px;
+            outline: none;
+        }
+
+        .btn-gold {
+            background: var(--oab-gold);
+            color: #0f172a;
+            font-weight: 800;
+            text-transform: uppercase;
+            padding: 14px;
+            border-radius: 8px;
+            width: 100%;
+            font-size: 11px;
+            transition: 0.3s;
+        }
+
+        .registro-item {
+            background: rgba(255, 255, 255, 0.03);
+            border-left: 4px solid var(--oab-gold);
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            font-size: 11px;
+        }
 
         .admin-only { display: none !important; }
         .is-admin .admin-only { display: block !important; }
-        
-        .registro-item { background: rgba(255,255,255,0.05); border-left: 3px solid var(--oab-gold); padding: 10px; border-radius: 6px; margin-bottom: 8px; font-size: 11px; }
+
+        embed { width: 100%; height: 100%; }
+
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-thumb { background: var(--oab-gold); border-radius: 10px; }
     </style>
 </head>
 <body id="appBody">
 
     <header>
-        <div class="max-w-[1800px] mx-auto flex justify-between items-center">
-            <div class="flex items-center gap-5">
-                <img src="https://raw.githubusercontent.com/cassiakelly995-lab/painel-triagem-juridica/main/santana-parnaiba-branco-e1744639876196-768x231.png" alt="OAB Santana" class="h-12">
-                <div class="h-8 w-[1px] bg-white/10 mx-2"></div>
+        <div class="flex justify-between items-center max-w-[1600px] mx-auto">
+            <div class="flex items-center gap-6">
+                <img src="https://raw.githubusercontent.com/cassiakelly995-lab/painel-triagem-juridica/main/santana-parnaiba-branco-e1744639876196-768x231.png" alt="OAB" class="h-10">
+                <div class="h-8 w-[1px] bg-white/10"></div>
                 <div>
-                    <h1 class="text-xl font-black uppercase italic tracking-tighter text-white">CAD Santana de Parnaíba</h1>
+                    <h1 class="text-xl font-black uppercase italic tracking-tighter">CAD Santana de Parnaíba</h1>
                     <p class="text-[9px] font-bold uppercase tracking-[0.3em] text-gold" style="color: var(--oab-gold);">Presidência: Dra. Maristela Gonçalves</p>
                 </div>
             </div>
-
-            <div class="flex gap-4">
-                <button id="lockBtn" onclick="authAdmin()" class="text-white/50 text-[10px] font-black uppercase hover:text-gold transition-all"><i class="fa-solid fa-lock mr-2"></i> Admin</button>
-                <button id="unlockBtn" onclick="logoutAdmin()" class="admin-only text-red-500 text-[10px] font-black uppercase"><i class="fa-solid fa-unlock mr-2"></i> Sair</button>
-                <div class="admin-only">
-                    <input type="file" id="upPDF" class="hidden" accept="application/pdf" onchange="handlePDF(this)">
-                    <button onclick="document.getElementById('upPDF').click()" class="bg-gold text-dark px-5 py-1.5 rounded-full text-[10px] font-black uppercase" style="background: var(--oab-gold); color: #000">Trocar PDF</button>
-                </div>
+            
+            <div class="flex gap-4 items-center">
+                <button id="lockBtn" onclick="authAdmin()" class="text-white/40 text-[10px] font-black uppercase hover:text-gold transition-all"><i class="fa-solid fa-lock mr-2"></i> Acesso Restrito</button>
+                <button id="unlockBtn" onclick="logoutAdmin()" class="admin-only text-red-500 text-[10px] font-black uppercase">Sair do Admin</button>
             </div>
         </div>
     </header>
 
-    <main class="p-5 flex-grow relative">
-        <div class="pdf-container" id="pdfBox">
-            <div class="flex flex-col items-center justify-center h-full opacity-20">
-                <i class="fa-solid fa-file-pdf text-8xl mb-4"></i>
-                <p class="font-black uppercase tracking-widest text-sm">Escala em Tela Cheia</p>
+    <main class="main-wrapper">
+        
+        <div class="a4-container">
+            <div class="a4-page" id="pdfBox">
+                <div class="flex flex-col items-center justify-center h-full text-slate-300 opacity-20">
+                    <i class="fa-solid fa-file-pdf text-7xl mb-4"></i>
+                    <p class="font-black uppercase tracking-widest text-xs">Visualização A4</p>
+                </div>
             </div>
         </div>
 
-        <div class="side-panel shadow-2xl">
-            <div class="admin-only mb-6 border-b border-white/10 pb-4">
-                <h4 class="text-[10px] font-black uppercase mb-3 text-gold" style="color: var(--oab-gold);">Novo Registro</h4>
-                <div class="space-y-3">
-                    <input type="text" id="tDia" placeholder="Dia (ex: 15/02)" class="input-oab">
-                    <input type="text" id="tSai" placeholder="Sai: Advogado(a)" class="input-oab">
-                    <input type="text" id="tEntra" placeholder="Entra: Advogado(a)" class="input-oab">
-                    <button onclick="addTroca()" class="btn-gold">Confirmar Troca</button>
+        <div class="info-panel">
+            
+            <div class="glass-card admin-only">
+                <div class="panel-header">Painel de Controle</div>
+                <div class="admin-only mb-4">
+                    <input type="file" id="upPDF" class="hidden" accept="application/pdf" onchange="handlePDF(this)">
+                    <button onclick="document.getElementById('upPDF').click()" class="w-full border border-gold/40 text-gold text-[10px] font-black uppercase p-3 rounded-lg hover:bg-gold/10" style="color: var(--oab-gold); border-color: var(--oab-gold);">Trocar Escala PDF</button>
                 </div>
+                <input type="text" id="tDia" placeholder="Data" class="input-oab">
+                <input type="text" id="tSai" placeholder="Advogado(a) que SAI" class="input-oab">
+                <input type="text" id="tEntra" placeholder="Advogado(a) que ENTRA" class="input-oab">
+                <button onclick="addTroca()" class="btn-gold">Salvar Alteração</button>
             </div>
 
-            <h4 class="text-[10px] font-black uppercase mb-4 opacity-50 tracking-widest text-center">Relatório de Trocas e Faltas</h4>
-            <div id="listaItems" class="overflow-y-auto max-height-[40vh] space-y-2">
-                </div>
+            <div class="glass-card flex-grow overflow-hidden flex flex-col">
+                <div class="panel-header">Relatório de Trocas</div>
+                <div id="listaItems" class="overflow-y-auto pr-2">
+                    </div>
+            </div>
+
         </div>
     </main>
 
@@ -149,7 +221,7 @@
 
         function renderPDF() {
             const data = localStorage.getItem('pdf_secure');
-            if (data) document.getElementById('pdfBox').innerHTML = `<embed src="${data}#toolbar=0&view=FitH" type="application/pdf">`;
+            if (data) document.getElementById('pdfBox').innerHTML = `<embed src="${data}#toolbar=0&navpanes=0&view=Fit" type="application/pdf">`;
         }
 
         function addTroca() {
@@ -165,19 +237,19 @@
         function renderLista() {
             const box = document.getElementById('listaItems');
             const isAdm = sessionStorage.getItem('isAdmin') === 'true';
-            box.innerHTML = db.length ? '' : '<p class="text-center py-5 opacity-20 text-[10px] font-bold">NENHUMA ALTERAÇÃO</p>';
+            box.innerHTML = db.length ? '' : '<p class="text-center py-10 opacity-20 text-[10px] font-bold">SEM REGISTROS</p>';
             db.forEach(item => {
                 box.innerHTML += `<div class="registro-item">
                     <div class="flex justify-between items-start">
-                        <span><b class="text-gold">${item.d}</b>: <s>${item.s}</s> → <span class="text-white font-bold">${item.e}</span></span>
-                        ${isAdm ? `<button onclick="del(${item.id})" class="text-red-500 ml-2"><i class="fa-solid fa-trash"></i></button>` : ''}
+                        <span><b class="text-gold">[${item.d}]</b><br><s>${item.s}</s><br><i class="fa-solid fa-arrow-down text-[8px] my-1 opacity-30"></i><br><span class="text-white font-bold">${item.e}</span></span>
+                        ${isAdm ? `<button onclick="del(${item.id})" class="text-red-500/30 hover:text-red-500 transition-all"><i class="fa-solid fa-trash-can"></i></button>` : ''}
                     </div>
                 </div>`;
             });
         }
 
         function del(id) { 
-            if(confirm("Apagar registro oficial?")) {
+            if(confirm("Apagar registro?")) {
                 db = db.filter(x => x.id !== id);
                 localStorage.setItem('cad_secure_v8', JSON.stringify(db));
                 renderLista();
