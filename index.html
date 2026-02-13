@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CAD SANTANA | FIXO ELITE</title>
+    <title>CAD SANTANA | ELITE FIXED</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <style>
@@ -20,7 +20,7 @@
             background-color: var(--oab-dark); 
             color: #f1f5f9; 
             height: 100vh; 
-            overflow: hidden; /* Trava a rolagem da página inteira */
+            overflow: hidden; 
             display: flex;
             flex-direction: column;
         }
@@ -30,10 +30,8 @@
             border-bottom: 2px solid var(--oab-gold);
             padding: 10px 40px;
             flex-shrink: 0;
-            z-index: 100;
         }
 
-        /* Container que não se move */
         .layout-master {
             display: flex;
             justify-content: center;
@@ -44,9 +42,8 @@
             height: calc(100vh - 80px);
         }
 
-        /* Moldura A4 Estática */
         .escala-fixa {
-            width: 65vh; /* Proporção baseada na altura da tela */
+            width: 65vh; 
             height: 85vh;
             background: white;
             box-shadow: 0 0 50px rgba(0,0,0,0.7);
@@ -55,13 +52,12 @@
             flex-shrink: 0;
         }
 
-        /* Painel de Informações Lateral */
         .painel-lateral {
             width: 400px;
             height: 85vh;
             display: flex;
             flex-direction: column;
-            gap: 20px;
+            gap: 15px;
             flex-shrink: 0;
         }
 
@@ -69,7 +65,7 @@
             background: var(--oab-card);
             border: 1px solid rgba(197, 163, 107, 0.15);
             border-radius: 16px;
-            padding: 25px;
+            padding: 20px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.4);
         }
 
@@ -79,20 +75,20 @@
             font-weight: 800;
             text-transform: uppercase;
             letter-spacing: 2px;
-            margin-bottom: 15px;
+            margin-bottom: 12px;
             display: block;
             border-bottom: 1px solid rgba(197, 163, 107, 0.1);
-            padding-bottom: 8px;
+            padding-bottom: 5px;
         }
 
         .input-oab {
             background: #070b14;
             border: 1px solid rgba(197, 163, 107, 0.2);
             border-radius: 8px;
-            padding: 10px 12px;
+            padding: 8px 12px;
             width: 100%;
             color: white;
-            margin-bottom: 10px;
+            margin-bottom: 8px;
             font-size: 12px;
             outline: none;
         }
@@ -102,24 +98,23 @@
             color: #000;
             font-weight: 900;
             text-transform: uppercase;
-            padding: 12px;
+            padding: 10px;
             border-radius: 8px;
             width: 100%;
             font-size: 10px;
-            transition: 0.2s;
+            margin-top: 5px;
         }
 
         .registro-item {
             background: rgba(255, 255, 255, 0.03);
             border-left: 3px solid var(--oab-gold);
-            padding: 12px;
+            padding: 10px;
             border-radius: 8px;
             margin-bottom: 8px;
             font-size: 11px;
-            animation: slideIn 0.3s ease-out;
         }
 
-        @keyframes slideIn { from { opacity: 0; transform: translateX(10px); } to { opacity: 1; transform: translateX(0); } }
+        .item-falta { border-left-color: #ef4444; background: rgba(239, 68, 68, 0.05); }
 
         .admin-only { display: none !important; }
         .is-admin .admin-only { display: block !important; }
@@ -136,8 +131,8 @@
         <div class="flex justify-between items-center max-w-[1800px] mx-auto">
             <div class="flex items-center gap-6">
                 <img src="https://raw.githubusercontent.com/cassiakelly995-lab/painel-triagem-juridica/main/santana-parnaiba-branco-e1744639876196-768x231.png" alt="OAB" class="h-10">
-                <div class="hidden md:block">
-                    <h1 class="text-white text-lg font-black uppercase italic tracking-tighter leading-none">CAD Santana de Parnaíba</h1>
+                <div>
+                    <h1 class="text-white text-lg font-black uppercase italic leading-none tracking-tighter">CAD Santana de Parnaíba</h1>
                     <p class="text-[9px] font-bold uppercase tracking-[0.3em] text-[#c5a36b] mt-1">Presidência: Dra. Maristela Gonçalves</p>
                 </div>
             </div>
@@ -160,20 +155,29 @@
         <div class="painel-lateral">
             
             <div class="glass-box admin-only">
-                <span class="label-gold">Controle de Escala</span>
-                <input type="file" id="filePDF" class="hidden" accept="application/pdf" onchange="uploadPDF(this)">
-                <button onclick="document.getElementById('filePDF').click()" class="w-full border border-gold/30 text-[#c5a36b] text-[10px] font-black py-2 rounded-lg mb-4 hover:bg-white/5">Substituir Arquivo PDF</button>
-                
-                <input type="text" id="inDia" placeholder="Dia/Mês" class="input-oab">
-                <input type="text" id="inSai" placeholder="Sai: Advogado(a)" class="input-oab">
-                <input type="text" id="inEntra" placeholder="Entra: Advogado(a)" class="input-oab">
-                <button onclick="saveTroca()" class="btn-salvar">Salvar no Sistema</button>
+                <span class="label-gold">Registrar Ocorrência</span>
+                <div class="flex gap-2 mb-4">
+                    <button onclick="setTab('T')" id="tabT" class="flex-1 text-[9px] font-black border-b-2 border-gold text-gold py-1">TROCA</button>
+                    <button onclick="setTab('F')" id="tabF" class="flex-1 text-[9px] font-black border-b-2 border-transparent text-slate-500 py-1">FALTA</button>
+                </div>
+
+                <div id="formTroca">
+                    <input type="text" id="inDiaT" placeholder="Dia/Mês" class="input-oab">
+                    <input type="text" id="inSai" placeholder="Sai: Advogado(a)" class="input-oab">
+                    <input type="text" id="inEntra" placeholder="Entra: Advogado(a)" class="input-oab">
+                    <button onclick="addOcorrencia('troca')" class="btn-salvar">Salvar Troca</button>
+                </div>
+
+                <div id="formFalta" class="hidden">
+                    <input type="text" id="inDiaF" placeholder="Dia/Mês" class="input-oab">
+                    <input type="text" id="inNomeF" placeholder="Nome do Faltante" class="input-oab">
+                    <button onclick="addOcorrencia('falta')" class="btn-salvar !bg-red-600 !text-white">Registrar Falta</button>
+                </div>
             </div>
 
             <div class="glass-box flex-grow overflow-hidden flex flex-col">
-                <span class="label-gold">Alterações e Ocorrências</span>
-                <div id="lista" class="overflow-y-auto flex-grow pr-2">
-                    </div>
+                <span class="label-gold">Histórico de Alterações</span>
+                <div id="lista" class="overflow-y-auto flex-grow pr-2"></div>
             </div>
 
         </div>
@@ -181,7 +185,7 @@
 
     <script>
         const PIN = "CAD2026"; 
-        let dataStore = JSON.parse(localStorage.getItem('cad_v8_final_fixed')) || [];
+        let store = JSON.parse(localStorage.getItem('cad_v8_final_fixed')) || [];
 
         function login() {
             if(prompt("🔒 Senha de Segurança:") === PIN) {
@@ -199,57 +203,49 @@
             drawList();
         }
 
-        function uploadPDF(input) {
-            const file = input.files[0];
-            if (file && sessionStorage.getItem('isAdmin')) {
-                const reader = new FileReader();
-                reader.onload = (e) => { 
-                    localStorage.setItem('pdf_final_fixed', e.target.result); 
-                    drawPDF(); 
-                };
-                reader.readAsDataURL(file);
-            }
+        function setTab(type) {
+            document.getElementById('formTroca').classList.toggle('hidden', type === 'F');
+            document.getElementById('formFalta').classList.toggle('hidden', type === 'T');
+            document.getElementById('tabT').className = type === 'T' ? 'flex-1 text-[9px] font-black border-b-2 border-gold text-gold py-1' : 'flex-1 text-[9px] font-black border-b-2 border-transparent text-slate-500 py-1';
+            document.getElementById('tabF').className = type === 'F' ? 'flex-1 text-[9px] font-black border-b-2 border-red-500 text-red-500 py-1' : 'flex-1 text-[9px] font-black border-b-2 border-transparent text-slate-500 py-1';
         }
 
-        function drawPDF() {
-            const raw = localStorage.getItem('pdf_final_fixed');
-            if (raw) document.getElementById('pdfArea').innerHTML = `<embed src="${raw}#toolbar=0&navpanes=0&view=FitH" type="application/pdf">`;
-        }
-
-        function saveTroca() {
-            const d = document.getElementById('inDia').value, s = document.getElementById('inSai').value, e = document.getElementById('inEntra').value;
-            if (d && s && e) { 
-                dataStore.unshift({ id: Date.now(), d, s, e }); 
-                localStorage.setItem('cad_v8_final_fixed', JSON.stringify(dataStore));
-                document.querySelectorAll('input').forEach(i => i.value = '');
-                drawList();
+        function addOcorrencia(tipo) {
+            if (tipo === 'troca') {
+                const d = document.getElementById('inDiaT').value, s = document.getElementById('inSai').value, e = document.getElementById('inEntra').value;
+                if (d && s && e) store.unshift({ id: Date.now(), tipo, d, s, e });
+            } else {
+                const d = document.getElementById('inDiaF').value, n = document.getElementById('inNomeF').value;
+                if (d && n) store.unshift({ id: Date.now(), tipo, d, n });
             }
+            localStorage.setItem('cad_v8_final_fixed', JSON.stringify(store));
+            document.querySelectorAll('input').forEach(i => i.value = '');
+            drawList();
         }
 
         function drawList() {
             const box = document.getElementById('lista');
             const adm = sessionStorage.getItem('isAdmin') === 'true';
-            box.innerHTML = dataStore.length ? '' : '<p class="text-center py-10 opacity-10 text-[10px] font-black uppercase">Nenhuma ocorrência</p>';
-            dataStore.forEach(item => {
-                box.innerHTML += `<div class="registro-item">
+            box.innerHTML = store.length ? '' : '<p class="text-center py-10 opacity-10 text-[10px] font-black">SEM REGISTROS</p>';
+            store.forEach(item => {
+                const isT = item.tipo === 'troca';
+                box.innerHTML += `<div class="registro-item ${!isT ? 'item-falta' : ''}">
                     <div class="flex justify-between items-center">
-                        <div>
-                            <span class="text-[#c5a36b] font-black">[${item.d}]</span> 
-                            <span class="opacity-40 ml-1"><s>${item.s}</s></span><br>
-                            <span class="text-white font-bold ml-6"><i class="fa-solid fa-arrow-turn-up fa-rotate-90 text-[8px] mr-2 opacity-30"></i>${item.e}</span>
+                        <div class="text-[11px] uppercase">
+                            <span class="${isT ? 'text-[#c5a36b]' : 'text-red-500'} font-black">[${item.d}]</span> 
+                            ${isT ? `<span class="opacity-40 ml-1"><s>${item.s}</s></span><br><span class="text-white font-bold ml-6">→ ${item.e}</span>` : `<span class="text-red-500 font-bold ml-1">FALTA: ${item.n}</span>`}
                         </div>
-                        ${adm ? `<button onclick="remove(${item.id})" class="text-red-900/40 hover:text-red-500 transition-colors"><i class="fa-solid fa-trash-can"></i></button>` : ''}
+                        ${adm ? `<button onclick="remove(${item.id})" class="text-white/10 hover:text-red-500"><i class="fa-solid fa-trash-can"></i></button>` : ''}
                     </div>
                 </div>`;
             });
         }
 
-        function remove(id) { 
-            if(confirm("Confirmar exclusão definitiva?")) { 
-                dataStore = dataStore.filter(x => x.id !== id); 
-                localStorage.setItem('cad_v8_final_fixed', JSON.stringify(dataStore)); 
-                drawList(); 
-            } 
+        function remove(id) { if(confirm("Remover?")) { store = store.filter(x => x.id !== id); localStorage.setItem('cad_v8_final_fixed', JSON.stringify(store)); drawList(); } }
+
+        function drawPDF() {
+            const raw = localStorage.getItem('pdf_final_fixed');
+            if (raw) document.getElementById('pdfArea').innerHTML = `<embed src="${raw}#toolbar=0&navpanes=0&view=FitH" type="application/pdf">`;
         }
 
         window.onload = () => { sync(); drawPDF(); };
