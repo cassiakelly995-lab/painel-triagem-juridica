@@ -12,15 +12,16 @@
         body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: var(--oab-dark); color: #f1f5f9; height: 100vh; overflow: hidden; display: flex; flex-direction: column; }
         header { background: #0f172a; border-bottom: 2px solid var(--oab-gold); padding: 10px 40px; flex-shrink: 0; }
         .layout-master { display: flex; justify-content: center; align-items: center; gap: 40px; padding: 30px; flex-grow: 1; height: calc(100vh - 80px); }
-        .escala-fixa { width: 65vh; height: 85vh; background: white; box-shadow: 0 0 50px rgba(0,0,0,0.7); border-radius: 4px; overflow: hidden; flex-shrink: 0; position: relative; }
+        .escala-fixa { width: 65vh; height: 85vh; background: white; box-shadow: 0 0 50px rgba(0,0,0,0.7); border-radius: 4px; overflow: hidden; flex-shrink: 0; display: flex; justify-content: center; align-items: center; }
         .painel-lateral { width: 420px; height: 85vh; display: flex; flex-direction: column; gap: 15px; flex-shrink: 0; }
         .glass-box { background: var(--oab-card); border: 1px solid rgba(197, 163, 107, 0.15); border-radius: 16px; padding: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.4); }
         .label-gold { color: var(--oab-gold); font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 12px; display: block; border-bottom: 1px solid rgba(197, 163, 107, 0.1); padding-bottom: 5px; }
         .input-oab { background: #070b14; border: 1px solid rgba(197, 163, 107, 0.2); border-radius: 8px; padding: 8px 12px; width: 100%; color: white; margin-bottom: 8px; font-size: 12px; outline: none; }
-        .btn-salvar { background: var(--oab-gold); color: #000; font-weight: 900; text-transform: uppercase; padding: 10px; border-radius: 8px; width: 100%; font-size: 10px; }
+        .btn-salvar { background: var(--oab-gold); color: #000; font-weight: 900; text-transform: uppercase; padding: 10px; border-radius: 8px; width: 100%; font-size: 10px; cursor: pointer; }
         .admin-only { display: none !important; }
         .is-admin .admin-only { display: block !important; }
-        embed, .escala-img { width: 100%; height: 100%; object-fit: contain; border: none; }
+        #viewArea { width: 100%; height: 100%; display: flex; justify-content: center; align-items: center; }
+        .escala-media { max-width: 100%; max-height: 100%; object-fit: contain; }
     </style>
 </head>
 <body id="mainBody">
@@ -44,10 +45,12 @@
     </header>
 
     <main class="layout-master">
-        <div class="escala-fixa" id="pdfArea">
-            <div class="flex flex-col items-center justify-center h-full text-slate-400 opacity-20">
-                <i class="fa-solid fa-file-contract text-6xl mb-4"></i>
-                <p class="font-black uppercase text-[10px]">Aguardando Arquivo</p>
+        <div class="escala-fixa">
+            <div id="viewArea">
+                <div class="flex flex-col items-center justify-center opacity-20 text-slate-400">
+                    <i class="fa-solid fa-file-image text-6xl mb-4"></i>
+                    <p class="font-black uppercase text-[10px]">Carregue a Escala no Painel</p>
+                </div>
             </div>
         </div>
 
@@ -55,27 +58,31 @@
             <div class="glass-box admin-only">
                 <span class="label-gold">Painel de Controle</span>
                 <div class="mb-4">
-                    <input type="file" id="fileInput" class="hidden" accept="application/pdf,image/*">
-                    <button onclick="triggerUpload()" class="w-full border border-gold/40 text-[#c5a36b] text-[9px] font-black py-2 rounded-lg hover:bg-gold/10 uppercase">
-                        <i class="fa-solid fa-cloud-arrow-up mr-2"></i> Carregar Escala (PDF/JPG)
+                    <input type="file" id="fileInput" class="hidden" accept="image/*,application/pdf" onchange="processFile(this)">
+                    <button onclick="document.getElementById('fileInput').click()" class="w-full border border-gold/40 text-[#c5a36b] text-[9px] font-black py-2 rounded-lg hover:bg-gold/10 uppercase">
+                        <i class="fa-solid fa-upload mr-2"></i> Selecionar Escala (Imagem ou PDF)
                     </button>
                 </div>
+                
                 <div class="flex gap-2 mb-3">
                     <button onclick="setTab('T')" id="tabT" class="flex-1 text-[9px] font-black border-b-2 border-gold text-gold py-1">TROCA</button>
                     <button onclick="setTab('F')" id="tabF" class="flex-1 text-[9px] font-black border-b-2 border-transparent text-slate-500 py-1">FALTA</button>
                 </div>
+
                 <div id="formTroca">
                     <input type="text" id="inDiaT" placeholder="Dia/Mês" class="input-oab">
                     <input type="text" id="inSai" placeholder="Sai: Advogado(a)" class="input-oab">
                     <input type="text" id="inEntra" placeholder="Entra: Advogado(a)" class="input-oab">
-                    <button onclick="add('troca')" class="btn-salvar">Confirmar Troca</button>
+                    <button onclick="add('troca')" class="btn-salvar">Salvar Troca</button>
                 </div>
+
                 <div id="formFalta" class="hidden">
                     <input type="text" id="inDiaF" placeholder="Dia/Mês" class="input-oab">
                     <input type="text" id="inNomeF" placeholder="Nome do Faltante" class="input-oab">
-                    <button onclick="add('falta')" class="btn-salvar !bg-red-700 !text-white">Registrar Falta</button>
+                    <button onclick="add('falta')" class="btn-salvar !bg-red-700 !text-white">Salvar Falta</button>
                 </div>
             </div>
+
             <div class="glass-box flex-grow overflow-hidden flex flex-col">
                 <span class="label-gold">Relatório de Ocorrências</span>
                 <div id="lista" class="overflow-y-auto flex-grow pr-2"></div>
@@ -85,11 +92,9 @@
 
     <script>
         const PIN = "CAD2026"; 
-        let store = JSON.parse(localStorage.getItem('cad_v8_final')) || [];
+        let store = JSON.parse(localStorage.getItem('cad_v8_db')) || [];
 
-        function login() {
-            if(prompt("🔒 Senha Admin:") === PIN) { sessionStorage.setItem('isAdmin', 'true'); sync(); }
-        }
+        function login() { if(prompt("🔒 Senha Admin:") === PIN) { sessionStorage.setItem('isAdmin', 'true'); sync(); } }
         function logout() { sessionStorage.removeItem('isAdmin'); sync(); }
         function sync() {
             const adm = sessionStorage.getItem('isAdmin') === 'true';
@@ -98,32 +103,33 @@
             drawList();
         }
 
-        // FUNÇÃO DE UPLOAD CORRIGIDA
-        function triggerUpload() { document.getElementById('fileInput').click(); }
-
-        document.getElementById('fileInput').addEventListener('change', function(e) {
-            const file = e.target.files[0];
+        // PROCESSAMENTO DE ARQUIVO MELHORADO
+        function processFile(input) {
+            const file = input.files[0];
             if (file) {
                 const reader = new FileReader();
-                reader.onload = function(event) {
-                    const content = event.target.result;
-                    const type = file.type === "application/pdf" ? 'pdf' : 'img';
+                reader.onload = function(e) {
+                    const content = e.target.result;
+                    const isPDF = file.type.includes('pdf');
                     localStorage.setItem('escala_content', content);
-                    localStorage.setItem('escala_ext', type);
-                    drawEscala();
+                    localStorage.setItem('escala_is_pdf', isPDF);
+                    renderEscala();
                 };
                 reader.readAsDataURL(file);
             }
-        });
+        }
 
-        function drawEscala() {
-            const data = localStorage.getItem('escala_content');
-            const type = localStorage.getItem('escala_ext');
-            const area = document.getElementById('pdfArea');
-            if (data) {
-                area.innerHTML = type === 'pdf' 
-                    ? `<embed src="${data}#toolbar=0&navpanes=0&view=FitH" type="application/pdf">`
-                    : `<img src="${data}" class="escala-img">`;
+        function renderEscala() {
+            const content = localStorage.getItem('escala_content');
+            const isPDF = localStorage.getItem('escala_is_pdf') === 'true';
+            const area = document.getElementById('viewArea');
+            
+            if (content) {
+                if (isPDF) {
+                    area.innerHTML = `<embed src="${content}#toolbar=0&navpanes=0&view=FitH" type="application/pdf" class="escala-media">`;
+                } else {
+                    area.innerHTML = `<img src="${content}" class="escala-media">`;
+                }
             }
         }
 
@@ -142,7 +148,7 @@
                 const d = document.getElementById('inDiaF').value, n = document.getElementById('inNomeF').value;
                 if (d && n) store.unshift({ id: Date.now(), tipo, d, n });
             }
-            localStorage.setItem('cad_v8_final', JSON.stringify(store));
+            localStorage.setItem('cad_v8_db', JSON.stringify(store));
             drawList();
         }
 
@@ -159,9 +165,9 @@
                 </div>`;
             });
         }
-        function del(id) { if(confirm("Apagar?")) { store = store.filter(x => x.id !== id); localStorage.setItem('cad_v8_final', JSON.stringify(store)); drawList(); } }
+        function del(id) { if(confirm("Apagar?")) { store = store.filter(x => x.id !== id); localStorage.setItem('cad_v8_db', JSON.stringify(store)); drawList(); } }
 
-        window.onload = () => { sync(); drawEscala(); };
+        window.onload = () => { sync(); renderEscala(); };
     </script>
 </body>
 </html>
