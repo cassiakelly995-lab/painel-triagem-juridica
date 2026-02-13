@@ -14,27 +14,28 @@
         header { background: #0f172a; border-bottom: 2px solid var(--oab-gold); padding: 10px 40px; flex-shrink: 0; }
         .layout-master { display: flex; justify-content: center; align-items: center; gap: 40px; padding: 20px; flex-grow: 1; height: calc(100vh - 80px); }
         
-        /* MOLDURA DA ESCALA - FIXAÇÃO ABSOLUTA */
+        /* MOLDURA DA ESCALA - FOCO EM IMAGEM FIXA */
         .escala-moldura { 
             width: 65vh; height: 85vh; background: #fff; 
             box-shadow: 0 0 60px rgba(0,0,0,0.9); border-radius: 4px; 
-            position: relative; overflow-y: auto; display: flex; flex-direction: column; align-items: center;
+            position: relative; overflow-y: auto; overflow-x: hidden;
         }
-        #pdfCanvas { max-width: 100%; height: auto; display: block; }
+        #pdfRenderArea canvas { width: 100% !important; height: auto !important; display: block; border-bottom: 2px solid #eee; }
         
         .painel-lateral { width: 400px; height: 85vh; display: flex; flex-direction: column; gap: 15px; }
         .glass-box { background: var(--oab-card); border: 1px solid rgba(197, 163, 107, 0.2); border-radius: 12px; padding: 20px; }
         .label-gold { color: var(--oab-gold); font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 10px; display: block; border-bottom: 1px solid rgba(197, 163, 107, 0.1); padding-bottom: 5px; }
         
         .input-oab { background: #070b14; border: 1px solid rgba(197, 163, 107, 0.3); border-radius: 8px; padding: 12px; width: 100%; color: white; margin-bottom: 8px; font-size: 12px; outline: none; }
-        .btn-gold { background: var(--oab-gold); color: #000; font-weight: 900; text-transform: uppercase; padding: 12px; border-radius: 8px; width: 100%; font-size: 11px; cursor: pointer; }
+        .btn-gold { background: var(--oab-gold); color: #000; font-weight: 900; text-transform: uppercase; padding: 12px; border-radius: 8px; width: 100%; font-size: 11px; cursor: pointer; transition: 0.2s; }
+        .btn-gold:hover { filter: brightness(1.2); }
 
         .admin-only { display: none !important; }
         .is-admin .admin-only { display: block !important; }
         .item-log { background: rgba(255, 255, 255, 0.03); border-left: 4px solid var(--oab-gold); padding: 12px; border-radius: 8px; margin-bottom: 8px; font-size: 12px; }
     </style>
 </head>
-<body id="masterApp">
+<body id="v8app">
 
     <header>
         <div class="flex justify-between items-center max-w-[1800px] mx-auto">
@@ -48,27 +49,27 @@
                 </div>
             </div>
             <div class="flex gap-4">
-                <button id="btnIn" onclick="entrar()" class="text-white/30 text-[10px] font-black uppercase">Admin</button>
-                <button onclick="sair()" class="admin-only text-red-500 text-[10px] font-black uppercase italic font-bold">Encerrar</button>
+                <button id="btnAdmin" onclick="login()" class="text-white/30 text-[10px] font-black uppercase hover:text-white">Admin</button>
+                <button onclick="logout()" class="admin-only text-red-500 text-[10px] font-black uppercase italic font-bold">Encerrar Sessão</button>
             </div>
         </div>
     </header>
 
     <main class="layout-master">
-        <div class="escala-moldura" id="printArea">
-            <canvas id="pdfCanvas"></canvas>
-            <div id="loading" class="absolute inset-0 flex flex-col items-center justify-center bg-white text-slate-300">
+        <div class="escala-moldura" id="viewer">
+            <div id="pdfRenderArea"></div>
+            <div id="placeholder" class="absolute inset-0 flex flex-col items-center justify-center bg-white text-slate-300">
                 <i class="fa-solid fa-file-pdf text-8xl mb-4"></i>
-                <p class="font-black uppercase text-xs">Aguardando Escala Permanente</p>
+                <p class="font-black uppercase text-xs">Escala Permanente V8</p>
             </div>
         </div>
 
         <div class="painel-lateral">
             <div class="glass-box admin-only">
                 <span class="label-gold">Controle Master</span>
-                <input type="file" id="pdfUpload" class="hidden" accept="application/pdf" onchange="processarEscala(this)">
-                <button onclick="document.getElementById('pdfUpload').click()" class="w-full border-2 border-dashed border-gold/40 text-gold py-3 rounded-xl text-[10px] font-black uppercase mb-4 hover:bg-gold/10">
-                    <i class="fa-solid fa-thumbtack mr-2"></i> Fixar Escala (Não Apaga)
+                <input type="file" id="fileIn" class="hidden" accept="application/pdf" onchange="converterEGravar(this)">
+                <button onclick="document.getElementById('fileIn').click()" class="w-full border-2 border-dashed border-gold/40 text-gold py-3 rounded-xl text-[10px] font-black uppercase mb-4 hover:bg-gold/10">
+                    <i class="fa-solid fa-thumbtack mr-2"></i> Fixar Escala (Modo Imagem)
                 </button>
 
                 <div class="flex gap-2 mb-4">
@@ -77,77 +78,87 @@
                 </div>
 
                 <div id="fT">
-                    <input type="text" id="iD" placeholder="Data" class="input-oab">
-                    <input type="text" id="iS" placeholder="Sai" class="input-oab">
-                    <input type="text" id="iE" placeholder="Entra" class="input-oab">
-                    <button onclick="add('T')" class="btn-gold">Fixar Troca</button>
+                    <input type="text" id="inD" placeholder="Data" class="input-oab">
+                    <input type="text" id="inS" placeholder="Advogado Sai" class="input-oab">
+                    <input type="text" id="inE" placeholder="Advogado Entra" class="input-oab">
+                    <button onclick="salvar('T')" class="btn-gold">Confirmar Troca</button>
                 </div>
                 <div id="fF" class="hidden">
-                    <input type="text" id="iDf" placeholder="Data" class="input-oab">
-                    <input type="text" id="iNf" placeholder="Nome" class="input-oab">
-                    <button onclick="add('F')" class="btn-gold !bg-red-700 !text-white">Fixar Falta</button>
+                    <input type="text" id="inDf" placeholder="Data" class="input-oab">
+                    <input type="text" id="inNf" placeholder="Nome Faltante" class="input-oab">
+                    <button onclick="salvar('F')" class="btn-gold !bg-red-700 !text-white">Registrar Falta</button>
                 </div>
             </div>
 
             <div class="glass-box flex-grow overflow-hidden flex flex-col">
                 <span class="label-gold">Histórico Permanente</span>
-                <div id="feed" class="overflow-y-auto flex-grow pr-2"></div>
+                <div id="logs" class="overflow-y-auto flex-grow pr-2"></div>
             </div>
         </div>
     </main>
 
     <script>
         pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
-        const CHAVE = "CAD2026";
-        let logs = JSON.parse(localStorage.getItem('cad_v8_final_logs')) || [];
+        const PASS = "CAD2026";
+        let db = JSON.parse(localStorage.getItem('v8_db_permanent')) || [];
 
-        function entrar() { if(prompt("Senha:") === CHAVE) { sessionStorage.setItem('auth', '1'); sync(); } }
-        function sair() { sessionStorage.removeItem('auth'); sync(); }
+        function login() { if(prompt("Senha:") === PASS) { sessionStorage.setItem('v8_log', '1'); sync(); } }
+        function logout() { sessionStorage.removeItem('v8_log'); sync(); }
 
         function sync() {
-            const ok = sessionStorage.getItem('auth') === '1';
-            document.getElementById('masterApp').className = ok ? 'is-admin' : '';
-            document.getElementById('btnIn').style.display = ok ? 'none' : 'block';
+            const isOk = sessionStorage.getItem('v8_log') === '1';
+            document.getElementById('v8app').className = isOk ? 'is-admin' : '';
+            document.getElementById('btnAdmin').style.display = isOk ? 'none' : 'block';
             renderLogs();
         }
 
-        async function processarEscala(input) {
+        // FUNÇÃO QUE RESOLVE O PROBLEMA DEFINITIVAMENTE
+        async function converterEGravar(input) {
             const file = input.files[0];
             if (!file) return;
+            
             const reader = new FileReader();
             reader.onload = async function() {
                 const typedarray = new Uint8Array(this.result);
                 const pdf = await pdfjsLib.getDocument(typedarray).promise;
-                const page = await pdf.getPage(1);
-                const viewport = page.getViewport({ scale: 2.0 });
-                const canvas = document.getElementById('pdfCanvas');
-                const context = canvas.getContext('2d');
-                canvas.height = viewport.height;
-                canvas.width = viewport.width;
-
-                await page.render({ canvasContext: context, viewport: viewport }).promise;
+                const renderArea = document.getElementById('pdfRenderArea');
+                renderArea.innerHTML = ''; // Limpa anterior
                 
-                // O PULO DO GATO: Transforma em imagem e salva no banco eterno
-                const imgData = canvas.toDataURL('image/png');
-                localStorage.setItem('escala_imortal', imgData);
-                document.getElementById('loading').style.display = 'none';
+                const imageBatch = [];
+                
+                for(let i=1; i <= pdf.numPages; i++) {
+                    const page = await pdf.getPage(i);
+                    const viewport = page.getViewport({ scale: 1.5 });
+                    const canvas = document.createElement('canvas');
+                    const context = canvas.getContext('2d');
+                    canvas.height = viewport.height;
+                    canvas.width = viewport.width;
+                    
+                    await page.render({ canvasContext: context, viewport: viewport }).promise;
+                    renderArea.appendChild(canvas);
+                    imageBatch.push(canvas.toDataURL('image/webp', 0.6));
+                }
+                
+                // Grava as imagens no banco definitivo
+                localStorage.setItem('v8_escala_images', JSON.stringify(imageBatch));
+                document.getElementById('placeholder').style.display = 'none';
             };
             reader.readAsArrayBuffer(file);
         }
 
         function loadEscala() {
-            const salva = localStorage.getItem('escala_imortal');
-            if (salva) {
-                const canvas = document.getElementById('pdfCanvas');
-                const ctx = canvas.getContext('2d');
-                const img = new Image();
-                img.onload = function() {
-                    canvas.width = img.width;
-                    canvas.height = img.height;
-                    ctx.drawImage(img, 0, 0);
-                    document.getElementById('loading').style.display = 'none';
-                };
-                img.src = salva;
+            const salvas = JSON.parse(localStorage.getItem('v8_escala_images'));
+            if (salvas && salvas.length > 0) {
+                const renderArea = document.getElementById('pdfRenderArea');
+                renderArea.innerHTML = '';
+                salvas.forEach(src => {
+                    const img = new Image();
+                    img.src = src;
+                    img.style.width = "100%";
+                    img.style.marginBottom = "10px";
+                    renderArea.appendChild(img);
+                });
+                document.getElementById('placeholder').style.display = 'none';
             }
         }
 
@@ -158,37 +169,38 @@
             document.getElementById('tF').className = t === 'F' ? 'flex-1 py-1 text-[10px] font-black border-b-2 border-red-500 text-red-500' : 'flex-1 py-1 text-[10px] font-black border-b-2 border-transparent text-slate-500';
         }
 
-        function add(t) {
-            let o = {};
-            if(t === 'T') {
-                const d = document.getElementById('iD').value, s = document.getElementById('iS').value, e = document.getElementById('iE').value;
-                if(d && s && e) o = { id: Date.now(), t, d, s, e };
+        function salvar(tipo) {
+            let item = {};
+            if(tipo === 'T') {
+                const d = document.getElementById('inD').value, s = document.getElementById('inS').value, e = document.getElementById('inE').value;
+                if(d && s && e) item = { id: Date.now(), tipo, d, s, e };
             } else {
-                const d = document.getElementById('iDf').value, n = document.getElementById('iNf').value;
-                if(d && n) o = { id: Date.now(), t, d, n };
+                const d = document.getElementById('inDf').value, n = document.getElementById('inNf').value;
+                if(d && n) item = { id: Date.now(), tipo, d, n };
             }
-            if(o.id) {
-                logs.unshift(o);
-                localStorage.setItem('cad_v8_final_logs', JSON.stringify(logs));
+            if(item.id) {
+                db.unshift(item);
+                localStorage.setItem('v8_db_permanent', JSON.stringify(db));
                 renderLogs();
                 document.querySelectorAll('input:not([type=file])').forEach(i => i.value = '');
             }
         }
 
         function renderLogs() {
-            const f = document.getElementById('feed');
-            f.innerHTML = logs.length ? '' : '<p class="text-center py-20 opacity-10 text-[10px] font-black">VAZIO</p>';
-            logs.forEach(i => {
-                const isT = i.t === 'T';
-                f.innerHTML += `<div class="item-log ${!isT ? 'border-red-600' : ''}">
+            const f = document.getElementById('logs');
+            f.innerHTML = db.length ? '' : '<p class="text-center py-20 opacity-10 text-[10px] font-black">SEM REGISTROS</p>';
+            db.forEach(i => {
+                const isT = i.tipo === 'T';
+                f.innerHTML += `
+                <div class="item-log ${!isT ? 'border-red-600' : ''}">
                     <div class="flex justify-between items-center uppercase font-bold">
                         <div class="text-[11px]"><span class="${isT?'text-gold':'text-red-500'}">[${i.d}]</span> ${isT?`<s>${i.s}</s> → ${i.e}`:`FALTA: ${i.n}`}</div>
-                        ${sessionStorage.getItem('auth')?`<button onclick="del(${i.id})" class="opacity-20 hover:text-red-500"><i class="fa-solid fa-trash"></i></button>`:''}
+                        ${sessionStorage.getItem('v8_log')?`<button onclick="del(${i.id})" class="opacity-20 hover:text-red-500"><i class="fa-solid fa-trash"></i></button>`:''}
                     </div>
                 </div>`;
             });
         }
-        function del(id) { if(confirm("Apagar?")) { logs = logs.filter(x => x.id !== id); localStorage.setItem('cad_v8_final_logs', JSON.stringify(logs)); renderLogs(); } }
+        function del(id) { if(confirm("Apagar?")) { db = db.filter(x => x.id !== id); localStorage.setItem('v8_db_permanent', JSON.stringify(db)); renderLogs(); } }
 
         window.onload = () => { sync(); loadEscala(); };
     </script>
