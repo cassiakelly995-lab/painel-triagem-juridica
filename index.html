@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CAD SANTANA | V8 DESTRAVADO</title>
+    <title>CAD SANTANA | V8 GOD MODE</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <style>
@@ -14,16 +14,19 @@
         
         .layout-master { display: flex; justify-content: center; align-items: center; gap: 40px; padding: 30px; flex-grow: 1; height: calc(100vh - 80px); }
         
-        /* Moldura A4 Fixa com Scroll para Arrastar se necessário */
+        /* Moldura A4 */
         .escala-fixa { 
             width: 65vh; 
             height: 85vh; 
-            background: white; 
-            box-shadow: 0 0 50px rgba(0,0,0,0.7); 
+            background: #fff; 
+            box-shadow: 0 0 50px rgba(0,0,0,0.8); 
             border-radius: 4px; 
-            overflow: auto; /* Permite arrastar se o PDF for maior */
+            overflow: hidden; 
             flex-shrink: 0; 
-            position: relative; 
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
         
         .painel-lateral { width: 420px; height: 85vh; display: flex; flex-direction: column; gap: 15px; flex-shrink: 0; }
@@ -36,9 +39,8 @@
         .admin-only { display: none !important; }
         .is-admin .admin-only { display: block !important; }
         
-        /* Estilo do Visualizador de PDF */
-        #pdfViewer { width: 100%; height: 100%; border: none; min-height: 85vh; }
-        
+        /* Visualizador */
+        #pdfViewer { width: 100%; height: 100%; border: none; }
         .registro-item { background: rgba(255, 255, 255, 0.03); border-left: 3px solid var(--oab-gold); padding: 10px; border-radius: 8px; margin-bottom: 8px; font-size: 11px; }
     </style>
 </head>
@@ -64,22 +66,20 @@
 
     <main class="layout-master">
         
-        <div class="escala-fixa" id="dropZone">
-            <div id="pdfContent" class="h-full w-full">
-                <div class="flex flex-col items-center justify-center h-full text-slate-400 opacity-20">
-                    <i class="fa-solid fa-file-pdf text-6xl mb-4"></i>
-                    <p class="font-black uppercase text-[10px]">Aguardando Escala</p>
-                </div>
+        <div class="escala-fixa" id="pdfArea">
+            <div class="flex flex-col items-center justify-center opacity-20 text-slate-500">
+                <i class="fa-solid fa-file-pdf text-6xl mb-4"></i>
+                <p class="font-black uppercase text-[10px]">Aguardando Escala</p>
             </div>
         </div>
 
         <div class="painel-lateral">
             <div class="glass-box admin-only">
-                <span class="label-gold">Painel de Controle</span>
+                <span class="label-gold">Controle</span>
                 <div class="mb-4">
-                    <input type="file" id="fileInput" class="hidden" accept=".pdf" onchange="handleUpload(this)">
-                    <button onclick="document.getElementById('fileInput').click()" class="w-full border border-gold/40 text-[#c5a36b] text-[9px] font-black py-2 rounded-lg hover:bg-gold/10 uppercase">
-                        <i class="fa-solid fa-folder-open mr-2"></i> Abrir Arquivo PDF
+                    <input type="file" id="fileIn" class="hidden" accept=".pdf" onchange="uploadPDF(this)">
+                    <button onclick="document.getElementById('fileIn').click()" class="w-full border border-gold/40 text-[#c5a36b] text-[9px] font-black py-2 rounded-lg hover:bg-gold/10 uppercase">
+                        <i class="fa-solid fa-upload mr-2"></i> Carregar PDF
                     </button>
                 </div>
 
@@ -90,22 +90,21 @@
 
                 <div id="formTroca">
                     <input type="text" id="inDiaT" placeholder="Data" class="input-oab">
-                    <input type="text" id="inSai" placeholder="Advogado que SAI" class="input-oab">
-                    <input type="text" id="inEntra" placeholder="Advogado que ENTRA" class="input-oab">
-                    <button onclick="add('troca')" class="btn-salvar">Confirmar Troca</button>
+                    <input type="text" id="inSai" placeholder="Sai" class="input-oab">
+                    <input type="text" id="inEntra" placeholder="Entra" class="input-oab">
+                    <button onclick="registrar('troca')" class="btn-salvar">Confirmar Troca</button>
                 </div>
 
                 <div id="formFalta" class="hidden">
                     <input type="text" id="inDiaF" placeholder="Data" class="input-oab">
                     <input type="text" id="inNomeF" placeholder="Nome do Faltante" class="input-oab">
-                    <button onclick="add('falta')" class="btn-salvar !bg-red-700 !text-white">Registrar Falta</button>
+                    <button onclick="registrar('falta')" class="btn-salvar !bg-red-700 !text-white">Salvar Falta</button>
                 </div>
             </div>
 
             <div class="glass-box flex-grow overflow-hidden flex flex-col">
-                <span class="label-gold">Relatório de Ocorrências</span>
+                <span class="label-gold">Histórico</span>
                 <div id="lista" class="overflow-y-auto flex-grow pr-2"></div>
-                <button onclick="downloadBackup()" class="mt-4 text-[8px] opacity-30 hover:opacity-100 uppercase font-black">Baixar Backup Dados</button>
             </div>
         </div>
     </main>
@@ -114,7 +113,7 @@
         const PIN = "CAD2026"; 
         let store = JSON.parse(localStorage.getItem('cad_v8_db')) || [];
 
-        function login() { if(prompt("🔒 Senha Admin:") === PIN) { sessionStorage.setItem('isAdmin', 'true'); sync(); } }
+        function login() { if(prompt("Senha:") === PIN) { sessionStorage.setItem('isAdmin', 'true'); sync(); } }
         function logout() { sessionStorage.removeItem('isAdmin'); sync(); }
         function sync() {
             const adm = sessionStorage.getItem('isAdmin') === 'true';
@@ -123,24 +122,23 @@
             drawList();
         }
 
-        // MOTOR DE CARREGAMENTO NOVO (BLINDADO)
-        function handleUpload(input) {
+        function uploadPDF(input) {
             const file = input.files[0];
             if (file) {
-                const blobURL = URL.createObjectURL(file);
-                renderPDF(blobURL);
-                // Salvar para persistência (Base64)
                 const reader = new FileReader();
-                reader.onload = (e) => localStorage.setItem('escala_persist', e.target.result);
+                reader.onload = function(e) {
+                    const base64 = e.target.result;
+                    localStorage.setItem('escala_saved', base64);
+                    render(base64);
+                };
                 reader.readAsDataURL(file);
             }
         }
 
-        function renderPDF(url) {
-            const container = document.getElementById('pdfContent');
-            container.innerHTML = `<object data="${url}#toolbar=0&navpanes=0&view=FitH" type="application/pdf" id="pdfViewer">
-                <embed src="${url}#toolbar=0&navpanes=0&view=FitH" type="application/pdf" />
-            </object>`;
+        function render(data) {
+            if (!data) return;
+            const area = document.getElementById('pdfArea');
+            area.innerHTML = `<embed src="${data}#toolbar=0&navpanes=0&view=FitH" type="application/pdf" id="pdfViewer">`;
         }
 
         function setTab(t) {
@@ -150,7 +148,7 @@
             document.getElementById('tabF').className = t === 'F' ? 'flex-1 text-[9px] font-black border-b-2 border-red-500 text-red-500 py-1' : 'flex-1 text-[9px] font-black border-b-2 border-transparent text-slate-500 py-1';
         }
 
-        function add(tipo) {
+        function registrar(tipo) {
             if (tipo === 'troca') {
                 const d = document.getElementById('inDiaT').value, s = document.getElementById('inSai').value, e = document.getElementById('inEntra').value;
                 if (d && s && e) store.unshift({ id: Date.now(), tipo, d, s, e });
@@ -164,32 +162,20 @@
 
         function drawList() {
             const box = document.getElementById('lista');
-            box.innerHTML = store.length ? '' : '<p class="text-center py-10 opacity-10 text-[10px] font-black">SEM REGISTROS</p>';
+            box.innerHTML = store.length ? '' : '<p class="text-center py-10 opacity-10 text-[10px] font-black">VAZIO</p>';
             store.forEach(i => {
                 const isT = i.tipo === 'troca';
-                box.innerHTML += `<div class="registro-item ${!isT ? 'border-red-600 bg-red-600/5' : ''}">
+                box.innerHTML += `<div class="registro-item ${!isT ? 'border-red-500' : ''}">
                     <div class="flex justify-between items-center text-[11px] uppercase">
                         <div><b class="${isT?'text-gold':'text-red-500'}">[${i.d}]</b> ${isT ? `<s>${i.s}</s> → <b>${i.e}</b>` : `<b>FALTA: ${i.n}</b>`}</div>
-                        ${sessionStorage.getItem('isAdmin') ? `<button onclick="del(${i.id})" class="text-white/10 hover:text-red-500 ml-2"><i class="fa-solid fa-trash"></i></button>` : ''}
+                        ${sessionStorage.getItem('isAdmin') ? `<button onclick="del(${i.id})" class="opacity-20 hover:text-red-500"><i class="fa-solid fa-trash"></i></button>` : ''}
                     </div>
                 </div>`;
             });
         }
         function del(id) { if(confirm("Apagar?")) { store = store.filter(x => x.id !== id); localStorage.setItem('cad_v8_db', JSON.stringify(store)); drawList(); } }
 
-        function downloadBackup() {
-            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(store));
-            const dl = document.createElement('a');
-            dl.setAttribute("href", dataStr);
-            dl.setAttribute("download", "backup_escala.json");
-            dl.click();
-        }
-
-        window.onload = () => { 
-            sync(); 
-            const saved = localStorage.getItem('escala_persist');
-            if(saved) renderPDF(saved);
-        };
+        window.onload = () => { sync(); render(localStorage.getItem('escala_saved')); };
     </script>
 </body>
 </html>
