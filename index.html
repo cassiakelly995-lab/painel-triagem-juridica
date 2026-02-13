@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CAD SANTANA | V8 ELITE EDITION</title>
+    <title>CAD SANTANA | V8 DESTRAVADO</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <style>
@@ -13,24 +13,33 @@
         header { background: #0f172a; border-bottom: 2px solid var(--oab-gold); padding: 10px 40px; flex-shrink: 0; }
         
         .layout-master { display: flex; justify-content: center; align-items: center; gap: 40px; padding: 30px; flex-grow: 1; height: calc(100vh - 80px); }
-        .escala-fixa { width: 65vh; height: 85vh; background: white; box-shadow: 0 0 50px rgba(0,0,0,0.7); border-radius: 4px; overflow: hidden; flex-shrink: 0; position: relative; }
-        .painel-lateral { width: 420px; height: 85vh; display: flex; flex-direction: column; gap: 15px; flex-shrink: 0; }
         
+        /* Moldura A4 Fixa com Scroll para Arrastar se necessário */
+        .escala-fixa { 
+            width: 65vh; 
+            height: 85vh; 
+            background: white; 
+            box-shadow: 0 0 50px rgba(0,0,0,0.7); 
+            border-radius: 4px; 
+            overflow: auto; /* Permite arrastar se o PDF for maior */
+            flex-shrink: 0; 
+            position: relative; 
+        }
+        
+        .painel-lateral { width: 420px; height: 85vh; display: flex; flex-direction: column; gap: 15px; flex-shrink: 0; }
         .glass-box { background: var(--oab-card); border: 1px solid rgba(197, 163, 107, 0.15); border-radius: 16px; padding: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.4); }
         .label-gold { color: var(--oab-gold); font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 12px; display: block; border-bottom: 1px solid rgba(197, 163, 107, 0.1); padding-bottom: 5px; }
         
         .input-oab { background: #070b14; border: 1px solid rgba(197, 163, 107, 0.2); border-radius: 8px; padding: 8px 12px; width: 100%; color: white; margin-bottom: 8px; font-size: 12px; outline: none; }
-        .btn-salvar { background: var(--oab-gold); color: #000; font-weight: 900; text-transform: uppercase; padding: 10px; border-radius: 8px; width: 100%; font-size: 10px; }
+        .btn-salvar { background: var(--oab-gold); color: #000; font-weight: 900; text-transform: uppercase; padding: 10px; border-radius: 8px; width: 100%; font-size: 10px; cursor: pointer; }
 
         .admin-only { display: none !important; }
         .is-admin .admin-only { display: block !important; }
         
-        iframe#pdfFrame { width: 100%; height: 100%; border: none; }
-        .registro-item { background: rgba(255, 255, 255, 0.03); border-left: 3px solid var(--oab-gold); padding: 10px; border-radius: 8px; margin-bottom: 8px; font-size: 11px; }
+        /* Estilo do Visualizador de PDF */
+        #pdfViewer { width: 100%; height: 100%; border: none; min-height: 85vh; }
         
-        /* Botão flutuante de download na escala */
-        .download-float { position: absolute; bottom: 20px; right: 20px; background: var(--oab-gold); color: black; padding: 12px; border-radius: 50%; box-shadow: 0 4px 15px rgba(0,0,0,0.5); cursor: pointer; transition: 0.3s; z-index: 10; display: none; }
-        .download-float:hover { transform: scale(1.1); }
+        .registro-item { background: rgba(255, 255, 255, 0.03); border-left: 3px solid var(--oab-gold); padding: 10px; border-radius: 8px; margin-bottom: 8px; font-size: 11px; }
     </style>
 </head>
 <body id="mainBody">
@@ -55,23 +64,22 @@
 
     <main class="layout-master">
         
-        <div class="escala-fixa" id="escalaContainer">
-            <div class="flex flex-col items-center justify-center h-full text-slate-400 opacity-20">
-                <i class="fa-solid fa-file-pdf text-6xl mb-4"></i>
-                <p class="font-black uppercase text-[10px]">Aguardando PDF</p>
+        <div class="escala-fixa" id="dropZone">
+            <div id="pdfContent" class="h-full w-full">
+                <div class="flex flex-col items-center justify-center h-full text-slate-400 opacity-20">
+                    <i class="fa-solid fa-file-pdf text-6xl mb-4"></i>
+                    <p class="font-black uppercase text-[10px]">Aguardando Escala</p>
+                </div>
             </div>
-        </div>
-        <div id="btnDownload" class="download-float" onclick="downloadEscala()" title="Baixar Escala">
-            <i class="fa-solid fa-download"></i>
         </div>
 
         <div class="painel-lateral">
             <div class="glass-box admin-only">
-                <span class="label-gold">Administração</span>
+                <span class="label-gold">Painel de Controle</span>
                 <div class="mb-4">
-                    <input type="file" id="pdfInput" class="hidden" accept=".pdf" onchange="loadPDF(this)">
-                    <button onclick="document.getElementById('pdfInput').click()" class="w-full border border-gold/40 text-[#c5a36b] text-[9px] font-black py-2 rounded-lg hover:bg-gold/10">
-                        <i class="fa-solid fa-file-arrow-up mr-2"></i> CARREGAR NOVA ESCALA (PDF)
+                    <input type="file" id="fileInput" class="hidden" accept=".pdf" onchange="handleUpload(this)">
+                    <button onclick="document.getElementById('fileInput').click()" class="w-full border border-gold/40 text-[#c5a36b] text-[9px] font-black py-2 rounded-lg hover:bg-gold/10 uppercase">
+                        <i class="fa-solid fa-folder-open mr-2"></i> Abrir Arquivo PDF
                     </button>
                 </div>
 
@@ -95,18 +103,16 @@
             </div>
 
             <div class="glass-box flex-grow overflow-hidden flex flex-col">
-                <div class="flex justify-between items-center mb-2">
-                    <span class="label-gold !mb-0">Relatório de Ocorrências</span>
-                    <button onclick="window.print()" class="text-[9px] font-black text-gold/50 hover:text-gold uppercase"><i class="fa-solid fa-print"></i></button>
-                </div>
+                <span class="label-gold">Relatório de Ocorrências</span>
                 <div id="lista" class="overflow-y-auto flex-grow pr-2"></div>
+                <button onclick="downloadBackup()" class="mt-4 text-[8px] opacity-30 hover:opacity-100 uppercase font-black">Baixar Backup Dados</button>
             </div>
         </div>
     </main>
 
     <script>
         const PIN = "CAD2026"; 
-        let store = JSON.parse(localStorage.getItem('cad_v8_final')) || [];
+        let store = JSON.parse(localStorage.getItem('cad_v8_db')) || [];
 
         function login() { if(prompt("🔒 Senha Admin:") === PIN) { sessionStorage.setItem('isAdmin', 'true'); sync(); } }
         function logout() { sessionStorage.removeItem('isAdmin'); sync(); }
@@ -117,38 +123,24 @@
             drawList();
         }
 
-        function loadPDF(input) {
+        // MOTOR DE CARREGAMENTO NOVO (BLINDADO)
+        function handleUpload(input) {
             const file = input.files[0];
             if (file) {
+                const blobURL = URL.createObjectURL(file);
+                renderPDF(blobURL);
+                // Salvar para persistência (Base64)
                 const reader = new FileReader();
-                reader.onload = function(e) {
-                    const pdfData = e.target.result;
-                    localStorage.setItem('escala_pdf_raw', pdfData);
-                    localStorage.setItem('escala_nome', file.name);
-                    renderPDF();
-                };
+                reader.onload = (e) => localStorage.setItem('escala_persist', e.target.result);
                 reader.readAsDataURL(file);
             }
         }
 
-        function renderPDF() {
-            const data = localStorage.getItem('escala_pdf_raw');
-            if (data) {
-                document.getElementById('escalaContainer').innerHTML = `<iframe src="${data}#toolbar=0&navpanes=0&view=FitH" id="pdfFrame"></iframe>`;
-                document.getElementById('btnDownload').style.display = 'block';
-            }
-        }
-
-        // FUNÇÃO DE DOWNLOAD CORRIGIDA
-        function downloadEscala() {
-            const data = localStorage.getItem('escala_pdf_raw');
-            const nome = localStorage.getItem('escala_nome') || 'escala_oab.pdf';
-            if (data) {
-                const link = document.createElement('a');
-                link.href = data;
-                link.download = nome;
-                link.click();
-            }
+        function renderPDF(url) {
+            const container = document.getElementById('pdfContent');
+            container.innerHTML = `<object data="${url}#toolbar=0&navpanes=0&view=FitH" type="application/pdf" id="pdfViewer">
+                <embed src="${url}#toolbar=0&navpanes=0&view=FitH" type="application/pdf" />
+            </object>`;
         }
 
         function setTab(t) {
@@ -166,7 +158,7 @@
                 const d = document.getElementById('inDiaF').value, n = document.getElementById('inNomeF').value;
                 if (d && n) store.unshift({ id: Date.now(), tipo, d, n });
             }
-            localStorage.setItem('cad_v8_final', JSON.stringify(store));
+            localStorage.setItem('cad_v8_db', JSON.stringify(store));
             drawList();
         }
 
@@ -183,9 +175,21 @@
                 </div>`;
             });
         }
-        function del(id) { if(confirm("Apagar?")) { store = store.filter(x => x.id !== id); localStorage.setItem('cad_v8_final', JSON.stringify(store)); drawList(); } }
+        function del(id) { if(confirm("Apagar?")) { store = store.filter(x => x.id !== id); localStorage.setItem('cad_v8_db', JSON.stringify(store)); drawList(); } }
 
-        window.onload = () => { sync(); renderPDF(); };
+        function downloadBackup() {
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(store));
+            const dl = document.createElement('a');
+            dl.setAttribute("href", dataStr);
+            dl.setAttribute("download", "backup_escala.json");
+            dl.click();
+        }
+
+        window.onload = () => { 
+            sync(); 
+            const saved = localStorage.getItem('escala_persist');
+            if(saved) renderPDF(saved);
+        };
     </script>
 </body>
 </html>
