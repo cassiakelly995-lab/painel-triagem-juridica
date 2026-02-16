@@ -17,15 +17,13 @@
         .escala-moldura { width: 100%; max-width: 800px; height: 70vh; background: #fff; box-shadow: 0 0 40px rgba(0,0,0,0.7); border-radius: 8px; position: relative; overflow-y: auto; }
         @media (min-width: 1024px) { .escala-moldura { width: 65vh; height: 85vh; } }
         #pdfRenderArea img { width: 100%; height: auto; display: block; border-bottom: 1px solid #eee; }
-        .painel-lateral { width: 100%; max-width: 400px; display: flex; flex-direction: column; gap: 15px; }
-        .glass-box { background: var(--oab-card); border: 1px solid rgba(197, 163, 107, 0.2); border-radius: 12px; padding: 20px; }
+        .glass-box { background: var(--oab-card); border: 1px solid rgba(197, 163, 107, 0.2); border-radius: 12px; padding: 20px; width: 100%; max-width: 400px; }
         .label-gold { color: var(--oab-gold); font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 10px; display: block; border-bottom: 1px solid rgba(197, 163, 107, 0.1); padding-bottom: 5px; }
         .input-oab { background: #070b14; border: 1px solid rgba(197, 163, 107, 0.3); border-radius: 8px; padding: 12px; width: 100%; color: white; margin-bottom: 8px; font-size: 14px; outline: none; }
-        .btn-gold { background: var(--oab-gold); color: #000; font-weight: 900; text-transform: uppercase; padding: 14px; border-radius: 8px; width: 100%; cursor: pointer; transition: 0.2s; }
+        .btn-gold { background: var(--oab-gold); color: #000; font-weight: 900; text-transform: uppercase; padding: 14px; border-radius: 8px; width: 100%; cursor: pointer; }
         .admin-only { display: none !important; }
         .is-admin .admin-only { display: block !important; }
         .item-log { background: rgba(255, 255, 255, 0.03); border-left: 4px solid var(--oab-gold); padding: 12px; border-radius: 8px; margin-bottom: 8px; font-size: 13px; }
-        .item-falta { border-left-color: #ef4444; background: rgba(239, 68, 68, 0.05); }
     </style>
 </head>
 <body id="v8app">
@@ -33,90 +31,53 @@
         <div class="flex justify-between items-center max-w-[1400px] mx-auto">
             <div class="flex items-center gap-4">
                 <i class="fa-solid fa-scale-balanced text-2xl text-[#c5a36b]"></i>
-                <h1 class="text-white text-sm md:text-lg font-black uppercase italic tracking-tighter">CAD Santana</h1>
+                <h1 class="text-white text-sm md:text-lg font-black uppercase italic">CAD Santana</h1>
             </div>
             <button id="btnAdmin" onclick="login()" class="text-white/40 text-[10px] font-black uppercase">Admin</button>
-            <button onclick="logout()" class="admin-only text-red-500 text-[10px] font-black uppercase font-bold">Bloquear</button>
         </div>
     </header>
 
     <main class="layout-master">
-        <div class="escala-moldura">
+        <div class="escala-moldura" id="viewer">
             <div id="pdfRenderArea"></div>
             <div id="placeholder" class="absolute inset-0 flex flex-col items-center justify-center bg-white text-slate-300 p-10 text-center">
-                <i class="fa-solid fa-file-contract text-6xl mb-4"></i>
-                <p class="font-black uppercase text-xs">Escala Permanente V8</p>
+                <i class="fa-solid fa-shield-check text-6xl mb-4 text-slate-200"></i>
+                <p class="font-black uppercase text-xs">Aguardando Escala Permanente</p>
             </div>
         </div>
 
-        <div class="painel-lateral">
-            <div class="glass-box admin-only">
-                <span class="label-gold">Gestão Mensal</span>
-                <button onclick="baixarRelatorio()" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-black text-[11px] uppercase py-3 rounded-xl mb-4 transition-all">
-                    <i class="fa-solid fa-file-export mr-2"></i> Baixar Relatório Mensal
-                </button>
-
-                <span class="label-gold">Controles de Escala</span>
-                <input type="file" id="fileIn" class="hidden" accept="application/pdf,image/*" onchange="uploadEterno(this)">
-                <button onclick="document.getElementById('fileIn').click()" class="btn-gold mb-4 w-full"><i class="fa-solid fa-lock mr-2"></i> ATUALIZAR ESCALA NO COFRE</button>
+        <div class="glass-box">
+            <div class="admin-only">
+                <span class="label-gold">Cofre de Escala</span>
+                <input type="file" id="fileIn" class="hidden" accept="application/pdf,image/*" onchange="gravarTatuagem(this)">
+                <button onclick="document.getElementById('fileIn').click()" class="btn-gold mb-4 w-full">FIXAR ESCALA PARA SEMPRE</button>
                 
-                <div class="flex gap-2 mb-4">
-                    <button onclick="aba('T')" id="btnT" class="flex-1 py-1 text-[10px] font-bold border-b-2 border-gold text-gold">TROCA</button>
-                    <button onclick="aba('F')" id="btnF" class="flex-1 py-1 text-[10px] font-bold border-b-2 border-transparent text-slate-500">FALTA</button>
-                </div>
-
-                <div id="formT">
-                    <input type="text" id="inD" placeholder="Data (Ex: 16/02)" class="input-oab">
-                    <input type="text" id="inS" placeholder="Advogado Sai" class="input-oab">
-                    <input type="text" id="inE" placeholder="Advogado Entra" class="input-oab">
-                    <button onclick="salvarItem('T')" class="btn-gold w-full">FIXAR TROCA</button>
-                </div>
-                <div id="formF" class="hidden">
-                    <input type="text" id="inDf" placeholder="Data da Falta" class="input-oab">
-                    <input type="text" id="inNf" placeholder="Nome do Faltante" class="input-oab">
-                    <button onclick="salvarItem('F')" class="btn-gold w-full !bg-red-600 !text-white">FIXAR FALTA</button>
-                </div>
+                <input type="text" id="inD" placeholder="Data" class="input-oab">
+                <input type="text" id="inS" placeholder="Sai" class="input-oab">
+                <input type="text" id="inE" placeholder="Entra" class="input-oab">
+                <button onclick="salvarPermanente()" class="btn-gold w-full mb-4">GRAVAR TROCA</button>
             </div>
-
-            <div class="glass-box flex-grow">
-                <span class="label-gold">Histórico Permanente</span>
-                <div id="logs" class="max-h-[400px] overflow-y-auto pr-2"></div>
-            </div>
+            <span class="label-gold">Histórico Inalterável</span>
+            <div id="logs" class="max-h-[300px] overflow-y-auto"></div>
         </div>
     </main>
 
     <script>
         pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
-        const CHAVE = "CAD2026";
         let db;
 
-        const request = indexedDB.open("CASSIA_V8_ULTIMATE", 5);
+        // INICIALIZAÇÃO DO BANCO DE DADOS LOCAL (INDEXEDDB)
+        const request = indexedDB.open("CASSIA_V8_ULTRA", 1);
         request.onupgradeneeded = e => {
             db = e.target.result;
-            if (!db.objectStoreNames.contains("permanent")) db.createObjectStore("permanent");
+            db.createObjectStore("data");
         };
         request.onsuccess = e => { db = e.target.result; carregarTudo(); };
 
-        function login() { if(prompt("Senha Master:") === CHAVE) { sessionStorage.setItem('v8_auth', '1'); syncUI(); } }
-        function logout() { sessionStorage.removeItem('v8_auth'); syncUI(); }
-        
-        function aba(tipo) {
-            document.getElementById('formT').classList.toggle('hidden', tipo === 'F');
-            document.getElementById('formF').classList.toggle('hidden', tipo === 'T');
-            document.getElementById('btnT').className = tipo === 'T' ? 'flex-1 py-1 text-[10px] font-bold border-b-2 border-gold text-gold' : 'flex-1 py-1 text-[10px] font-bold border-b-2 border-transparent text-slate-500';
-            document.getElementById('btnF').className = tipo === 'F' ? 'flex-1 py-1 text-[10px] font-bold border-b-2 border-red-500 text-red-500' : 'flex-1 py-1 text-[10px] font-bold border-b-2 border-transparent text-slate-500';
-        }
+        function login() { if(prompt("Senha:") === "CAD2026") { document.getElementById('v8app').classList.add('is-admin'); } }
 
-        function syncUI() {
-            const auth = sessionStorage.getItem('v8_auth') === '1';
-            document.getElementById('v8app').className = auth ? 'is-admin' : '';
-            document.getElementById('btnAdmin').style.display = auth ? 'none' : 'block';
-            renderLogs();
-        }
-
-        async function uploadEterno(input) {
+        async function gravarTatuagem(input) {
             const file = input.files[0];
-            if (!file) return;
             const reader = new FileReader();
             reader.onload = async function() {
                 let images = [];
@@ -124,23 +85,33 @@
                     const pdf = await pdfjsLib.getDocument(new Uint8Array(this.result)).promise;
                     for(let i=1; i <= pdf.numPages; i++) {
                         const page = await pdf.getPage(i);
-                        const viewport = page.getViewport({ scale: 2.0 });
                         const canvas = document.createElement('canvas');
+                        const viewport = page.getViewport({ scale: 2.0 });
                         canvas.height = viewport.height; canvas.width = viewport.width;
                         await page.render({ canvasContext: canvas.getContext('2d'), viewport: viewport }).promise;
                         images.push(canvas.toDataURL('image/webp', 0.8));
                     }
                 } else { images.push(this.result); }
-                const tx = db.transaction("permanent", "readwrite");
-                tx.objectStore("permanent").put(images, "escala_v8");
+                
+                const tx = db.transaction("data", "readwrite");
+                tx.objectStore("data").put(images, "escala");
                 tx.oncomplete = () => location.reload();
             };
             file.type === "application/pdf" ? reader.readAsArrayBuffer(file) : reader.readAsDataURL(file);
         }
 
+        function salvarPermanente() {
+            const d = document.getElementById('inD').value, s = document.getElementById('inS').value, e = document.getElementById('inE').value;
+            if(!d) return;
+            let logs = JSON.parse(localStorage.getItem('logs_v8') || '[]');
+            logs.unshift({d, s, e, id: Date.now()});
+            localStorage.setItem('logs_v8', JSON.stringify(logs));
+            renderLogs();
+        }
+
         function carregarTudo() {
-            const tx = db.transaction("permanent", "readonly");
-            tx.objectStore("permanent").get("escala_v8").onsuccess = e => {
+            const tx = db.transaction("data", "readonly");
+            tx.objectStore("data").get("escala").onsuccess = e => {
                 const res = e.target.result;
                 if (res) {
                     const area = document.getElementById('pdfRenderArea'); area.innerHTML = '';
@@ -148,76 +119,16 @@
                     document.getElementById('placeholder').style.display = 'none';
                 }
             };
-            syncUI();
-        }
-
-        function salvarItem(tipo) {
-            let item = { id: Date.now(), tipo: tipo };
-            if(tipo === 'T') {
-                item.d = document.getElementById('inD').value;
-                item.s = document.getElementById('inS').value;
-                item.e = document.getElementById('inE').value;
-            } else {
-                item.d = document.getElementById('inDf').value;
-                item.n = document.getElementById('inNf').value;
-            }
-            if(!item.d) return;
-            let logs = JSON.parse(localStorage.getItem('v8_logs_fixos') || '[]');
-            logs.unshift(item);
-            localStorage.setItem('v8_logs_fixos', JSON.stringify(logs));
             renderLogs();
-            document.querySelectorAll('input:not([type=file])').forEach(i => i.value = '');
         }
 
         function renderLogs() {
             const container = document.getElementById('logs');
-            let logs = JSON.parse(localStorage.getItem('v8_logs_fixos') || '[]');
+            let logs = JSON.parse(localStorage.getItem('logs_v8') || '[]');
             container.innerHTML = logs.map(l => `
-                <div class="item-log ${l.tipo === 'F' ? 'item-falta' : ''}">
-                    <div class="flex justify-between">
-                        <span class="${l.tipo === 'F' ? 'text-red-500' : 'text-gold'} font-black">[${l.d}]</span>
-                        ${sessionStorage.getItem('v8_auth') ? `<button onclick="del(${l.id})" class="text-red-900"><i class="fa-solid fa-trash"></i></button>` : ''}
-                    </div>
-                    <div class="mt-1 uppercase text-[12px]">
-                        ${l.tipo === 'T' ? `<s>${l.s}</s> → <b>${l.e}</b>` : `<b class="text-red-500">FALTA REGISTRADA:</b> ${l.n}`}
-                    </div>
+                <div class="item-log">
+                    <span class="text-gold font-black">[${l.d}]</span> <s>${l.s}</s> → <b>${l.e}</b>
                 </div>`).join('');
-        }
-
-        function baixarRelatorio() {
-            let logs = JSON.parse(localStorage.getItem('v8_logs_fixos') || '[]');
-            if (logs.length === 0) { alert("Nenhum dado para exportar."); return; }
-            
-            let dataAtu = new Date();
-            let mes = dataAtu.toLocaleString('pt-br', { month: 'long' }).toUpperCase();
-            
-            let txt = `OAB SANTANA DE PARNAÍBA - RELATÓRIO DE ASSISTÊNCIA\n`;
-            txt += `MÊS DE REFERÊNCIA: ${mes} / ${dataAtu.getFullYear()}\n`;
-            txt += `--------------------------------------------------\n\n`;
-            
-            logs.forEach(l => {
-                if(l.tipo === 'T') {
-                    txt += `[DATA: ${l.d}] TROCA: Saiu ${l.s} / Entrou ${l.e}\n`;
-                } else {
-                    txt += `[DATA: ${l.d}] FALTA: Advogado(a) ${l.n}\n`;
-                }
-            });
-            
-            txt += `\n--------------------------------------------------\n`;
-            txt += `Gerado automaticamente pelo Sistema Cássia Prompt V8`;
-            
-            const blob = new Blob([txt], { type: 'text/plain' });
-            const url = window.URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `RELATORIO_CAD_SANTANA_${mes}.txt`;
-            a.click();
-        }
-
-        function del(id) { 
-            let logs = JSON.parse(localStorage.getItem('v8_logs_fixos') || '[]');
-            localStorage.setItem('v8_logs_fixos', JSON.stringify(logs.filter(l => l.id !== id)));
-            renderLogs();
         }
     </script>
 </body>
