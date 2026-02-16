@@ -22,7 +22,6 @@
         .label-gold { color: var(--oab-gold); font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 10px; display: block; border-bottom: 1px solid rgba(197, 163, 107, 0.1); padding-bottom: 5px; }
         .input-oab { background: #070b14; border: 1px solid rgba(197, 163, 107, 0.3); border-radius: 8px; padding: 12px; width: 100%; color: white; margin-bottom: 8px; font-size: 14px; outline: none; }
         .btn-gold { background: var(--oab-gold); color: #000; font-weight: 900; text-transform: uppercase; padding: 14px; border-radius: 8px; width: 100%; cursor: pointer; transition: 0.2s; }
-        .btn-gold:hover { filter: brightness(1.1); }
         .admin-only { display: none !important; }
         .is-admin .admin-only { display: block !important; }
         .item-log { background: rgba(255, 255, 255, 0.03); border-left: 4px solid var(--oab-gold); padding: 12px; border-radius: 8px; margin-bottom: 8px; font-size: 13px; }
@@ -45,16 +44,21 @@
         <div class="escala-moldura">
             <div id="pdfRenderArea"></div>
             <div id="placeholder" class="absolute inset-0 flex flex-col items-center justify-center bg-white text-slate-300 p-10 text-center">
-                <i class="fa-solid fa-database text-6xl mb-4"></i>
-                <p class="font-black uppercase text-xs">Aguardando Escala Permanente</p>
+                <i class="fa-solid fa-file-contract text-6xl mb-4"></i>
+                <p class="font-black uppercase text-xs">Escala Permanente V8</p>
             </div>
         </div>
 
         <div class="painel-lateral">
             <div class="glass-box admin-only">
-                <span class="label-gold">Controle Master</span>
+                <span class="label-gold">Gestão Mensal</span>
+                <button onclick="baixarRelatorio()" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-black text-[11px] uppercase py-3 rounded-xl mb-4 transition-all">
+                    <i class="fa-solid fa-file-export mr-2"></i> Baixar Relatório Mensal
+                </button>
+
+                <span class="label-gold">Controles de Escala</span>
                 <input type="file" id="fileIn" class="hidden" accept="application/pdf,image/*" onchange="uploadEterno(this)">
-                <button onclick="document.getElementById('fileIn').click()" class="btn-gold mb-4 w-full"><i class="fa-solid fa-lock mr-2"></i> FIXAR ARQUIVO NO COFRE</button>
+                <button onclick="document.getElementById('fileIn').click()" class="btn-gold mb-4 w-full"><i class="fa-solid fa-lock mr-2"></i> ATUALIZAR ESCALA NO COFRE</button>
                 
                 <div class="flex gap-2 mb-4">
                     <button onclick="aba('T')" id="btnT" class="flex-1 py-1 text-[10px] font-bold border-b-2 border-gold text-gold">TROCA</button>
@@ -62,20 +66,21 @@
                 </div>
 
                 <div id="formT">
-                    <input type="text" id="inD" placeholder="Data" class="input-oab">
+                    <input type="text" id="inD" placeholder="Data (Ex: 16/02)" class="input-oab">
                     <input type="text" id="inS" placeholder="Advogado Sai" class="input-oab">
                     <input type="text" id="inE" placeholder="Advogado Entra" class="input-oab">
-                    <button onclick="salvarItem('T')" class="btn-gold w-full">REGISTRAR TROCA</button>
+                    <button onclick="salvarItem('T')" class="btn-gold w-full">FIXAR TROCA</button>
                 </div>
                 <div id="formF" class="hidden">
                     <input type="text" id="inDf" placeholder="Data da Falta" class="input-oab">
                     <input type="text" id="inNf" placeholder="Nome do Faltante" class="input-oab">
-                    <button onclick="salvarItem('F')" class="btn-gold w-full !bg-red-600 !text-white">REGISTRAR FALTA</button>
+                    <button onclick="salvarItem('F')" class="btn-gold w-full !bg-red-600 !text-white">FIXAR FALTA</button>
                 </div>
             </div>
+
             <div class="glass-box flex-grow">
                 <span class="label-gold">Histórico Permanente</span>
-                <div id="logs" class="max-h-[400px] overflow-y-auto"></div>
+                <div id="logs" class="max-h-[400px] overflow-y-auto pr-2"></div>
             </div>
         </div>
     </main>
@@ -85,14 +90,14 @@
         const CHAVE = "CAD2026";
         let db;
 
-        const request = indexedDB.open("CASSIA_V8_FINAL", 4);
+        const request = indexedDB.open("CASSIA_V8_ULTIMATE", 5);
         request.onupgradeneeded = e => {
             db = e.target.result;
             if (!db.objectStoreNames.contains("permanent")) db.createObjectStore("permanent");
         };
         request.onsuccess = e => { db = e.target.result; carregarTudo(); };
 
-        function login() { if(prompt("Senha:") === CHAVE) { sessionStorage.setItem('v8_auth', '1'); syncUI(); } }
+        function login() { if(prompt("Senha Master:") === CHAVE) { sessionStorage.setItem('v8_auth', '1'); syncUI(); } }
         function logout() { sessionStorage.removeItem('v8_auth'); syncUI(); }
         
         function aba(tipo) {
@@ -173,11 +178,42 @@
                         <span class="${l.tipo === 'F' ? 'text-red-500' : 'text-gold'} font-black">[${l.d}]</span>
                         ${sessionStorage.getItem('v8_auth') ? `<button onclick="del(${l.id})" class="text-red-900"><i class="fa-solid fa-trash"></i></button>` : ''}
                     </div>
-                    <div class="mt-1 uppercase">
-                        ${l.tipo === 'T' ? `<s>${l.s}</s> → <b>${l.e}</b>` : `<b class="text-red-500">FALTA:</b> ${l.n}`}
+                    <div class="mt-1 uppercase text-[12px]">
+                        ${l.tipo === 'T' ? `<s>${l.s}</s> → <b>${l.e}</b>` : `<b class="text-red-500">FALTA REGISTRADA:</b> ${l.n}`}
                     </div>
                 </div>`).join('');
         }
+
+        function baixarRelatorio() {
+            let logs = JSON.parse(localStorage.getItem('v8_logs_fixos') || '[]');
+            if (logs.length === 0) { alert("Nenhum dado para exportar."); return; }
+            
+            let dataAtu = new Date();
+            let mes = dataAtu.toLocaleString('pt-br', { month: 'long' }).toUpperCase();
+            
+            let txt = `OAB SANTANA DE PARNAÍBA - RELATÓRIO DE ASSISTÊNCIA\n`;
+            txt += `MÊS DE REFERÊNCIA: ${mes} / ${dataAtu.getFullYear()}\n`;
+            txt += `--------------------------------------------------\n\n`;
+            
+            logs.forEach(l => {
+                if(l.tipo === 'T') {
+                    txt += `[DATA: ${l.d}] TROCA: Saiu ${l.s} / Entrou ${l.e}\n`;
+                } else {
+                    txt += `[DATA: ${l.d}] FALTA: Advogado(a) ${l.n}\n`;
+                }
+            });
+            
+            txt += `\n--------------------------------------------------\n`;
+            txt += `Gerado automaticamente pelo Sistema Cássia Prompt V8`;
+            
+            const blob = new Blob([txt], { type: 'text/plain' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `RELATORIO_CAD_SANTANA_${mes}.txt`;
+            a.click();
+        }
+
         function del(id) { 
             let logs = JSON.parse(localStorage.getItem('v8_logs_fixos') || '[]');
             localStorage.setItem('v8_logs_fixos', JSON.stringify(logs.filter(l => l.id !== id)));
