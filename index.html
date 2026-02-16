@@ -2,7 +2,7 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
     <title>CAD SANTANA | V8 GOD MODE ELITE</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
@@ -10,184 +10,146 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&display=swap');
         :root { --oab-dark: #070b14; --oab-gold: #c5a36b; --oab-card: #111827; }
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: var(--oab-dark); color: #f1f5f9; height: 100vh; overflow: hidden; display: flex; flex-direction: column; }
-        header { background: #0f172a; border-bottom: 2px solid var(--oab-gold); padding: 10px 40px; flex-shrink: 0; }
-        .layout-master { display: flex; justify-content: center; align-items: center; gap: 40px; padding: 20px; flex-grow: 1; height: calc(100vh - 80px); }
-        .escala-moldura { width: 65vh; height: 85vh; background: #fff; box-shadow: 0 0 60px rgba(0,0,0,0.9); border-radius: 4px; position: relative; overflow-y: auto; overflow-x: hidden; }
-        #pdfRenderArea canvas, #pdfRenderArea img { width: 100% !important; height: auto !important; display: block; border-bottom: 2px solid #eee; }
-        .painel-lateral { width: 400px; height: 85vh; display: flex; flex-direction: column; gap: 15px; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: var(--oab-dark); color: #f1f5f9; min-height: 100vh; display: flex; flex-direction: column; }
+        header { background: #0f172a; border-bottom: 2px solid var(--oab-gold); padding: 15px 20px; flex-shrink: 0; sticky: top; z-index: 50; }
+        .layout-master { display: flex; flex-direction: column; gap: 20px; padding: 20px; flex-grow: 1; align-items: center; }
+        @media (min-width: 1024px) { .layout-master { flex-direction: row; align-items: flex-start; justify-content: center; } }
+        .escala-moldura { width: 100%; max-width: 800px; height: 70vh; background: #fff; box-shadow: 0 0 40px rgba(0,0,0,0.7); border-radius: 8px; position: relative; overflow-y: auto; }
+        @media (min-width: 1024px) { .escala-moldura { width: 65vh; height: 85vh; } }
+        #pdfRenderArea img { width: 100%; height: auto; display: block; border-bottom: 1px solid #eee; }
+        .painel-lateral { width: 100%; max-width: 400px; display: flex; flex-direction: column; gap: 15px; }
         .glass-box { background: var(--oab-card); border: 1px solid rgba(197, 163, 107, 0.2); border-radius: 12px; padding: 20px; }
         .label-gold { color: var(--oab-gold); font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 10px; display: block; border-bottom: 1px solid rgba(197, 163, 107, 0.1); padding-bottom: 5px; }
-        .input-oab { background: #070b14; border: 1px solid rgba(197, 163, 107, 0.3); border-radius: 8px; padding: 12px; width: 100%; color: white; margin-bottom: 8px; font-size: 12px; outline: none; }
-        .btn-gold { background: var(--oab-gold); color: #000; font-weight: 900; text-transform: uppercase; padding: 12px; border-radius: 8px; width: 100%; font-size: 11px; cursor: pointer; transition: 0.2s; }
-        .btn-gold:hover { filter: brightness(1.2); }
+        .input-oab { background: #070b14; border: 1px solid rgba(197, 163, 107, 0.3); border-radius: 8px; padding: 12px; width: 100%; color: white; margin-bottom: 8px; font-size: 14px; outline: none; }
+        .btn-gold { background: var(--oab-gold); color: #000; font-weight: 900; text-transform: uppercase; padding: 14px; border-radius: 8px; width: 100%; cursor: pointer; }
         .admin-only { display: none !important; }
         .is-admin .admin-only { display: block !important; }
-        .item-log { background: rgba(255, 255, 255, 0.03); border-left: 4px solid var(--oab-gold); padding: 12px; border-radius: 8px; margin-bottom: 8px; font-size: 12px; }
+        .item-log { background: rgba(255, 255, 255, 0.03); border-left: 4px solid var(--oab-gold); padding: 12px; border-radius: 8px; margin-bottom: 8px; font-size: 13px; }
     </style>
 </head>
 <body id="v8app">
     <header>
-        <div class="flex justify-between items-center max-w-[1800px] mx-auto">
-            <div class="flex items-center gap-6">
-                <div class="bg-white/5 p-2 rounded-xl border border-gold/20"><i class="fa-solid fa-scale-balanced text-3xl text-[#c5a36b]"></i></div>
-                <div>
-                    <h1 class="text-white text-xl font-black uppercase italic tracking-tighter">CAD Santana de Parnaíba</h1>
-                    <p class="text-[10px] font-bold uppercase text-[#c5a36b]">Presidência: Dra. Maristela Gonçalves</p>
-                </div>
+        <div class="flex justify-between items-center max-w-[1400px] mx-auto">
+            <div class="flex items-center gap-4">
+                <i class="fa-solid fa-scale-balanced text-2xl text-[#c5a36b]"></i>
+                <h1 class="text-white text-sm md:text-lg font-black uppercase italic tracking-tighter">CAD Santana</h1>
             </div>
-            <div class="flex gap-4">
-                <button id="btnAdmin" onclick="login()" class="text-white/30 text-[10px] font-black uppercase hover:text-white">Admin</button>
-                <button onclick="logout()" class="admin-only text-red-500 text-[10px] font-black uppercase italic font-bold">Encerrar Sessão</button>
-            </div>
+            <button id="btnAdmin" onclick="login()" class="text-white/40 text-[10px] font-black uppercase">Admin</button>
+            <button onclick="logout()" class="admin-only text-red-500 text-[10px] font-black uppercase font-bold">Bloquear</button>
         </div>
     </header>
 
     <main class="layout-master">
-        <div class="escala-moldura" id="viewer">
+        <div class="escala-moldura">
             <div id="pdfRenderArea"></div>
-            <div id="placeholder" class="absolute inset-0 flex flex-col items-center justify-center bg-white text-slate-300">
-                <i class="fa-solid fa-file-pdf text-8xl mb-4"></i>
-                <p class="font-black uppercase text-xs">Escala Permanente V8</p>
+            <div id="placeholder" class="absolute inset-0 flex flex-col items-center justify-center bg-white text-slate-300 p-10 text-center">
+                <i class="fa-solid fa-database text-6xl mb-4"></i>
+                <p class="font-black uppercase text-xs">Aguardando Escala Permanente</p>
             </div>
         </div>
 
         <div class="painel-lateral">
             <div class="glass-box admin-only">
                 <span class="label-gold">Controle Master</span>
-                <input type="file" id="fileIn" class="hidden" accept="application/pdf" onchange="converterEGravar(this)">
-                <button onclick="document.getElementById('fileIn').click()" class="w-full border-2 border-dashed border-gold/40 text-gold py-3 rounded-xl text-[10px] font-black uppercase mb-4 hover:bg-gold/10">
-                    <i class="fa-solid fa-thumbtack mr-2"></i> Fixar Nova Escala
-                </button>
-                <div class="flex gap-2 mb-4">
-                    <button onclick="tab('T')" id="tT" class="flex-1 py-1 text-[10px] font-black border-b-2 border-gold text-gold">TROCA</button>
-                    <button onclick="tab('F')" id="tF" class="flex-1 py-1 text-[10px] font-black border-b-2 border-transparent text-slate-500">FALTA</button>
-                </div>
-                <div id="fT">
+                <input type="file" id="fileIn" class="hidden" accept="application/pdf,image/*" onchange="uploadEterno(this)">
+                <button onclick="document.getElementById('fileIn').click()" class="btn-gold mb-4 w-full"><i class="fa-solid fa-lock mr-2"></i> FIXAR ARQUIVO NO COFRE</button>
+                <div class="space-y-2">
                     <input type="text" id="inD" placeholder="Data" class="input-oab">
                     <input type="text" id="inS" placeholder="Advogado Sai" class="input-oab">
                     <input type="text" id="inE" placeholder="Advogado Entra" class="input-oab">
-                    <button onclick="salvar('T')" class="btn-gold">Confirmar Troca</button>
-                </div>
-                <div id="fF" class="hidden">
-                    <input type="text" id="inDf" placeholder="Data" class="input-oab">
-                    <input type="text" id="inNf" placeholder="Nome Faltante" class="input-oab">
-                    <button onclick="salvar('F')" class="btn-gold !bg-red-700 !text-white">Registrar Falta</button>
+                    <button onclick="salvarLog()" class="btn-gold w-full">REGISTRAR HISTÓRICO</button>
                 </div>
             </div>
-            <div class="glass-box flex-grow overflow-hidden flex flex-col">
+            <div class="glass-box flex-grow">
                 <span class="label-gold">Histórico Permanente</span>
-                <div id="logs" class="overflow-y-auto flex-grow pr-2"></div>
+                <div id="logs" class="max-h-[300px] overflow-y-auto"></div>
             </div>
         </div>
     </main>
 
     <script>
         pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
-        const PASS = "CAD2026";
-        let db = JSON.parse(localStorage.getItem('v8_db_permanent')) || [];
+        const CHAVE = "CAD2026";
+        let db;
 
-        function login() { if(prompt("Senha Master:") === PASS) { sessionStorage.setItem('v8_log', '1'); sync(); } }
-        function logout() { sessionStorage.removeItem('v8_log'); sync(); }
+        const request = indexedDB.open("CASSIA_V8_FINAL", 3);
+        request.onupgradeneeded = e => {
+            db = e.target.result;
+            if (!db.objectStoreNames.contains("permanent")) db.createObjectStore("permanent");
+        };
+        request.onsuccess = e => { db = e.target.result; carregarTudo(); };
 
-        function sync() {
-            const isOk = sessionStorage.getItem('v8_log') === '1';
-            document.getElementById('v8app').className = isOk ? 'is-admin' : '';
-            document.getElementById('btnAdmin').style.display = isOk ? 'none' : 'block';
+        function login() { if(prompt("Senha:") === CHAVE) { sessionStorage.setItem('v8_auth', '1'); syncUI(); } }
+        function logout() { sessionStorage.removeItem('v8_auth'); syncUI(); }
+        function syncUI() {
+            const auth = sessionStorage.getItem('v8_auth') === '1';
+            document.getElementById('v8app').className = auth ? 'is-admin' : '';
+            document.getElementById('btnAdmin').style.display = auth ? 'none' : 'block';
             renderLogs();
         }
 
-        async function converterEGravar(input) {
-            if(sessionStorage.getItem('v8_log') !== '1') return;
+        async function uploadEterno(input) {
             const file = input.files[0];
             if (!file) return;
-            
             const reader = new FileReader();
             reader.onload = async function() {
-                try {
-                    const typedarray = new Uint8Array(this.result);
-                    const pdf = await pdfjsLib.getDocument(typedarray).promise;
-                    const imageBatch = [];
+                let images = [];
+                if (file.type === "application/pdf") {
+                    const pdf = await pdfjsLib.getDocument(new Uint8Array(this.result)).promise;
                     for(let i=1; i <= pdf.numPages; i++) {
                         const page = await pdf.getPage(i);
-                        const viewport = page.getViewport({ scale: 1.5 });
+                        const viewport = page.getViewport({ scale: 2.0 });
                         const canvas = document.createElement('canvas');
-                        const context = canvas.getContext('2d');
-                        canvas.height = viewport.height;
-                        canvas.width = viewport.width;
-                        await page.render({ canvasContext: context, viewport: viewport }).promise;
-                        imageBatch.push(canvas.toDataURL('image/webp', 0.4)); // Compressão para estabilidade
+                        canvas.height = viewport.height; canvas.width = viewport.width;
+                        await page.render({ canvasContext: canvas.getContext('2d'), viewport: viewport }).promise;
+                        images.push(canvas.toDataURL('image/webp', 0.8));
                     }
-                    localStorage.setItem('v8_escala_images', JSON.stringify(imageBatch));
-                    loadEscala();
-                } catch (e) { alert("Erro ao fixar: PDF muito pesado."); }
+                } else { images.push(this.result); }
+                const tx = db.transaction("permanent", "readwrite");
+                tx.objectStore("permanent").put(images, "escala_v8");
+                tx.oncomplete = () => location.reload();
             };
-            reader.readAsArrayBuffer(file);
+            file.type === "application/pdf" ? reader.readAsArrayBuffer(file) : reader.readAsDataURL(file);
         }
 
-        function loadEscala() {
-            const data = localStorage.getItem('v8_escala_images');
-            const renderArea = document.getElementById('pdfRenderArea');
-            const placeholder = document.getElementById('placeholder');
-            if (data) {
-                const salvas = JSON.parse(data);
-                if(salvas.length > 0) {
-                    renderArea.innerHTML = '';
-                    salvas.forEach(src => {
-                        const img = new Image();
-                        img.src = src;
-                        img.style.width = "100%";
-                        img.style.marginBottom = "10px";
-                        renderArea.appendChild(img);
-                    });
-                    placeholder.style.display = 'none';
-                    return;
+        function carregarTudo() {
+            const tx = db.transaction("permanent", "readonly");
+            tx.objectStore("permanent").get("escala_v8").onsuccess = e => {
+                const res = e.target.result;
+                if (res) {
+                    const area = document.getElementById('pdfRenderArea'); area.innerHTML = '';
+                    res.forEach(src => { const img = new Image(); img.src = src; area.appendChild(img); });
+                    document.getElementById('placeholder').style.display = 'none';
                 }
-            }
-            placeholder.style.display = 'flex';
+            };
+            syncUI();
         }
 
-        function tab(t) {
-            document.getElementById('fT').classList.toggle('hidden', t === 'F');
-            document.getElementById('fF').classList.toggle('hidden', t === 'T');
-            document.getElementById('tT').className = t === 'T' ? 'flex-1 py-1 text-[10px] font-black border-b-2 border-gold text-gold' : 'flex-1 py-1 text-[10px] font-black border-b-2 border-transparent text-slate-500';
-            document.getElementById('tF').className = t === 'F' ? 'flex-1 py-1 text-[10px] font-black border-b-2 border-red-500 text-red-500' : 'flex-1 py-1 text-[10px] font-black border-b-2 border-transparent text-slate-500';
-        }
-
-        function salvar(tipo) {
-            let item = {};
-            if(tipo === 'T') {
-                const d = document.getElementById('inD').value, s = document.getElementById('inS').value, e = document.getElementById('inE').value;
-                if(d && s && e) item = { id: Date.now(), tipo, d, s, e };
-            } else {
-                const d = document.getElementById('inDf').value, n = document.getElementById('inNf').value;
-                if(d && n) item = { id: Date.now(), tipo, d, n };
-            }
-            if(item.id) {
-                db.unshift(item);
-                localStorage.setItem('v8_db_permanent', JSON.stringify(db));
-                renderLogs();
-                document.querySelectorAll('input:not([type=file])').forEach(i => i.value = '');
-            }
+        function salvarLog() {
+            const d = document.getElementById('inD').value, s = document.getElementById('inS').value, e = document.getElementById('inE').value;
+            if(!d || !s || !e) return;
+            let logs = JSON.parse(localStorage.getItem('v8_logs_fixos') || '[]');
+            logs.unshift({d, s, e, id: Date.now()});
+            localStorage.setItem('v8_logs_fixos', JSON.stringify(logs));
+            renderLogs();
+            document.querySelectorAll('input:not([type=file])').forEach(i => i.value = '');
         }
 
         function renderLogs() {
-            const f = document.getElementById('logs');
-            f.innerHTML = db.length ? '' : '<p class="text-center py-20 opacity-10 text-[10px] font-black">SEM REGISTROS</p>';
-            db.forEach(i => {
-                const isT = i.tipo === 'T';
-                f.innerHTML += `
-                <div class="item-log ${!isT ? 'border-red-600' : ''}">
-                    <div class="flex justify-between items-center uppercase font-bold">
-                        <div class="text-[11px]"><span class="${isT?'text-gold':'text-red-500'}">[${i.d}]</span> ${isT?`<s>${i.s}</s> → ${i.e}`:`FALTA: ${i.n}`}</div>
-                        ${sessionStorage.getItem('v8_log')?`<button onclick="del(${i.id})" class="opacity-20 hover:text-red-500"><i class="fa-solid fa-trash"></i></button>`:''}
-                    </div>
-                </div>`;
-            });
+            const container = document.getElementById('logs');
+            let logs = JSON.parse(localStorage.getItem('v8_logs_fixos') || '[]');
+            container.innerHTML = logs.map(l => `
+                <div class="item-log">
+                    <div class="flex justify-between"><span class="text-gold font-black">[${l.d}]</span>
+                    ${sessionStorage.getItem('v8_auth') ? `<button onclick="del(${l.id})" class="text-red-900"><i class="fa-solid fa-trash"></i></button>` : ''}</div>
+                    <div class="mt-1"><s>${l.s}</s> → <b>${l.e}</b></div>
+                </div>`).join('');
         }
-        function del(id) { if(confirm("Apagar registro permanentemente?")) { db = db.filter(x => x.id !== id); localStorage.setItem('v8_db_permanent', JSON.stringify(db)); renderLogs(); } }
-
-        window.onload = () => { sync(); loadEscala(); };
+        function del(id) { 
+            let logs = JSON.parse(localStorage.getItem('v8_logs_fixos') || '[]');
+            localStorage.setItem('v8_logs_fixos', JSON.stringify(logs.filter(l => l.id !== id)));
+            renderLogs();
+        }
     </script>
 </body>
 </html>
