@@ -11,7 +11,7 @@
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&display=swap');
         :root { --oab-dark: #070b14; --oab-gold: #c5a36b; --oab-card: #111827; }
         body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: var(--oab-dark); color: #f1f5f9; min-height: 100vh; display: flex; flex-direction: column; }
-        header { background: #0f172a; border-bottom: 2px solid var(--oab-gold); padding: 15px 20px; flex-shrink: 0; sticky: top; z-index: 50; }
+        header { background: #0f172a; border-bottom: 2px solid var(--oab-gold); padding: 15px 20px; flex-shrink: 0; position: sticky; top: 0; z-index: 50; }
         .layout-master { display: flex; flex-direction: column; gap: 20px; padding: 20px; flex-grow: 1; align-items: center; }
         @media (min-width: 1024px) { .layout-master { flex-direction: row; align-items: flex-start; justify-content: center; } }
         .escala-moldura { width: 100%; max-width: 800px; height: 70vh; background: #fff; box-shadow: 0 0 40px rgba(0,0,0,0.7); border-radius: 8px; position: relative; overflow-y: auto; }
@@ -21,10 +21,12 @@
         .glass-box { background: var(--oab-card); border: 1px solid rgba(197, 163, 107, 0.2); border-radius: 12px; padding: 20px; }
         .label-gold { color: var(--oab-gold); font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 10px; display: block; border-bottom: 1px solid rgba(197, 163, 107, 0.1); padding-bottom: 5px; }
         .input-oab { background: #070b14; border: 1px solid rgba(197, 163, 107, 0.3); border-radius: 8px; padding: 12px; width: 100%; color: white; margin-bottom: 8px; font-size: 14px; outline: none; }
-        .btn-gold { background: var(--oab-gold); color: #000; font-weight: 900; text-transform: uppercase; padding: 14px; border-radius: 8px; width: 100%; cursor: pointer; }
+        .btn-gold { background: var(--oab-gold); color: #000; font-weight: 900; text-transform: uppercase; padding: 14px; border-radius: 8px; width: 100%; cursor: pointer; transition: 0.2s; }
+        .btn-gold:hover { filter: brightness(1.1); }
         .admin-only { display: none !important; }
         .is-admin .admin-only { display: block !important; }
         .item-log { background: rgba(255, 255, 255, 0.03); border-left: 4px solid var(--oab-gold); padding: 12px; border-radius: 8px; margin-bottom: 8px; font-size: 13px; }
+        .item-falta { border-left-color: #ef4444; background: rgba(239, 68, 68, 0.05); }
     </style>
 </head>
 <body id="v8app">
@@ -53,16 +55,27 @@
                 <span class="label-gold">Controle Master</span>
                 <input type="file" id="fileIn" class="hidden" accept="application/pdf,image/*" onchange="uploadEterno(this)">
                 <button onclick="document.getElementById('fileIn').click()" class="btn-gold mb-4 w-full"><i class="fa-solid fa-lock mr-2"></i> FIXAR ARQUIVO NO COFRE</button>
-                <div class="space-y-2">
+                
+                <div class="flex gap-2 mb-4">
+                    <button onclick="aba('T')" id="btnT" class="flex-1 py-1 text-[10px] font-bold border-b-2 border-gold text-gold">TROCA</button>
+                    <button onclick="aba('F')" id="btnF" class="flex-1 py-1 text-[10px] font-bold border-b-2 border-transparent text-slate-500">FALTA</button>
+                </div>
+
+                <div id="formT">
                     <input type="text" id="inD" placeholder="Data" class="input-oab">
                     <input type="text" id="inS" placeholder="Advogado Sai" class="input-oab">
                     <input type="text" id="inE" placeholder="Advogado Entra" class="input-oab">
-                    <button onclick="salvarLog()" class="btn-gold w-full">REGISTRAR HISTÓRICO</button>
+                    <button onclick="salvarItem('T')" class="btn-gold w-full">REGISTRAR TROCA</button>
+                </div>
+                <div id="formF" class="hidden">
+                    <input type="text" id="inDf" placeholder="Data da Falta" class="input-oab">
+                    <input type="text" id="inNf" placeholder="Nome do Faltante" class="input-oab">
+                    <button onclick="salvarItem('F')" class="btn-gold w-full !bg-red-600 !text-white">REGISTRAR FALTA</button>
                 </div>
             </div>
             <div class="glass-box flex-grow">
                 <span class="label-gold">Histórico Permanente</span>
-                <div id="logs" class="max-h-[300px] overflow-y-auto"></div>
+                <div id="logs" class="max-h-[400px] overflow-y-auto"></div>
             </div>
         </div>
     </main>
@@ -72,7 +85,7 @@
         const CHAVE = "CAD2026";
         let db;
 
-        const request = indexedDB.open("CASSIA_V8_FINAL", 3);
+        const request = indexedDB.open("CASSIA_V8_FINAL", 4);
         request.onupgradeneeded = e => {
             db = e.target.result;
             if (!db.objectStoreNames.contains("permanent")) db.createObjectStore("permanent");
@@ -81,6 +94,14 @@
 
         function login() { if(prompt("Senha:") === CHAVE) { sessionStorage.setItem('v8_auth', '1'); syncUI(); } }
         function logout() { sessionStorage.removeItem('v8_auth'); syncUI(); }
+        
+        function aba(tipo) {
+            document.getElementById('formT').classList.toggle('hidden', tipo === 'F');
+            document.getElementById('formF').classList.toggle('hidden', tipo === 'T');
+            document.getElementById('btnT').className = tipo === 'T' ? 'flex-1 py-1 text-[10px] font-bold border-b-2 border-gold text-gold' : 'flex-1 py-1 text-[10px] font-bold border-b-2 border-transparent text-slate-500';
+            document.getElementById('btnF').className = tipo === 'F' ? 'flex-1 py-1 text-[10px] font-bold border-b-2 border-red-500 text-red-500' : 'flex-1 py-1 text-[10px] font-bold border-b-2 border-transparent text-slate-500';
+        }
+
         function syncUI() {
             const auth = sessionStorage.getItem('v8_auth') === '1';
             document.getElementById('v8app').className = auth ? 'is-admin' : '';
@@ -125,11 +146,19 @@
             syncUI();
         }
 
-        function salvarLog() {
-            const d = document.getElementById('inD').value, s = document.getElementById('inS').value, e = document.getElementById('inE').value;
-            if(!d || !s || !e) return;
+        function salvarItem(tipo) {
+            let item = { id: Date.now(), tipo: tipo };
+            if(tipo === 'T') {
+                item.d = document.getElementById('inD').value;
+                item.s = document.getElementById('inS').value;
+                item.e = document.getElementById('inE').value;
+            } else {
+                item.d = document.getElementById('inDf').value;
+                item.n = document.getElementById('inNf').value;
+            }
+            if(!item.d) return;
             let logs = JSON.parse(localStorage.getItem('v8_logs_fixos') || '[]');
-            logs.unshift({d, s, e, id: Date.now()});
+            logs.unshift(item);
             localStorage.setItem('v8_logs_fixos', JSON.stringify(logs));
             renderLogs();
             document.querySelectorAll('input:not([type=file])').forEach(i => i.value = '');
@@ -139,10 +168,14 @@
             const container = document.getElementById('logs');
             let logs = JSON.parse(localStorage.getItem('v8_logs_fixos') || '[]');
             container.innerHTML = logs.map(l => `
-                <div class="item-log">
-                    <div class="flex justify-between"><span class="text-gold font-black">[${l.d}]</span>
-                    ${sessionStorage.getItem('v8_auth') ? `<button onclick="del(${l.id})" class="text-red-900"><i class="fa-solid fa-trash"></i></button>` : ''}</div>
-                    <div class="mt-1"><s>${l.s}</s> → <b>${l.e}</b></div>
+                <div class="item-log ${l.tipo === 'F' ? 'item-falta' : ''}">
+                    <div class="flex justify-between">
+                        <span class="${l.tipo === 'F' ? 'text-red-500' : 'text-gold'} font-black">[${l.d}]</span>
+                        ${sessionStorage.getItem('v8_auth') ? `<button onclick="del(${l.id})" class="text-red-900"><i class="fa-solid fa-trash"></i></button>` : ''}
+                    </div>
+                    <div class="mt-1 uppercase">
+                        ${l.tipo === 'T' ? `<s>${l.s}</s> → <b>${l.e}</b>` : `<b class="text-red-500">FALTA:</b> ${l.n}`}
+                    </div>
                 </div>`).join('');
         }
         function del(id) { 
