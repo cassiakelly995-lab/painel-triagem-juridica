@@ -2,133 +2,208 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
-    <title>CAD SANTANA | V8 GOD MODE ELITE</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CÁSSIA PROMPT V8 | ELITE EDITION</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database-compat.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&display=swap');
         :root { --oab-dark: #070b14; --oab-gold: #c5a36b; --oab-card: #111827; }
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: var(--oab-dark); color: #f1f5f9; min-height: 100vh; display: flex; flex-direction: column; }
-        header { background: #0f172a; border-bottom: 2px solid var(--oab-gold); padding: 15px 20px; flex-shrink: 0; position: sticky; top: 0; z-index: 50; }
-        .layout-master { display: flex; flex-direction: column; gap: 20px; padding: 20px; flex-grow: 1; align-items: center; }
-        @media (min-width: 1024px) { .layout-master { flex-direction: row; align-items: flex-start; justify-content: center; } }
-        .escala-moldura { width: 100%; max-width: 800px; height: 70vh; background: #fff; box-shadow: 0 0 40px rgba(0,0,0,0.7); border-radius: 8px; position: relative; overflow-y: auto; }
-        @media (min-width: 1024px) { .escala-moldura { width: 65vh; height: 85vh; } }
-        #pdfRenderArea img { width: 100%; height: auto; display: block; border-bottom: 1px solid #eee; }
-        .glass-box { background: var(--oab-card); border: 1px solid rgba(197, 163, 107, 0.2); border-radius: 12px; padding: 20px; width: 100%; max-width: 400px; }
-        .label-gold { color: var(--oab-gold); font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 10px; display: block; border-bottom: 1px solid rgba(197, 163, 107, 0.1); padding-bottom: 5px; }
-        .input-oab { background: #070b14; border: 1px solid rgba(197, 163, 107, 0.3); border-radius: 8px; padding: 12px; width: 100%; color: white; margin-bottom: 8px; font-size: 14px; outline: none; }
-        .btn-gold { background: var(--oab-gold); color: #000; font-weight: 900; text-transform: uppercase; padding: 14px; border-radius: 8px; width: 100%; cursor: pointer; }
-        .admin-only { display: none !important; }
-        .is-admin .admin-only { display: block !important; }
-        .item-log { background: rgba(255, 255, 255, 0.03); border-left: 4px solid var(--oab-gold); padding: 12px; border-radius: 8px; margin-bottom: 8px; font-size: 13px; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: var(--oab-dark); color: #f1f5f9; }
+        .gold-gradient { background: linear-gradient(135deg, #c5a36b 0%, #f1dca7 50%, #c5a36b 100%); }
+        .glass-card { background: var(--oab-card); border: 1px solid rgba(197, 163, 107, 0.2); border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        .input-oab { background: #0b121f; border: 1px solid rgba(197, 163, 107, 0.3); border-radius: 8px; padding: 12px; color: white; width: 100%; margin-bottom: 10px; outline: none; transition: 0.3s; }
+        .input-oab:focus { border-color: var(--oab-gold); box-shadow: 0 0 10px rgba(197, 163, 107, 0.2); }
+        .btn-gold { background: var(--oab-gold); color: #000; font-weight: 800; text-transform: uppercase; padding: 12px; border-radius: 8px; cursor: pointer; transition: 0.3s; border: none; }
+        .btn-gold:hover { transform: translateY(-2px); filter: brightness(1.1); }
+        .admin-section { display: none; }
+        .is-admin .admin-section { display: block; }
+        .log-item { background: rgba(255,255,255,0.03); border-left: 4px solid var(--oab-gold); padding: 12px; margin-bottom: 10px; border-radius: 8px; }
+        .falta-item { border-left-color: #ef4444; background: rgba(239, 68, 68, 0.05); }
+        footer { font-size: 10px; text-align: center; padding: 20px; opacity: 0.5; color: #fff; }
     </style>
 </head>
-<body id="v8app">
-    <header>
-        <div class="flex justify-between items-center max-w-[1400px] mx-auto">
-            <div class="flex items-center gap-4">
-                <i class="fa-solid fa-scale-balanced text-2xl text-[#c5a36b]"></i>
-                <h1 class="text-white text-sm md:text-lg font-black uppercase italic">CAD Santana</h1>
+<body id="mainApp">
+
+    <header class="p-6 border-b border-[#c5a36b]/30 bg-[#0f172a] sticky top-0 z-50">
+        <div class="max-w-6xl mx-auto flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 gold-gradient rounded-lg flex items-center justify-center shadow-lg shadow-gold/20">
+                    <i class="fa-solid fa-gavel text-black"></i>
+                </div>
+                <div>
+                    <h1 class="font-black text-xl tracking-tighter italic">CÁSSIA PROMPT <span class="text-[#c5a36b]">V8</span></h1>
+                    <p class="text-[9px] uppercase tracking-widest text-slate-400">Elite Edition | Santana de Parnaíba</p>
+                </div>
             </div>
-            <button id="btnAdmin" onclick="login()" class="text-white/40 text-[10px] font-black uppercase">Admin</button>
+            <button onclick="fazerLogin()" class="opacity-30 hover:opacity-100 transition-opacity"><i class="fa-solid fa-lock"></i></button>
         </div>
     </header>
 
-    <main class="layout-master">
-        <div class="escala-moldura" id="viewer">
-            <div id="pdfRenderArea"></div>
-            <div id="placeholder" class="absolute inset-0 flex flex-col items-center justify-center bg-white text-slate-300 p-10 text-center">
-                <i class="fa-solid fa-shield-check text-6xl mb-4 text-slate-200"></i>
-                <p class="font-black uppercase text-xs">Aguardando Escala Permanente</p>
+    <main class="max-w-6xl mx-auto p-4 grid grid-cols-1 lg:grid-cols-3 gap-6">
+        
+        <div class="lg:col-span-2">
+            <div class="glass-card overflow-hidden">
+                <div class="p-4 border-b border-white/5 flex justify-between items-center bg-white/5">
+                    <h3 class="font-bold text-sm uppercase flex items-center gap-2">
+                        <i class="fa-solid fa-calendar-days text-[#c5a36b]"></i> Escala de Plantão
+                    </h3>
+                </div>
+                <div id="containerEscala" class="min-h-[400px] flex items-center justify-center bg-black/20">
+                    <p class="text-slate-500 italic">Carregando escala da nuvem...</p>
+                </div>
             </div>
         </div>
 
-        <div class="glass-box">
-            <div class="admin-only">
-                <span class="label-gold">Cofre de Escala</span>
-                <input type="file" id="fileIn" class="hidden" accept="application/pdf,image/*" onchange="gravarTatuagem(this)">
-                <button onclick="document.getElementById('fileIn').click()" class="btn-gold mb-4 w-full">FIXAR ESCALA PARA SEMPRE</button>
-                
-                <input type="text" id="inD" placeholder="Data" class="input-oab">
-                <input type="text" id="inS" placeholder="Sai" class="input-oab">
-                <input type="text" id="inE" placeholder="Entra" class="input-oab">
-                <button onclick="salvarPermanente()" class="btn-gold w-full mb-4">GRAVAR TROCA</button>
+        <div class="space-y-6">
+            <div class="glass-card p-6">
+                <div class="admin-section border-b border-white/10 pb-6 mb-6">
+                    <span class="text-[10px] font-black text-[#c5a36b] uppercase block mb-4 tracking-widest text-center">Painel de Gestão</span>
+                    
+                    <input type="file" id="fileIn" class="hidden" accept="image/*" onchange="uploadEscala(this)">
+                    <button onclick="document.getElementById('fileIn').click()" class="btn-gold w-full mb-4">
+                        <i class="fa-solid fa-upload mr-2"></i>ATUALIZAR ESCALA
+                    </button>
+
+                    <div class="space-y-2">
+                        <input type="text" id="dataTroca" placeholder="Data (ex: 16/02)" class="input-oab">
+                        <input type="text" id="advSai" placeholder="Advogado(a) que sai" class="input-oab">
+                        <input type="text" id="advEntra" placeholder="Advogado(a) que entra" class="input-oab">
+                        
+                        <div class="grid grid-cols-2 gap-2">
+                            <button onclick="registrar('T')" class="btn-gold text-[11px]">REGISTRAR TROCA</button>
+                            <button onclick="registrar('F')" class="bg-red-600 hover:bg-red-700 text-white font-bold p-3 rounded-lg text-[11px] uppercase">FALTA</button>
+                        </div>
+                    </div>
+                    <button onclick="exportarExcel()" class="w-full mt-4 bg-green-700 text-white p-2 rounded-lg text-[10px] font-bold uppercase hover:bg-green-600 transition">
+                        <i class="fa-solid fa-file-excel mr-2"></i>Baixar Relatório Mensal
+                    </button>
+                </div>
+
+                <span class="text-[10px] font-black text-[#c5a36b] uppercase block mb-4 tracking-widest">Ocorrências do Mês</span>
+                <div id="listaLogs" class="max-h-[500px] overflow-y-auto space-y-3">
+                    </div>
             </div>
-            <span class="label-gold">Histórico Inalterável</span>
-            <div id="logs" class="max-h-[300px] overflow-y-auto"></div>
         </div>
     </main>
 
+    <footer>
+        <p>A responsabilidade é de quem está usando e o programa apenas gera o prompt.</p>
+        <p class="mt-2 text-[#c5a36b] font-bold">Cássia Prompt V8 © 2026</p>
+    </footer>
+
     <script>
-        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
-        let db;
-
-        // INICIALIZAÇÃO DO BANCO DE DADOS LOCAL (INDEXEDDB)
-        const request = indexedDB.open("CASSIA_V8_ULTRA", 1);
-        request.onupgradeneeded = e => {
-            db = e.target.result;
-            db.createObjectStore("data");
+        // CONFIGURAÇÃO QUE VOCÊ CRIOU NO GOOGLE
+        const firebaseConfig = {
+            apiKey: "AIzaSyCBxYwyTieXWmzC_yGq0Abyr5xXZoj-4ts",
+            authDomain: "cassia-assistencia-v8.firebaseapp.com",
+            projectId: "cassia-assistencia-v8",
+            storageBucket: "cassia-assistencia-v8.firebasestorage.app",
+            messagingSenderId: "1082407112672",
+            appId: "1:1082407112672:web:ea69563be63a9bd8036585",
+            databaseURL: "https://cassia-assistencia-v8-default-rtdb.firebaseio.com/"
         };
-        request.onsuccess = e => { db = e.target.result; carregarTudo(); };
 
-        function login() { if(prompt("Senha:") === "CAD2026") { document.getElementById('v8app').classList.add('is-admin'); } }
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
 
-        async function gravarTatuagem(input) {
+        function fazerLogin() {
+            if(prompt("Senha Master:") === "CAD2026") {
+                document.getElementById('mainApp').classList.add('is-admin');
+            }
+        }
+
+        // FUNÇÃO PARA SUBIR A ESCALA
+        function uploadEscala(input) {
             const file = input.files[0];
             const reader = new FileReader();
-            reader.onload = async function() {
-                let images = [];
-                if (file.type === "application/pdf") {
-                    const pdf = await pdfjsLib.getDocument(new Uint8Array(this.result)).promise;
-                    for(let i=1; i <= pdf.numPages; i++) {
-                        const page = await pdf.getPage(i);
-                        const canvas = document.createElement('canvas');
-                        const viewport = page.getViewport({ scale: 2.0 });
-                        canvas.height = viewport.height; canvas.width = viewport.width;
-                        await page.render({ canvasContext: canvas.getContext('2d'), viewport: viewport }).promise;
-                        images.push(canvas.toDataURL('image/webp', 0.8));
-                    }
-                } else { images.push(this.result); }
+            reader.onload = (e) => {
+                db.ref('escala_v8').set(e.target.result);
+            };
+            reader.readAsDataURL(file);
+        }
+
+        // ESCUTAR MUDANÇAS NA ESCALA (Sincroniza automático)
+        db.ref('escala_v8').on('value', snap => {
+            const imgData = snap.val();
+            const container = document.getElementById('containerEscala');
+            if(imgData) {
+                container.innerHTML = `<img src="${imgData}" class="w-full animate-in fade-in duration-500">`;
+            } else {
+                container.innerHTML = `<p class="text-slate-500">Nenhuma escala postada.</p>`;
+            }
+        });
+
+        // REGISTRAR TROCA OU FALTA
+        function registrar(tipo) {
+            const d = document.getElementById('dataTroca').value;
+            const s = document.getElementById('advSai').value;
+            const e = document.getElementById('advEntra').value;
+            
+            if(!d || !s) return alert("Preencha Data e Advogado(a)!");
+
+            db.ref('logs_v8').push({
+                tipo: tipo,
+                data: d,
+                saiu: s,
+                entrou: tipo === 'F' ? '---' : (e || 'Pendente'),
+                timestamp: Date.now()
+            });
+
+            document.getElementById('dataTroca').value = '';
+            document.getElementById('advSai').value = '';
+            document.getElementById('advEntra').value = '';
+        }
+
+        // ESCUTAR MUDANÇAS NOS LOGS
+        db.ref('logs_v8').on('value', snap => {
+            const lista = document.getElementById('listaLogs');
+            lista.innerHTML = '';
+            const data = snap.val();
+            if(data) {
+                Object.keys(data).reverse().forEach(id => {
+                    const item = data[id];
+                    const isFalta = item.tipo === 'F';
+                    lista.innerHTML += `
+                        <div class="log-item ${isFalta ? 'falta-item' : ''} relative group">
+                            <div class="flex justify-between items-start mb-1">
+                                <span class="text-[10px] font-bold text-[#c5a36b] tracking-tighter">[ ${item.data} ]</span>
+                                <button onclick="apagar('${id}')" class="admin-section text-red-900 hover:text-red-500 text-[10px]">Apagar</button>
+                            </div>
+                            <div class="text-[12px] uppercase">
+                                ${isFalta ? 
+                                    `<b class="text-red-500">FALTA:</b> ${item.saiu}` : 
+                                    `<b>SAIU:</b> ${item.saiu}<br><b>ENTROU:</b> ${item.entrou}`}
+                            </div>
+                        </div>
+                    `;
+                });
+            }
+        });
+
+        function apagar(id) { if(confirm("Deseja excluir este registro?")) db.ref('logs_v8').child(id).remove(); }
+
+        // EXCEL (A MÁGICA DO RELATÓRIO)
+        function exportarExcel() {
+            db.ref('logs_v8').once('value', snap => {
+                const logs = snap.val();
+                if(!logs) return alert("Não há dados para exportar.");
                 
-                const tx = db.transaction("data", "readwrite");
-                tx.objectStore("data").put(images, "escala");
-                tx.oncomplete = () => location.reload();
-            };
-            file.type === "application/pdf" ? reader.readAsArrayBuffer(file) : reader.readAsDataURL(file);
-        }
+                const rows = Object.values(logs).map(item => ({
+                    "DATA": item.data,
+                    "TIPO": item.tipo === 'F' ? 'FALTA' : 'TROCA',
+                    "SAIU / FALTANTE": item.saiu,
+                    "ENTROU / SUBSTITUTO": item.entrou
+                }));
 
-        function salvarPermanente() {
-            const d = document.getElementById('inD').value, s = document.getElementById('inS').value, e = document.getElementById('inE').value;
-            if(!d) return;
-            let logs = JSON.parse(localStorage.getItem('logs_v8') || '[]');
-            logs.unshift({d, s, e, id: Date.now()});
-            localStorage.setItem('logs_v8', JSON.stringify(logs));
-            renderLogs();
-        }
-
-        function carregarTudo() {
-            const tx = db.transaction("data", "readonly");
-            tx.objectStore("data").get("escala").onsuccess = e => {
-                const res = e.target.result;
-                if (res) {
-                    const area = document.getElementById('pdfRenderArea'); area.innerHTML = '';
-                    res.forEach(src => { const img = new Image(); img.src = src; area.appendChild(img); });
-                    document.getElementById('placeholder').style.display = 'none';
-                }
-            };
-            renderLogs();
-        }
-
-        function renderLogs() {
-            const container = document.getElementById('logs');
-            let logs = JSON.parse(localStorage.getItem('logs_v8') || '[]');
-            container.innerHTML = logs.map(l => `
-                <div class="item-log">
-                    <span class="text-gold font-black">[${l.d}]</span> <s>${l.s}</s> → <b>${l.e}</b>
-                </div>`).join('');
+                const ws = XLSX.utils.json_to_sheet(rows);
+                const wb = XLSX.utils.book_new();
+                XLSX.utils.book_append_sheet(wb, ws, "Relatorio_Plantao");
+                XLSX.writeFile(wb, "Relatorio_Santana_Parnaiba.xlsx");
+            });
         }
     </script>
 </body>
