@@ -3,38 +3,181 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cássia Prompt V8 - Elite Edition</title>
+    <title>CÁSSIA PROMPT V8 | CAD ELITE</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database-compat.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #121212; color: #e0e0e0; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
-        .container { background: #1e1e1e; padding: 30px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); width: 90%; max-width: 700px; border: 1px solid #333; }
-        h1 { color: #bb86fc; text-align: center; font-size: 24px; text-transform: uppercase; letter-spacing: 2px; }
-        textarea { width: 100%; height: 200px; background: #2a2a2a; border: 1px solid #444; color: #fff; padding: 15px; border-radius: 8px; font-size: 16px; box-sizing: border-box; resize: vertical; margin-bottom: 20px; }
-        button { width: 100%; padding: 15px; background: #03dac6; color: #000; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 16px; transition: 0.3s; }
-        button:hover { background: #018786; color: #fff; }
-        footer { margin-top: 30px; font-size: 12px; color: #666; text-align: center; line-height: 1.6; border-top: 1px solid #333; padding-top: 15px; }
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&display=swap');
+        :root { --oab-dark: #070b14; --oab-gold: #c5a36b; --oab-card: #111827; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: var(--oab-dark); color: #f1f5f9; }
+        .gold-gradient { background: linear-gradient(135deg, #c5a36b 0%, #f1dca7 50%, #c5a36b 100%); }
+        .glass-card { background: var(--oab-card); border: 1px solid rgba(197, 163, 107, 0.2); border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        .input-oab { background: #0b121f; border: 1px solid rgba(197, 163, 107, 0.3); border-radius: 8px; padding: 12px; color: white; width: 100%; margin-bottom: 10px; outline: none; transition: 0.3s; }
+        .input-oab:focus { border-color: var(--oab-gold); box-shadow: 0 0 10px rgba(197, 163, 107, 0.2); }
+        .btn-gold { background: var(--oab-gold); color: #000; font-weight: 800; text-transform: uppercase; padding: 12px; border-radius: 8px; cursor: pointer; border: none; }
+        .admin-section { display: none; }
+        .is-admin .admin-section { display: block; }
+        .log-item { background: rgba(255,255,255,0.03); border-left: 4px solid var(--oab-gold); padding: 12px; margin-bottom: 10px; border-radius: 8px; }
+        .falta-item { border-left-color: #ef4444; background: rgba(239, 68, 68, 0.05); }
+        footer { font-size: 10px; text-align: center; padding: 20px; opacity: 0.5; color: #fff; line-height: 1.6; }
     </style>
 </head>
-<body>
-    <div class="container">
-        <h1>Cássia Prompt V8 <br><span style="font-size: 14px; color: #03dac6;">God Mode Edition</span></h1>
-        <textarea id="userInput" placeholder="Descreva aqui o caso jurídico para processamento do Prompt Supremo..."></textarea>
-        <button onclick="enviarParaIA()">GERAR PROMPT SUPREMO</button>
-        
-        <footer>
-            PROJETO: CÁSSIA PROMPT V8 ELITE EDITION<br>
-            <strong>AVISO:</strong> A responsabilidade pelo uso desta ferramenta é inteiramente do usuário. <br>
-            O programa apenas gera o prompt através de IA.
-        </footer>
-    </div>
+<body id="mainApp">
+
+    <header class="p-6 border-b border-[#c5a36b]/30 bg-[#0f172a] sticky top-0 z-50">
+        <div class="max-w-6xl mx-auto flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                <div class="w-12 h-12 gold-gradient rounded-lg flex items-center justify-center shadow-lg shadow-gold/20">
+                    <i class="fa-solid fa-scale-balanced text-black text-xl"></i>
+                </div>
+                <div>
+                    <h1 class="font-black text-xl tracking-tighter italic uppercase text-white">Painel CAD <span class="text-[#c5a36b]">V8</span></h1>
+                    <p class="text-[10px] uppercase tracking-widest text-[#c5a36b] font-bold">Presidente da CAD Maristela Gonçalves</p>
+                    <p class="text-[8px] uppercase tracking-[3px] text-slate-400">Santana de Parnaíba</p>
+                </div>
+            </div>
+            <button onclick="fazerLogin()" class="opacity-20 hover:opacity-100 transition-opacity"><i class="fa-solid fa-user-tie"></i></button>
+        </div>
+    </header>
+
+    <main class="max-w-6xl mx-auto p-4 grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div class="lg:col-span-2">
+            <div class="glass-card overflow-hidden">
+                <div class="p-4 border-b border-white/5 flex justify-between items-center bg-white/5">
+                    <h3 class="font-bold text-sm uppercase flex items-center gap-2">
+                        <i class="fa-solid fa-calendar-check text-[#c5a36b]"></i> Escala de Plantão CAD
+                    </h3>
+                </div>
+                <div id="containerEscala" class="min-h-[400px] flex items-center justify-center bg-black/20">
+                    <p class="text-slate-500 italic">Conectando ao banco de dados...</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="space-y-6">
+            <div class="glass-card p-6">
+                <div class="admin-section border-b border-white/10 pb-6 mb-6">
+                    <span class="text-[10px] font-black text-[#c5a36b] uppercase block mb-4 tracking-widest text-center">Gestão da Presidência CAD</span>
+                    
+                    <input type="file" id="fileIn" class="hidden" accept="image/*" onchange="uploadEscala(this)">
+                    <button onclick="document.getElementById('fileIn').click()" class="btn-gold w-full mb-4">
+                        <i class="fa-solid fa-image mr-2"></i>ATUALIZAR ESCALA OFICIAL
+                    </button>
+
+                    <div class="space-y-2">
+                        <input type="text" id="dataTroca" placeholder="Data (Ex: 17/02)" class="input-oab">
+                        <input type="text" id="advSai" placeholder="Advogado(a) que SAI" class="input-oab">
+                        <input type="text" id="advEntra" placeholder="Advogado(a) que ENTRA" class="input-oab">
+                        
+                        <div class="grid grid-cols-2 gap-2">
+                            <button onclick="registrar('T')" class="btn-gold text-[11px]">REGISTRAR TROCA</button>
+                            <button onclick="registrar('F')" class="bg-red-700 hover:bg-red-800 text-white font-bold p-3 rounded-lg text-[11px] uppercase">FALTA</button>
+                        </div>
+                    </div>
+                    
+                    <button onclick="exportarExcel()" class="w-full mt-4 bg-emerald-700 text-white p-2 rounded-lg text-[10px] font-bold uppercase hover:bg-emerald-600 transition flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-file-excel"></i> Gerar Relatório CAD
+                    </button>
+                </div>
+
+                <span class="text-[10px] font-black text-[#c5a36b] uppercase block mb-4 tracking-widest border-b border-[#c5a36b]/20 pb-2">Registros da Comissão</span>
+                <div id="listaLogs" class="max-h-[500px] overflow-y-auto space-y-3 pr-2"></div>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p>A responsabilidade é de quem está usando e o programa apenas gera o prompt.</p>
+        <p class="mt-2 text-[#c5a36b] font-bold uppercase">Cássia Prompt V8 - Santana de Parnaíba © 2026</p>
+    </footer>
 
     <script>
-        const API_KEY = "AIzaSyCBxYwyTieXWmzC_yGq0Abyr5xXZoj-4ts";
-        
-        function enviarParaIA() {
-            const texto = document.getElementById('userInput').value;
-            if(!texto) { alert("Por favor, insira o caso."); return; }
-            alert("Processando com a Chave V8... (Integração Ativa)");
-            // A lógica de conexão com o Gemini/GPT entra aqui utilizando a API_KEY
+        // CONFIGURAÇÃO ATUALIZADA COM A CHAVE NOVA
+        const firebaseConfig = {
+            apiKey: "AIzaSyCBxYwyTieXWmzC_yGq0Abyr5xXZoj-4ts",
+            authDomain: "cassia-assistencia-v8.firebaseapp.com",
+            projectId: "cassia-assistencia-v8",
+            storageBucket: "cassia-assistencia-v8.firebasestorage.app",
+            messagingSenderId: "1082407112672",
+            appId: "1:1082407112672:web:ea69563be63a9bd8036585",
+            databaseURL: "https://cassia-assistencia-v8-default-rtdb.firebaseio.com/"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+
+        function fazerLogin() {
+            if(prompt("Senha Master CAD:") === "CAD2026") {
+                document.getElementById('mainApp').classList.add('is-admin');
+            }
+        }
+
+        function uploadEscala(input) {
+            const file = input.files[0];
+            const reader = new FileReader();
+            reader.onload = (e) => db.ref('escala_v8').set(e.target.result);
+            reader.readAsDataURL(file);
+        }
+
+        db.ref('escala_v8').on('value', snap => {
+            const imgData = snap.val();
+            const container = document.getElementById('containerEscala');
+            if(imgData) container.innerHTML = `<img src="${imgData}" class="w-full">`;
+        });
+
+        function registrar(tipo) {
+            const d = document.getElementById('dataTroca').value;
+            const s = document.getElementById('advSai').value;
+            const e = document.getElementById('advEntra').value;
+            if(!d || !s) return alert("Preencha os dados!");
+
+            db.ref('logs_v8').push({
+                tipo: tipo, data: d, saiu: s, entrou: tipo === 'F' ? 'FALTA' : (e || '---'), timestamp: Date.now()
+            });
+
+            document.getElementById('advSai').value = '';
+            document.getElementById('advEntra').value = '';
+        }
+
+        db.ref('logs_v8').on('value', snap => {
+            const lista = document.getElementById('listaLogs');
+            lista.innerHTML = '';
+            const data = snap.val();
+            if(data) {
+                Object.keys(data).reverse().forEach(id => {
+                    const item = data[id];
+                    const isFalta = item.tipo === 'F';
+                    lista.innerHTML += `
+                        <div class="log-item ${isFalta ? 'falta-item' : ''}">
+                            <div class="flex justify-between items-center mb-1">
+                                <span class="text-[10px] font-bold text-[#c5a36b]">[ ${item.data} ]</span>
+                                <button onclick="apagar('${id}')" class="admin-section text-red-900 text-[10px]">Excluir</button>
+                            </div>
+                            <div class="text-[11px] uppercase">
+                                ${isFalta ? `<b class="text-red-500">FALTA:</b> ${item.saiu}` : `<b>SAIU:</b> ${item.saiu} → <b>ENTROU:</b> ${item.entrou}`}
+                            </div>
+                        </div>`;
+                });
+            }
+        });
+
+        function apagar(id) { if(confirm("Excluir?")) db.ref('logs_v8').child(id).remove(); }
+
+        function exportarExcel() {
+            db.ref('logs_v8').once('value', snap => {
+                const logs = snap.val();
+                if(!logs) return alert("Sem dados.");
+                const rows = Object.values(logs).map(i => ({
+                    "DATA": i.data, "STATUS": i.tipo === 'F' ? 'FALTA' : 'TROCA', "ADV_SAIU": i.saiu, "ADV_ENTROU": i.entrou
+                }));
+                const ws = XLSX.utils.json_to_sheet(rows);
+                const wb = XLSX.utils.book_new();
+                XLSX.utils.book_append_sheet(wb, ws, "CAD");
+                XLSX.writeFile(wb, "Relatorio_CAD.xlsx");
+            });
         }
     </script>
 </body>
