@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CÁSSIA PROMPT V8 | ELITE EDITION</title>
+    <title>CÁSSIA PROMPT V8 | CAD ELITE</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database-compat.js"></script>
@@ -17,8 +17,7 @@
         .glass-card { background: var(--oab-card); border: 1px solid rgba(197, 163, 107, 0.2); border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
         .input-oab { background: #0b121f; border: 1px solid rgba(197, 163, 107, 0.3); border-radius: 8px; padding: 12px; color: white; width: 100%; margin-bottom: 10px; outline: none; transition: 0.3s; }
         .input-oab:focus { border-color: var(--oab-gold); box-shadow: 0 0 10px rgba(197, 163, 107, 0.2); }
-        .btn-gold { background: var(--oab-gold); color: #000; font-weight: 800; text-transform: uppercase; padding: 12px; border-radius: 8px; cursor: pointer; transition: 0.3s; border: none; }
-        .btn-gold:hover { transform: translateY(-2px); filter: brightness(1.1); }
+        .btn-gold { background: var(--oab-gold); color: #000; font-weight: 800; text-transform: uppercase; padding: 12px; border-radius: 8px; cursor: pointer; border: none; }
         .admin-section { display: none; }
         .is-admin .admin-section { display: block; }
         .log-item { background: rgba(255,255,255,0.03); border-left: 4px solid var(--oab-gold); padding: 12px; margin-bottom: 10px; border-radius: 8px; }
@@ -35,12 +34,12 @@
                     <i class="fa-solid fa-scale-balanced text-black text-xl"></i>
                 </div>
                 <div>
-                    <h1 class="font-black text-xl tracking-tighter italic">CÁSSIA PROMPT <span class="text-[#c5a36b]">V8</span></h1>
-                    <p class="text-[10px] uppercase tracking-widest text-[#c5a36b] font-bold">Presidente Maristela Gonçalves</p>
+                    <h1 class="font-black text-xl tracking-tighter italic uppercase text-white">Painel CAD <span class="text-[#c5a36b]">V8</span></h1>
+                    <p class="text-[10px] uppercase tracking-widest text-[#c5a36b] font-bold">Presidente da CAD Maristela Gonçalves</p>
                     <p class="text-[8px] uppercase tracking-[3px] text-slate-400">Santana de Parnaíba</p>
                 </div>
             </div>
-            <button onclick="fazerLogin()" class="opacity-20 hover:opacity-100 transition-opacity"><i class="fa-solid fa-shield-halved"></i></button>
+            <button onclick="fazerLogin()" class="opacity-20 hover:opacity-100 transition-opacity"><i class="fa-solid fa-user-tie"></i></button>
         </div>
     </header>
 
@@ -50,11 +49,11 @@
             <div class="glass-card overflow-hidden">
                 <div class="p-4 border-b border-white/5 flex justify-between items-center bg-white/5">
                     <h3 class="font-bold text-sm uppercase flex items-center gap-2">
-                        <i class="fa-solid fa-calendar-check text-[#c5a36b]"></i> Escala de Plantão Oficial
+                        <i class="fa-solid fa-calendar-check text-[#c5a36b]"></i> Escala de Plantão CAD
                     </h3>
                 </div>
                 <div id="containerEscala" class="min-h-[400px] flex items-center justify-center bg-black/20">
-                    <p class="text-slate-500 italic">Sincronizando com a nuvem do Google...</p>
+                    <p class="text-slate-500 italic">Acessando Banco de Dados CAD...</p>
                 </div>
             </div>
         </div>
@@ -62,11 +61,11 @@
         <div class="space-y-6">
             <div class="glass-card p-6">
                 <div class="admin-section border-b border-white/10 pb-6 mb-6">
-                    <span class="text-[10px] font-black text-[#c5a36b] uppercase block mb-4 tracking-widest text-center">Painel da Presidência</span>
+                    <span class="text-[10px] font-black text-[#c5a36b] uppercase block mb-4 tracking-widest text-center">Gestão da Presidência CAD</span>
                     
                     <input type="file" id="fileIn" class="hidden" accept="image/*" onchange="uploadEscala(this)">
                     <button onclick="document.getElementById('fileIn').click()" class="btn-gold w-full mb-4">
-                        <i class="fa-solid fa-image mr-2"></i>ATUALIZAR IMAGEM DA ESCALA
+                        <i class="fa-solid fa-image mr-2"></i>ATUALIZAR ESCALA OFICIAL
                     </button>
 
                     <div class="space-y-2">
@@ -81,13 +80,11 @@
                     </div>
                     
                     <button onclick="exportarExcel()" class="w-full mt-4 bg-emerald-700 text-white p-2 rounded-lg text-[10px] font-bold uppercase hover:bg-emerald-600 transition flex items-center justify-center gap-2">
-                        <i class="fa-solid fa-file-excel"></i> Gerar Relatório Mensal
+                        <i class="fa-solid fa-file-excel"></i> Gerar Relatório CAD
                     </button>
-                    
-                    <button onclick="limparTudo()" class="w-full mt-2 text-red-900 text-[8px] uppercase font-bold opacity-30 hover:opacity-100">Limpar Histórico do Mês</button>
                 </div>
 
-                <span class="text-[10px] font-black text-[#c5a36b] uppercase block mb-4 tracking-widest border-b border-[#c5a36b]/20 pb-2">Ocorrências Mensais</span>
+                <span class="text-[10px] font-black text-[#c5a36b] uppercase block mb-4 tracking-widest border-b border-[#c5a36b]/20 pb-2">Registros da Comissão</span>
                 <div id="listaLogs" class="max-h-[500px] overflow-y-auto space-y-3 pr-2">
                     </div>
             </div>
@@ -96,11 +93,10 @@
 
     <footer>
         <p>A responsabilidade é de quem está usando e o programa apenas gera o prompt.</p>
-        <p class="mt-2 text-[#c5a36b] font-bold">Cássia Prompt V8 Elite Edition © 2026</p>
+        <p class="mt-2 text-[#c5a36b] font-bold uppercase">Cássia Prompt V8 - Santana de Parnaíba © 2026</p>
     </footer>
 
     <script>
-        // CONFIGURAÇÃO OFICIAL CÁSSIA V8
         const firebaseConfig = {
             apiKey: "AIzaSyCBxYwyTieXWmzC_yGq0Abyr5xXZoj-4ts",
             authDomain: "cassia-assistencia-v8.firebaseapp.com",
@@ -115,7 +111,7 @@
         const db = firebase.database();
 
         function fazerLogin() {
-            if(prompt("Senha Master:") === "CAD2026") {
+            if(prompt("Senha Master CAD:") === "CAD2026") {
                 document.getElementById('mainApp').classList.add('is-admin');
             }
         }
@@ -130,22 +126,20 @@
         db.ref('escala_v8').on('value', snap => {
             const imgData = snap.val();
             const container = document.getElementById('containerEscala');
-            if(imgData) {
-                container.innerHTML = `<img src="${imgData}" class="w-full">`;
-            }
+            if(imgData) container.innerHTML = `<img src="${imgData}" class="w-full">`;
         });
 
         function registrar(tipo) {
             const d = document.getElementById('dataTroca').value;
             const s = document.getElementById('advSai').value;
             const e = document.getElementById('advEntra').value;
-            if(!d || !s) return alert("Data e Advogado são obrigatórios!");
+            if(!d || !s) return alert("Preencha os dados básicos!");
 
             db.ref('logs_v8').push({
                 tipo: tipo,
                 data: d,
                 saiu: s,
-                entrou: tipo === 'F' ? 'FALTA REGISTRADA' : (e || 'Pendente'),
+                entrou: tipo === 'F' ? 'FALTA REGISTRADA' : (e || '---'),
                 timestamp: Date.now()
             });
 
@@ -164,21 +158,18 @@
                     lista.innerHTML += `
                         <div class="log-item ${isFalta ? 'falta-item' : ''}">
                             <div class="flex justify-between items-center mb-1">
-                                <span class="text-[10px] font-bold text-[#c5a36b] tracking-tighter">[ ${item.data} ]</span>
-                                <button onclick="apagar('${id}')" class="admin-section text-red-900 text-[10px]">Apagar</button>
+                                <span class="text-[10px] font-bold text-[#c5a36b]">[ ${item.data} ]</span>
+                                <button onclick="apagar('${id}')" class="admin-section text-red-900 text-[10px]">Excluir</button>
                             </div>
-                            <div class="text-[12px] uppercase leading-tight">
-                                ${isFalta ? 
-                                    `<b class="text-red-500 font-black">FALTA:</b> ${item.saiu}` : 
-                                    `<b>SAIU:</b> ${item.saiu}<br><b class="text-emerald-500">ENTROU:</b> ${item.entrou}`}
+                            <div class="text-[11px] uppercase">
+                                ${isFalta ? `<b class="text-red-500">FALTA:</b> ${item.saiu}` : `<b>SAIU:</b> ${item.saiu} → <b>ENTROU:</b> ${item.entrou}`}
                             </div>
                         </div>`;
                 });
             }
         });
 
-        function apagar(id) { if(confirm("Excluir registro?")) db.ref('logs_v8').child(id).remove(); }
-        function limparTudo() { if(confirm("LIMPAR TUDO?")) db.ref('logs_v8').remove(); }
+        function apagar(id) { if(confirm("Excluir registro da CAD?")) db.ref('logs_v8').child(id).remove(); }
 
         function exportarExcel() {
             db.ref('logs_v8').once('value', snap => {
@@ -187,13 +178,13 @@
                 const rows = Object.values(logs).map(i => ({
                     "DATA": i.data,
                     "STATUS": i.tipo === 'F' ? 'FALTA' : 'TROCA',
-                    "ADVOGADO_SAIU": i.saiu,
-                    "ADVOGADO_ENTROU": i.entrou
+                    "ADV_SAIU": i.saiu,
+                    "ADV_ENTROU": i.entrou
                 }));
                 const ws = XLSX.utils.json_to_sheet(rows);
                 const wb = XLSX.utils.book_new();
-                XLSX.utils.book_append_sheet(wb, ws, "Plantao");
-                XLSX.writeFile(wb, "Relatorio_Santana_Parnaiba.xlsx");
+                XLSX.utils.book_append_sheet(wb, ws, "Relatorio_CAD");
+                XLSX.writeFile(wb, "Relatorio_CAD_Santana.xlsx");
             });
         }
     </script>
