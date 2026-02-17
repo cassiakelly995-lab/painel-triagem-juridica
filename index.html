@@ -23,7 +23,7 @@
         .is-admin .admin-section { display: block; }
         .log-item { background: rgba(255,255,255,0.03); border-left: 4px solid var(--oab-gold); padding: 12px; margin-bottom: 10px; border-radius: 8px; }
         .falta-item { border-left-color: #ef4444; background: rgba(239, 68, 68, 0.05); }
-        footer { font-size: 10px; text-align: center; padding: 20px; opacity: 0.5; color: #fff; }
+        footer { font-size: 10px; text-align: center; padding: 20px; opacity: 0.5; color: #fff; line-height: 1.6; }
     </style>
 </head>
 <body id="mainApp">
@@ -31,15 +31,16 @@
     <header class="p-6 border-b border-[#c5a36b]/30 bg-[#0f172a] sticky top-0 z-50">
         <div class="max-w-6xl mx-auto flex justify-between items-center">
             <div class="flex items-center gap-3">
-                <div class="w-10 h-10 gold-gradient rounded-lg flex items-center justify-center shadow-lg shadow-gold/20">
-                    <i class="fa-solid fa-gavel text-black"></i>
+                <div class="w-12 h-12 gold-gradient rounded-lg flex items-center justify-center shadow-lg shadow-gold/20">
+                    <i class="fa-solid fa-scale-balanced text-black text-xl"></i>
                 </div>
                 <div>
                     <h1 class="font-black text-xl tracking-tighter italic">CÁSSIA PROMPT <span class="text-[#c5a36b]">V8</span></h1>
-                    <p class="text-[9px] uppercase tracking-widest text-slate-400">Elite Edition | Santana de Parnaíba</p>
+                    <p class="text-[10px] uppercase tracking-widest text-[#c5a36b] font-bold">Presidente Maristela Gonçalves</p>
+                    <p class="text-[8px] uppercase tracking-[3px] text-slate-400">Santana de Parnaíba</p>
                 </div>
             </div>
-            <button onclick="fazerLogin()" class="opacity-30 hover:opacity-100 transition-opacity"><i class="fa-solid fa-lock"></i></button>
+            <button onclick="fazerLogin()" class="opacity-20 hover:opacity-100 transition-opacity"><i class="fa-solid fa-shield-halved"></i></button>
         </div>
     </header>
 
@@ -49,11 +50,11 @@
             <div class="glass-card overflow-hidden">
                 <div class="p-4 border-b border-white/5 flex justify-between items-center bg-white/5">
                     <h3 class="font-bold text-sm uppercase flex items-center gap-2">
-                        <i class="fa-solid fa-calendar-days text-[#c5a36b]"></i> Escala de Plantão
+                        <i class="fa-solid fa-calendar-check text-[#c5a36b]"></i> Escala de Plantão Oficial
                     </h3>
                 </div>
                 <div id="containerEscala" class="min-h-[400px] flex items-center justify-center bg-black/20">
-                    <p class="text-slate-500 italic">Carregando escala da nuvem...</p>
+                    <p class="text-slate-500 italic">Sincronizando com a nuvem do Google...</p>
                 </div>
             </div>
         </div>
@@ -61,30 +62,33 @@
         <div class="space-y-6">
             <div class="glass-card p-6">
                 <div class="admin-section border-b border-white/10 pb-6 mb-6">
-                    <span class="text-[10px] font-black text-[#c5a36b] uppercase block mb-4 tracking-widest text-center">Painel de Gestão</span>
+                    <span class="text-[10px] font-black text-[#c5a36b] uppercase block mb-4 tracking-widest text-center">Painel da Presidência</span>
                     
                     <input type="file" id="fileIn" class="hidden" accept="image/*" onchange="uploadEscala(this)">
                     <button onclick="document.getElementById('fileIn').click()" class="btn-gold w-full mb-4">
-                        <i class="fa-solid fa-upload mr-2"></i>ATUALIZAR ESCALA
+                        <i class="fa-solid fa-image mr-2"></i>ATUALIZAR IMAGEM DA ESCALA
                     </button>
 
                     <div class="space-y-2">
-                        <input type="text" id="dataTroca" placeholder="Data (ex: 16/02)" class="input-oab">
-                        <input type="text" id="advSai" placeholder="Advogado(a) que sai" class="input-oab">
-                        <input type="text" id="advEntra" placeholder="Advogado(a) que entra" class="input-oab">
+                        <input type="text" id="dataTroca" placeholder="Data (Ex: 17/02)" class="input-oab">
+                        <input type="text" id="advSai" placeholder="Advogado(a) que SAI" class="input-oab">
+                        <input type="text" id="advEntra" placeholder="Advogado(a) que ENTRA" class="input-oab">
                         
                         <div class="grid grid-cols-2 gap-2">
                             <button onclick="registrar('T')" class="btn-gold text-[11px]">REGISTRAR TROCA</button>
-                            <button onclick="registrar('F')" class="bg-red-600 hover:bg-red-700 text-white font-bold p-3 rounded-lg text-[11px] uppercase">FALTA</button>
+                            <button onclick="registrar('F')" class="bg-red-700 hover:bg-red-800 text-white font-bold p-3 rounded-lg text-[11px] uppercase shadow-lg shadow-red-900/20">FALTA</button>
                         </div>
                     </div>
-                    <button onclick="exportarExcel()" class="w-full mt-4 bg-green-700 text-white p-2 rounded-lg text-[10px] font-bold uppercase hover:bg-green-600 transition">
-                        <i class="fa-solid fa-file-excel mr-2"></i>Baixar Relatório Mensal
+                    
+                    <button onclick="exportarExcel()" class="w-full mt-4 bg-emerald-700 text-white p-2 rounded-lg text-[10px] font-bold uppercase hover:bg-emerald-600 transition flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-file-excel"></i> Gerar Relatório Mensal
                     </button>
+                    
+                    <button onclick="limparTudo()" class="w-full mt-2 text-red-900 text-[8px] uppercase font-bold opacity-30 hover:opacity-100">Limpar Histórico do Mês</button>
                 </div>
 
-                <span class="text-[10px] font-black text-[#c5a36b] uppercase block mb-4 tracking-widest">Ocorrências do Mês</span>
-                <div id="listaLogs" class="max-h-[500px] overflow-y-auto space-y-3">
+                <span class="text-[10px] font-black text-[#c5a36b] uppercase block mb-4 tracking-widest border-b border-[#c5a36b]/20 pb-2">Ocorrências Mensais</span>
+                <div id="listaLogs" class="max-h-[500px] overflow-y-auto space-y-3 pr-2">
                     </div>
             </div>
         </div>
@@ -92,11 +96,11 @@
 
     <footer>
         <p>A responsabilidade é de quem está usando e o programa apenas gera o prompt.</p>
-        <p class="mt-2 text-[#c5a36b] font-bold">Cássia Prompt V8 © 2026</p>
+        <p class="mt-2 text-[#c5a36b] font-bold">Cássia Prompt V8 Elite Edition © 2026</p>
     </footer>
 
     <script>
-        // CONFIGURAÇÃO QUE VOCÊ CRIOU NO GOOGLE
+        // CONFIGURAÇÃO OFICIAL CÁSSIA V8
         const firebaseConfig = {
             apiKey: "AIzaSyCBxYwyTieXWmzC_yGq0Abyr5xXZoj-4ts",
             authDomain: "cassia-assistencia-v8.firebaseapp.com",
@@ -116,49 +120,39 @@
             }
         }
 
-        // FUNÇÃO PARA SUBIR A ESCALA
         function uploadEscala(input) {
             const file = input.files[0];
             const reader = new FileReader();
-            reader.onload = (e) => {
-                db.ref('escala_v8').set(e.target.result);
-            };
+            reader.onload = (e) => db.ref('escala_v8').set(e.target.result);
             reader.readAsDataURL(file);
         }
 
-        // ESCUTAR MUDANÇAS NA ESCALA (Sincroniza automático)
         db.ref('escala_v8').on('value', snap => {
             const imgData = snap.val();
             const container = document.getElementById('containerEscala');
             if(imgData) {
-                container.innerHTML = `<img src="${imgData}" class="w-full animate-in fade-in duration-500">`;
-            } else {
-                container.innerHTML = `<p class="text-slate-500">Nenhuma escala postada.</p>`;
+                container.innerHTML = `<img src="${imgData}" class="w-full">`;
             }
         });
 
-        // REGISTRAR TROCA OU FALTA
         function registrar(tipo) {
             const d = document.getElementById('dataTroca').value;
             const s = document.getElementById('advSai').value;
             const e = document.getElementById('advEntra').value;
-            
-            if(!d || !s) return alert("Preencha Data e Advogado(a)!");
+            if(!d || !s) return alert("Data e Advogado são obrigatórios!");
 
             db.ref('logs_v8').push({
                 tipo: tipo,
                 data: d,
                 saiu: s,
-                entrou: tipo === 'F' ? '---' : (e || 'Pendente'),
+                entrou: tipo === 'F' ? 'FALTA REGISTRADA' : (e || 'Pendente'),
                 timestamp: Date.now()
             });
 
-            document.getElementById('dataTroca').value = '';
             document.getElementById('advSai').value = '';
             document.getElementById('advEntra').value = '';
         }
 
-        // ESCUTAR MUDANÇAS NOS LOGS
         db.ref('logs_v8').on('value', snap => {
             const lista = document.getElementById('listaLogs');
             lista.innerHTML = '';
@@ -168,40 +162,37 @@
                     const item = data[id];
                     const isFalta = item.tipo === 'F';
                     lista.innerHTML += `
-                        <div class="log-item ${isFalta ? 'falta-item' : ''} relative group">
-                            <div class="flex justify-between items-start mb-1">
+                        <div class="log-item ${isFalta ? 'falta-item' : ''}">
+                            <div class="flex justify-between items-center mb-1">
                                 <span class="text-[10px] font-bold text-[#c5a36b] tracking-tighter">[ ${item.data} ]</span>
-                                <button onclick="apagar('${id}')" class="admin-section text-red-900 hover:text-red-500 text-[10px]">Apagar</button>
+                                <button onclick="apagar('${id}')" class="admin-section text-red-900 text-[10px]">Apagar</button>
                             </div>
-                            <div class="text-[12px] uppercase">
+                            <div class="text-[12px] uppercase leading-tight">
                                 ${isFalta ? 
-                                    `<b class="text-red-500">FALTA:</b> ${item.saiu}` : 
-                                    `<b>SAIU:</b> ${item.saiu}<br><b>ENTROU:</b> ${item.entrou}`}
+                                    `<b class="text-red-500 font-black">FALTA:</b> ${item.saiu}` : 
+                                    `<b>SAIU:</b> ${item.saiu}<br><b class="text-emerald-500">ENTROU:</b> ${item.entrou}`}
                             </div>
-                        </div>
-                    `;
+                        </div>`;
                 });
             }
         });
 
-        function apagar(id) { if(confirm("Deseja excluir este registro?")) db.ref('logs_v8').child(id).remove(); }
+        function apagar(id) { if(confirm("Excluir registro?")) db.ref('logs_v8').child(id).remove(); }
+        function limparTudo() { if(confirm("LIMPAR TUDO?")) db.ref('logs_v8').remove(); }
 
-        // EXCEL (A MÁGICA DO RELATÓRIO)
         function exportarExcel() {
             db.ref('logs_v8').once('value', snap => {
                 const logs = snap.val();
-                if(!logs) return alert("Não há dados para exportar.");
-                
-                const rows = Object.values(logs).map(item => ({
-                    "DATA": item.data,
-                    "TIPO": item.tipo === 'F' ? 'FALTA' : 'TROCA',
-                    "SAIU / FALTANTE": item.saiu,
-                    "ENTROU / SUBSTITUTO": item.entrou
+                if(!logs) return alert("Sem dados.");
+                const rows = Object.values(logs).map(i => ({
+                    "DATA": i.data,
+                    "STATUS": i.tipo === 'F' ? 'FALTA' : 'TROCA',
+                    "ADVOGADO_SAIU": i.saiu,
+                    "ADVOGADO_ENTROU": i.entrou
                 }));
-
                 const ws = XLSX.utils.json_to_sheet(rows);
                 const wb = XLSX.utils.book_new();
-                XLSX.utils.book_append_sheet(wb, ws, "Relatorio_Plantao");
+                XLSX.utils.book_append_sheet(wb, ws, "Plantao");
                 XLSX.writeFile(wb, "Relatorio_Santana_Parnaiba.xlsx");
             });
         }
