@@ -127,6 +127,58 @@
         /* INLINE EDIT */
         .edit-row { display: flex; align-items: center; gap: 6px; margin-bottom: 6px; }
         .edit-row .edit-input { flex: 1; }
+
+        /* ══ AUTOCOMPLETE ══ */
+        .autocomplete-wrap { position: relative; margin-bottom: 10px; }
+        .autocomplete-input {
+            background: #0b121f;
+            border: 1px solid rgba(197,163,107,0.4);
+            border-radius: 8px;
+            padding: 11px 36px 11px 12px;
+            color: white;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: 12px;
+            font-weight: 600;
+            width: 100%;
+            outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        .autocomplete-input:focus { border-color: #c5a36b; box-shadow: 0 0 10px rgba(197,163,107,0.15); }
+        .autocomplete-input::placeholder { color: #475569; font-weight: 400; }
+        .autocomplete-icon {
+            position: absolute; right: 11px; top: 50%; transform: translateY(-50%);
+            color: #c5a36b; font-size: 11px; pointer-events: none;
+        }
+        .autocomplete-dropdown {
+            position: absolute; top: calc(100% + 4px); left: 0; right: 0;
+            background: #0d1a2e; border: 1px solid rgba(197,163,107,0.35);
+            border-radius: 10px; z-index: 9999; max-height: 220px; overflow-y: auto;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.6);
+            display: none;
+        }
+        .autocomplete-dropdown.open { display: block; }
+        .autocomplete-item {
+            padding: 10px 14px; font-size: 12px; font-weight: 600; color: #e2e8f0;
+            cursor: pointer; border-bottom: 1px solid rgba(255,255,255,0.04);
+            transition: background 0.15s;
+            display: flex; align-items: center; gap: 8px;
+        }
+        .autocomplete-item:last-child { border-bottom: none; }
+        .autocomplete-item:hover, .autocomplete-item.highlighted { background: rgba(197,163,107,0.12); color: #f1dca7; }
+        .autocomplete-item em { color: #c5a36b; font-style: normal; }
+        .autocomplete-empty { padding: 12px 14px; font-size: 11px; color: #475569; font-style: italic; }
+        .autocomplete-label {
+            font-size: 9px; font-weight: 800; text-transform: uppercase;
+            letter-spacing: 0.15em; color: #64748b; margin-bottom: 4px; padding-left: 2px;
+        }
+
+        /* Lista advogados no modal */
+        .adv-modal-item {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 8px 10px; border-radius: 8px;
+            background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05);
+            margin-bottom: 6px; font-size: 12px; font-weight: 600; color: #f1dca7;
+        }
     </style>
 </head>
 <body id="mainApp">
@@ -159,7 +211,7 @@
 <div class="max-w-6xl mx-auto px-4 pt-5 pb-1">
     <div class="tab-nav">
         <button class="tab-btn active" onclick="trocarAba('plantao',this)">
-            <i class="fa-solid fa-calendar-check mr-1"></i>Plantão
+            <i class="fa-solid fa-calendar-check mr-1"></i>Triagem
         </button>
         <button class="tab-btn" onclick="trocarAba('assistencia',this)">
             <i class="fa-solid fa-handshake mr-1"></i>Convênio
@@ -180,7 +232,7 @@
 <main class="max-w-6xl mx-auto p-4">
 
 <!-- ══════════════════════════════════════ -->
-<!--  ABA 1 · PLANTÃO — 100% ORIGINAL      -->
+<!--  ABA 1 · PLANTÃO                      -->
 <!-- ══════════════════════════════════════ -->
 <div id="tab-plantao" class="tab-content active">
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -188,7 +240,7 @@
             <div class="glass-card overflow-hidden">
                 <div class="p-4 border-b border-white/5 flex justify-between items-center bg-white/5">
                     <h3 class="font-bold text-sm uppercase flex items-center gap-2">
-                        <i class="fa-solid fa-calendar-check text-[#c5a36b]"></i> Escala de Plantão CAD
+                        <i class="fa-solid fa-calendar-check text-[#c5a36b]"></i> Escala de Triagem CAD
                     </h3>
                 </div>
                 <div id="containerEscala" class="min-h-[400px] flex items-center justify-center bg-black/20">
@@ -196,27 +248,57 @@
                 </div>
             </div>
         </div>
+
         <div class="space-y-6">
             <div class="glass-card p-6">
                 <div class="admin-section border-b border-white/10 pb-6 mb-6">
                     <span class="text-[10px] font-black text-[#c5a36b] uppercase block mb-4 tracking-widest text-center">Gestão da Presidência CAD</span>
+
                     <input type="file" id="fileIn" class="hidden" accept="image/*" onchange="uploadEscala(this)">
                     <button onclick="document.getElementById('fileIn').click()" class="btn-gold mb-4">
                         <i class="fa-solid fa-image mr-2"></i>ATUALIZAR ESCALA OFICIAL
                     </button>
-                    <div class="space-y-2">
+
+                    <div class="space-y-1">
+                        <!-- Data -->
                         <input type="text" id="dataTroca" placeholder="Data (Ex: 17/02)" class="input-oab">
-                        <input type="text" id="advSai" placeholder="Advogado(a) que SAI" class="input-oab">
-                        <input type="text" id="advEntra" placeholder="Advogado(a) que ENTRA" class="input-oab">
-                        <div class="grid grid-cols-2 gap-2">
+
+                        <!-- Autocomplete: quem SAI -->
+                        <p class="autocomplete-label"><i class="fa-solid fa-arrow-right-from-bracket text-red-400 mr-1"></i>Advogado(a) que SAI</p>
+                        <div class="autocomplete-wrap" id="wrapSai">
+                            <input type="text" id="advSaiInput" class="autocomplete-input"
+                                placeholder="Digite o nome..." autocomplete="off"
+                                oninput="filtrarAdv('Sai')" onkeydown="navAdv(event,'Sai')" onfocus="abrirDropdown('Sai')" onblur="fecharDropdownDelay('Sai')">
+                            <i class="fa-solid fa-magnifying-glass autocomplete-icon"></i>
+                            <div class="autocomplete-dropdown" id="dropSai"></div>
+                        </div>
+
+                        <!-- Autocomplete: quem ENTRA -->
+                        <p class="autocomplete-label" id="labelEntra"><i class="fa-solid fa-arrow-right-to-bracket text-emerald-400 mr-1"></i>Advogado(a) que ENTRA</p>
+                        <div class="autocomplete-wrap" id="wrapEntra">
+                            <input type="text" id="advEntraInput" class="autocomplete-input"
+                                placeholder="Digite o nome..." autocomplete="off"
+                                oninput="filtrarAdv('Entra')" onkeydown="navAdv(event,'Entra')" onfocus="abrirDropdown('Entra')" onblur="fecharDropdownDelay('Entra')">
+                            <i class="fa-solid fa-magnifying-glass autocomplete-icon"></i>
+                            <div class="autocomplete-dropdown" id="dropEntra"></div>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-2 pt-1">
                             <button onclick="registrar('T')" class="btn-gold text-[11px]">REGISTRAR TROCA</button>
                             <button onclick="registrar('F')" class="bg-red-700 hover:bg-red-800 text-white font-bold p-3 rounded-lg text-[11px] uppercase w-full cursor-pointer border-none">FALTA</button>
                         </div>
                     </div>
-                    <button onclick="exportarExcel()" class="w-full mt-4 bg-emerald-700 text-white p-2 rounded-lg text-[10px] font-bold uppercase hover:bg-emerald-600 transition flex items-center justify-center gap-2 cursor-pointer border-none">
+
+                    <!-- Gerenciar lista -->
+                    <button onclick="abrirModalAdvogados()" class="w-full mt-3 border border-[#c5a36b]/30 text-[#c5a36b] bg-transparent p-2 rounded-lg text-[10px] font-bold uppercase hover:bg-[#c5a36b]/10 transition flex items-center justify-center gap-2 cursor-pointer">
+                        <i class="fa-solid fa-list-ul"></i> Gerenciar Lista de Advogados
+                    </button>
+
+                    <button onclick="exportarExcel()" class="w-full mt-2 bg-emerald-700 text-white p-2 rounded-lg text-[10px] font-bold uppercase hover:bg-emerald-600 transition flex items-center justify-center gap-2 cursor-pointer border-none">
                         <i class="fa-solid fa-file-excel"></i> Gerar Relatório CAD
                     </button>
                 </div>
+
                 <span class="text-[10px] font-black text-[#c5a36b] uppercase block mb-4 tracking-widest border-b border-[#c5a36b]/20 pb-2">Registros da Comissão</span>
                 <div id="listaLogs" class="max-h-[500px] overflow-y-auto space-y-3 pr-2"></div>
             </div>
@@ -228,13 +310,9 @@
 <!--  ABA 2 · CONVÊNIO                     -->
 <!-- ══════════════════════════════════════ -->
 <div id="tab-assistencia" class="tab-content">
-
-    <!-- Stats editáveis -->
     <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
         <div class="stat-card" onclick="editarStat('casos')" title="Clique para editar">
-            <div class="stat-icon" style="background:rgba(197,163,107,0.1)">
-                <i class="fa-solid fa-gavel" style="color:#c5a36b"></i>
-            </div>
+            <div class="stat-icon" style="background:rgba(197,163,107,0.1)"><i class="fa-solid fa-gavel" style="color:#c5a36b"></i></div>
             <div>
                 <div class="stat-value" id="statCasos">—</div>
                 <div class="stat-label">Casos Ativos</div>
@@ -242,9 +320,7 @@
             </div>
         </div>
         <div class="stat-card" onclick="editarStat('encerrados')" title="Clique para editar">
-            <div class="stat-icon" style="background:rgba(16,185,129,0.1)">
-                <i class="fa-solid fa-circle-check" style="color:#10b981"></i>
-            </div>
+            <div class="stat-icon" style="background:rgba(16,185,129,0.1)"><i class="fa-solid fa-circle-check" style="color:#10b981"></i></div>
             <div>
                 <div class="stat-value" id="statEncerrados">—</div>
                 <div class="stat-label">Encerrados</div>
@@ -252,18 +328,14 @@
             </div>
         </div>
         <div class="stat-card" id="statMembroCard">
-            <div class="stat-icon" style="background:rgba(59,130,246,0.1)">
-                <i class="fa-solid fa-users" style="color:#3b82f6"></i>
-            </div>
+            <div class="stat-icon" style="background:rgba(59,130,246,0.1)"><i class="fa-solid fa-users" style="color:#3b82f6"></i></div>
             <div>
                 <div class="stat-value" id="statMembros">—</div>
                 <div class="stat-label">Membros CAD</div>
             </div>
         </div>
         <div class="stat-card" onclick="editarStat('vigencia')" title="Clique para editar">
-            <div class="stat-icon" style="background:rgba(245,158,11,0.1)">
-                <i class="fa-solid fa-calendar-days" style="color:#f59e0b"></i>
-            </div>
+            <div class="stat-icon" style="background:rgba(245,158,11,0.1)"><i class="fa-solid fa-calendar-days" style="color:#f59e0b"></i></div>
             <div>
                 <div class="stat-value" id="statVigencia">—</div>
                 <div class="stat-label">Vigência (ano)</div>
@@ -271,7 +343,6 @@
             </div>
         </div>
     </div>
-
     <div class="info-card">
         <div class="info-card-title">
             <i class="fa-solid fa-file-contract"></i> Informações do Convênio
@@ -288,11 +359,8 @@
 <!-- ══════════════════════════════════════ -->
 <div id="tab-documentos" class="tab-content">
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-
-        <!-- Upload (admin) -->
         <div class="info-card admin-section">
             <div class="info-card-title"><i class="fa-solid fa-cloud-arrow-up"></i> Enviar Documento</div>
-
             <div class="upload-zone" id="uploadZone" onclick="document.getElementById('fileDocInput').click()"
                 ondragover="event.preventDefault();this.classList.add('dragover')"
                 ondragleave="this.classList.remove('dragover')"
@@ -303,7 +371,6 @@
                 <p class="mt-1 text-[10px]">Máx. 20 MB</p>
             </div>
             <input type="file" id="fileDocInput" class="hidden" accept=".pdf,.doc,.docx,.xls,.xlsx,.png,.jpg,.jpeg" onchange="handleFileSelect(this)">
-
             <div id="uploadProgress" class="hidden mt-3">
                 <div class="flex justify-between text-[10px] text-slate-400 mb-1">
                     <span id="uploadFileName">Enviando...</span>
@@ -311,7 +378,6 @@
                 </div>
                 <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
             </div>
-
             <div class="section-divider"><span>Detalhes</span></div>
             <div class="space-y-2">
                 <input type="text" id="docNome" placeholder="Nome do documento" class="edit-input">
@@ -328,8 +394,6 @@
                 </button>
             </div>
         </div>
-
-        <!-- Lista de documentos -->
         <div class="lg:col-span-2 info-card">
             <div class="info-card-title">
                 <i class="fa-solid fa-folder-open"></i> Repositório de Documentos
@@ -344,9 +408,7 @@
                     </select>
                 </div>
             </div>
-            <div id="listaDocs">
-                <p class="text-[11px] text-slate-600 italic">Carregando documentos...</p>
-            </div>
+            <div id="listaDocs"><p class="text-[11px] text-slate-600 italic">Carregando documentos...</p></div>
         </div>
     </div>
 </div>
@@ -356,8 +418,6 @@
 <!-- ══════════════════════════════════════ -->
 <div id="tab-comissao" class="tab-content">
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-
-        <!-- Membros -->
         <div class="info-card">
             <div class="info-card-title">
                 <i class="fa-solid fa-users-gear"></i> Membros da Comissão
@@ -365,12 +425,8 @@
                     <i class="fa-solid fa-plus mr-1"></i> Adicionar
                 </button>
             </div>
-            <div id="listaContatos">
-                <p class="text-[11px] text-slate-600 italic">Nenhum membro cadastrado.</p>
-            </div>
+            <div id="listaContatos"><p class="text-[11px] text-slate-600 italic">Nenhum membro cadastrado.</p></div>
         </div>
-
-        <!-- Contatos Inst + Sobre -->
         <div class="info-card">
             <div class="info-card-title">
                 <i class="fa-solid fa-landmark"></i> Contatos Institucionais
@@ -378,10 +434,7 @@
                     <i class="fa-solid fa-plus mr-1"></i> Adicionar
                 </button>
             </div>
-            <div id="listaContInst">
-                <p class="text-[11px] text-slate-600 italic">Nenhum contato cadastrado.</p>
-            </div>
-
+            <div id="listaContInst"><p class="text-[11px] text-slate-600 italic">Nenhum contato cadastrado.</p></div>
             <div class="section-divider"><span>Sobre a CAD</span></div>
             <div class="text-[12px] text-slate-400 leading-relaxed" id="textoSobreCAD">
                 A Comissão de Assistência e Advocacia Dativa de Santana de Parnaíba atua em defesa dos cidadãos que não possuem condições de arcar com honorários advocatícios, garantindo o acesso à Justiça previsto na Constituição Federal.
@@ -398,15 +451,10 @@
 <!-- ══════════════════════════════════════ -->
 <div id="tab-avisos" class="tab-content">
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-
         <div class="lg:col-span-2 info-card">
             <div class="info-card-title"><i class="fa-solid fa-bullhorn"></i> Comunicados & Avisos</div>
-            <div id="listaAvisos">
-                <p class="text-[11px] text-slate-600 italic">Nenhum aviso publicado.</p>
-            </div>
+            <div id="listaAvisos"><p class="text-[11px] text-slate-600 italic">Nenhum aviso publicado.</p></div>
         </div>
-
-        <!-- Form novo aviso (admin) -->
         <div class="info-card admin-section">
             <div class="info-card-title"><i class="fa-solid fa-plus-circle"></i> Novo Aviso</div>
             <div class="space-y-2">
@@ -423,7 +471,6 @@
                 </button>
             </div>
         </div>
-
         <div class="info-card hide-admin">
             <div class="info-card-title"><i class="fa-solid fa-circle-info"></i> Informação</div>
             <p class="text-[11px] text-slate-500">Comunicados são publicados pela Presidência da CAD. Faça login para gerenciar.</p>
@@ -438,12 +485,11 @@
     <p class="mt-2 text-[#c5a36b] font-bold uppercase">Cássia Prompt V8 - Santana de Parnaíba © 2026</p>
 </footer>
 
-<!-- ═══ TOAST ═══ -->
 <div id="toast"></div>
 
 <script>
 // ════════════════════════════════════════
-//  FIREBASE — CONFIG ORIGINAL
+//  FIREBASE
 // ════════════════════════════════════════
 const firebaseConfig = {
     apiKey: "AIzaSyCBxYwyTieXWmzC_yGq0Abyr5xXZoj-4ts",
@@ -505,6 +551,154 @@ function trocarAba(aba, btn) {
 }
 
 // ════════════════════════════════════════
+//  LISTA DE ADVOGADOS — AUTOCOMPLETE
+// ════════════════════════════════════════
+let advogadosCadastrados = []; // array de strings com os nomes
+let advHighlight = { Sai: -1, Entra: -1 };
+
+// Carrega do Firebase
+db.ref('advogados_v8').on('value', snap => {
+    const data = snap.val();
+    if (data) {
+        advogadosCadastrados = Object.values(data).map(a => a.nome).sort((a,b) => a.localeCompare(b,'pt'));
+    } else {
+        advogadosCadastrados = [];
+    }
+});
+
+// Abre dropdown com todos os nomes ao focar
+function abrirDropdown(campo) {
+    const val = document.getElementById('adv'+campo+'Input').value;
+    renderDropdown(campo, val);
+}
+
+// Filtra enquanto digita
+function filtrarAdv(campo) {
+    const val = document.getElementById('adv'+campo+'Input').value;
+    advHighlight[campo] = -1;
+    renderDropdown(campo, val);
+}
+
+function renderDropdown(campo, filtro) {
+    const drop = document.getElementById('drop'+campo);
+    const termo = filtro.trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+    const lista = filtro.trim() === ''
+        ? advogadosCadastrados
+        : advogadosCadastrados.filter(n => n.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').includes(termo));
+
+    if (!lista.length) {
+        drop.innerHTML = `<div class="autocomplete-empty"><i class="fa-solid fa-circle-xmark mr-2" style="color:#ef4444"></i>Nenhum advogado encontrado</div>`;
+    } else {
+        drop.innerHTML = lista.map((nome, i) => {
+            // Destaca o trecho digitado
+            const re = new RegExp('('+filtro.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+')','gi');
+            const highlighted = nome.replace(re, '<em>$1</em>');
+            return `<div class="autocomplete-item" data-idx="${i}" onmousedown="selecionarAdv('${campo}','${nome.replace(/'/g,"\\'")}')">
+                <i class="fa-solid fa-user-tie fa-xs" style="color:#c5a36b;opacity:0.6"></i>
+                ${highlighted}
+            </div>`;
+        }).join('');
+    }
+    drop.classList.add('open');
+}
+
+function selecionarAdv(campo, nome) {
+    document.getElementById('adv'+campo+'Input').value = nome;
+    document.getElementById('drop'+campo).classList.remove('open');
+}
+
+function fecharDropdownDelay(campo) {
+    setTimeout(() => document.getElementById('drop'+campo).classList.remove('open'), 180);
+}
+
+// Navegação por teclado (↑↓ Enter Esc)
+function navAdv(e, campo) {
+    const drop = document.getElementById('drop'+campo);
+    const items = drop.querySelectorAll('.autocomplete-item');
+    if (!drop.classList.contains('open') || !items.length) return;
+
+    if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        advHighlight[campo] = Math.min(advHighlight[campo] + 1, items.length - 1);
+    } else if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        advHighlight[campo] = Math.max(advHighlight[campo] - 1, 0);
+    } else if (e.key === 'Enter') {
+        e.preventDefault();
+        if (advHighlight[campo] >= 0) items[advHighlight[campo]].dispatchEvent(new MouseEvent('mousedown'));
+        return;
+    } else if (e.key === 'Escape') {
+        drop.classList.remove('open');
+        return;
+    }
+    items.forEach((it, i) => it.classList.toggle('highlighted', i === advHighlight[campo]));
+    if (advHighlight[campo] >= 0) items[advHighlight[campo]].scrollIntoView({ block: 'nearest' });
+}
+
+// ── Modal gerenciar advogados ──
+function abrirModalAdvogados() {
+    const itens = advogadosCadastrados.length
+        ? advogadosCadastrados.map(nome => `
+            <div class="adv-modal-item">
+                <span><i class="fa-solid fa-user-tie text-[#c5a36b] mr-2 text-[10px]"></i>${nome}</span>
+                <button onmousedown="removerAdvogado('${nome.replace(/'/g,"\\'")}',this)" class="btn-sm btn-sm-red text-[9px]">✕</button>
+            </div>`).join('')
+        : '<p class="text-[11px] text-slate-500 italic mb-3">Nenhum advogado cadastrado ainda.</p>';
+
+    abrirModal('Advogados da Escala', `
+        <div id="listaAdvModal" class="max-h-64 overflow-y-auto mb-3 pr-1">${itens}</div>
+        <div class="section-divider"><span>Adicionar novo</span></div>
+        <div class="flex gap-2 mt-2">
+            <input type="text" id="novoAdvNome" class="edit-input mb-0 flex-1" placeholder="Nome completo" style="text-transform:uppercase">
+            <button onclick="adicionarAdvogado()" class="btn-sm btn-sm-gold" style="flex-shrink:0">
+                <i class="fa-solid fa-plus mr-1"></i>Add
+            </button>
+        </div>
+        <p class="text-[9px] text-slate-600 mt-2 italic">Cadastre uma vez. Depois é só digitar para buscar!</p>
+    `);
+    setTimeout(() => {
+        const inp = document.getElementById('novoAdvNome');
+        if(inp) {
+            inp.focus();
+            inp.addEventListener('keydown', e => { if(e.key==='Enter') adicionarAdvogado(); });
+        }
+    }, 120);
+}
+
+function adicionarAdvogado() {
+    const inp = document.getElementById('novoAdvNome');
+    const nome = inp.value.trim().toUpperCase();
+    if(!nome) return toast('Digite o nome do advogado.','error');
+    if(advogadosCadastrados.includes(nome)) return toast('Já cadastrado!','info');
+    db.ref('advogados_v8').push({ nome });
+    inp.value = '';
+    inp.focus();
+    toast(`${nome} adicionado!`, 'success');
+    // Atualiza lista no modal sem fechar
+    setTimeout(() => {
+        const lista = document.getElementById('listaAdvModal');
+        if(lista) lista.innerHTML = advogadosCadastrados.map(n => `
+            <div class="adv-modal-item">
+                <span><i class="fa-solid fa-user-tie text-[#c5a36b] mr-2 text-[10px]"></i>${n}</span>
+                <button onmousedown="removerAdvogado('${n.replace(/'/g,"\\'")}',this)" class="btn-sm btn-sm-red text-[9px]">✕</button>
+            </div>`).join('');
+    }, 400);
+}
+
+function removerAdvogado(nome, btn) {
+    db.ref('advogados_v8').once('value', snap => {
+        const data = snap.val();
+        if(!data) return;
+        const entry = Object.entries(data).find(([,v]) => v.nome === nome);
+        if(entry) {
+            db.ref('advogados_v8/'+entry[0]).remove();
+            btn.closest('.adv-modal-item')?.remove();
+            toast(`${nome} removido.`, 'info');
+        }
+    });
+}
+
+// ════════════════════════════════════════
 //  ESCALA — ORIGINAL
 // ════════════════════════════════════════
 function uploadEscala(input) {
@@ -524,37 +718,74 @@ db.ref('escala_v8').on('value', snap => {
 });
 
 // ════════════════════════════════════════
-//  LOGS — ORIGINAL
+//  LOGS — COM ORDENAÇÃO POR DATA
 // ════════════════════════════════════════
 function registrar(tipo) {
-    const d = document.getElementById('dataTroca').value;
-    const s = document.getElementById('advSai').value;
-    const e = document.getElementById('advEntra').value;
-    if(!d || !s) return toast('Preencha os dados!', 'error');
-    db.ref('logs_v8').push({ tipo, data: d, saiu: s, entrou: tipo === 'F' ? 'FALTA' : (e || '---'), timestamp: Date.now() });
-    document.getElementById('advSai').value = '';
-    document.getElementById('advEntra').value = '';
+    const d = document.getElementById('dataTroca').value.trim();
+    const s = document.getElementById('advSaiInput').value.trim();
+    const e = document.getElementById('advEntraInput').value.trim();
+    if(!d || !s) return toast('Preencha a data e o advogado que SAI!', 'error');
+    if(tipo === 'T' && !e) return toast('Preencha o advogado que ENTRA!', 'error');
+
+    // Converte data DD/MM para número comparável (MMDD) para ordenação
+    const partes = d.split('/');
+    const dataNum = partes.length === 2
+        ? parseInt(partes[1].padStart(2,'0') + partes[0].padStart(2,'0'))
+        : 0;
+
+    db.ref('logs_v8').push({
+        tipo,
+        data: d,
+        dataNum,                          // ← campo para ordenar
+        saiu: s,
+        entrou: tipo === 'F' ? 'FALTA' : (e || '---'),
+        timestamp: Date.now()
+    });
+
+    // Limpa campos
+    document.getElementById('dataTroca').value = '';
+    document.getElementById('advSaiInput').value = '';
+    document.getElementById('advEntraInput').value = '';
     toast(tipo === 'F' ? 'Falta registrada.' : 'Troca registrada.', 'success');
 }
+
 db.ref('logs_v8').on('value', snap => {
     const lista = document.getElementById('listaLogs');
     lista.innerHTML = '';
     const data = snap.val();
-    if(data) {
-        Object.keys(data).reverse().forEach(id => {
-            const item = data[id];
-            const isFalta = item.tipo === 'F';
-            lista.innerHTML += `<div class="log-item ${isFalta ? 'falta-item' : ''}">
-                <div class="flex justify-between items-center mb-1">
-                    <span class="text-[10px] font-bold text-[#c5a36b]">[ ${item.data} ]</span>
-                    <button onclick="apagar('${id}')" class="admin-section text-red-900 text-[10px] bg-transparent border-none cursor-pointer">Excluir</button>
-                </div>
-                <div class="text-[11px] uppercase">
-                    ${isFalta ? `<b class="text-red-500">FALTA:</b> ${item.saiu}` : `<b>SAIU:</b> ${item.saiu} → <b>ENTROU:</b> ${item.entrou}`}
-                </div></div>`;
-        });
-    }
+    if(!data) return;
+
+    // ── ORDENAÇÃO POR DATA ──
+    const items = Object.entries(data).sort((a, b) => {
+        const dA = a[1].dataNum ?? parseDateNum(a[1].data);
+        const dB = b[1].dataNum ?? parseDateNum(b[1].data);
+        return dA - dB; // crescente (01/03 → 31/03)
+    });
+
+    items.forEach(([id, item]) => {
+        const isFalta = item.tipo === 'F';
+        lista.innerHTML += `<div class="log-item ${isFalta ? 'falta-item' : ''}">
+            <div class="flex justify-between items-center mb-1">
+                <span class="text-[10px] font-bold text-[#c5a36b]">[ ${item.data} ]</span>
+                <button onclick="apagar('${id}')" class="admin-section text-red-900 text-[10px] bg-transparent border-none cursor-pointer">Excluir</button>
+            </div>
+            <div class="text-[11px] uppercase">
+                ${isFalta
+                    ? `<b class="text-red-500">FALTA:</b> ${item.saiu}`
+                    : `<b>SAIU:</b> ${item.saiu} → <b>ENTROU:</b> ${item.entrou}`}
+            </div>
+        </div>`;
+    });
 });
+
+// Converte "DD/MM" → número para ordenar registros antigos sem dataNum
+function parseDateNum(d) {
+    if(!d) return 0;
+    const p = d.split('/');
+    if(p.length < 2) return 0;
+    return parseInt(p[1].padStart(2,'0') + p[0].padStart(2,'0'));
+}
+
 function apagar(id) { if(confirm("Excluir registro?")) db.ref('logs_v8').child(id).remove(); }
 
 // ════════════════════════════════════════
@@ -564,9 +795,12 @@ function exportarExcel() {
     db.ref('logs_v8').once('value', snap => {
         const logs = snap.val();
         if(!logs) return toast('Sem dados para exportar.', 'error');
-        const rows = Object.values(logs).map(i => ({
-            "DATA": i.data, "STATUS": i.tipo === 'F' ? 'FALTA' : 'TROCA', "ADV_SAIU": i.saiu, "ADV_ENTROU": i.entrou
-        }));
+        const rows = Object.values(logs)
+            .sort((a,b) => (a.dataNum||parseDateNum(a.data)) - (b.dataNum||parseDateNum(b.data)))
+            .map(i => ({
+                "DATA": i.data, "STATUS": i.tipo === 'F' ? 'FALTA' : 'TROCA',
+                "ADV_SAIU": i.saiu, "ADV_ENTROU": i.entrou
+            }));
         const ws = XLSX.utils.json_to_sheet(rows);
         const wb = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(wb, ws, "CAD");
@@ -575,7 +809,7 @@ function exportarExcel() {
 }
 
 // ════════════════════════════════════════
-//  CONVÊNIO
+//  CONVÊNIO — ORIGINAL
 // ════════════════════════════════════════
 const convenioDefault = [
     { label: "Órgão Conveniante", value: "OAB Subseção Santana de Parnaíba" },
@@ -598,7 +832,6 @@ db.ref('convenio_v8').on('value', snap => {
     const vig = data.find(r => r.label === 'Vigência');
     if(vig && vig.value !== '—') document.getElementById('statVigencia').textContent = vig.value;
 });
-
 function abrirModalConvenio() {
     db.ref('convenio_v8').once('value', snap => {
         const data = snap.val() || convenioDefault;
@@ -624,8 +857,7 @@ let _convenioIdx = 20;
 function adicionarLinhaConvenio() {
     const i = _convenioIdx++;
     const div = document.createElement('div');
-    div.className = 'edit-row';
-    div.id = `cr${i}`;
+    div.className = 'edit-row'; div.id = `cr${i}`;
     div.innerHTML = `
         <input class="edit-input" style="flex:1.2" id="cl${i}" placeholder="Campo">
         <input class="edit-input" style="flex:2" id="cv${i}" placeholder="Valor">
@@ -646,7 +878,7 @@ function salvarConvenio() {
 }
 
 // ════════════════════════════════════════
-//  STATS EDITÁVEIS
+//  STATS — ORIGINAL
 // ════════════════════════════════════════
 db.ref('stats_v8').on('value', snap => {
     const d = snap.val() || {};
@@ -659,9 +891,7 @@ function editarStat(campo) {
     const labels = { casos: 'Casos Ativos', encerrados: 'Encerrados', vigencia: 'Vigência (ano/período)' };
     abrirModal(`Editar: ${labels[campo]}`, `
         <input type="text" id="statInput" class="edit-input mb-3" placeholder="Novo valor" value="${document.getElementById('stat'+campo.charAt(0).toUpperCase()+campo.slice(1)).textContent.replace('—','')}">
-        <button onclick="salvarStat('${campo}')" class="btn-gold">
-            <i class="fa-solid fa-floppy-disk mr-2"></i>SALVAR
-        </button>`);
+        <button onclick="salvarStat('${campo}')" class="btn-gold"><i class="fa-solid fa-floppy-disk mr-2"></i>SALVAR</button>`);
     setTimeout(() => document.getElementById('statInput')?.focus(), 100);
 }
 function salvarStat(campo) {
@@ -672,13 +902,10 @@ function salvarStat(campo) {
 }
 
 // ════════════════════════════════════════
-//  DOCUMENTOS — Firebase Storage
+//  DOCUMENTOS — ORIGINAL
 // ════════════════════════════════════════
 let pendingFile = null;
-
-function handleFileSelect(input) {
-    if(input.files[0]) setPendingFile(input.files[0]);
-}
+function handleFileSelect(input) { if(input.files[0]) setPendingFile(input.files[0]); }
 function handleDrop(e) {
     e.preventDefault();
     document.getElementById('uploadZone').classList.remove('dragover');
@@ -686,12 +913,7 @@ function handleDrop(e) {
 }
 function setPendingFile(file) {
     pendingFile = file;
-    const maxMB = 20;
-    if(file.size > maxMB * 1024 * 1024) {
-        toast(`Arquivo muito grande! Máx ${maxMB}MB.`, 'error');
-        pendingFile = null;
-        return;
-    }
+    if(file.size > 20*1024*1024) { toast('Arquivo muito grande! Máx 20MB.','error'); pendingFile=null; return; }
     document.getElementById('docNome').value = file.name.replace(/\.[^.]+$/,'');
     document.getElementById('btnEnviar').disabled = false;
     document.getElementById('btnEnviar').style.opacity = '1';
@@ -701,100 +923,72 @@ function setPendingFile(file) {
         <p class="mt-1">${(file.size/1024/1024).toFixed(2)} MB · Pronto para enviar</p>`;
     toast(`Arquivo selecionado: ${file.name}`, 'info');
 }
-
 function confirmarUpload() {
-    if(!pendingFile) return toast('Selecione um arquivo.', 'error');
+    if(!pendingFile) return toast('Selecione um arquivo.','error');
     const nome = document.getElementById('docNome').value.trim() || pendingFile.name;
     const desc = document.getElementById('docDesc').value.trim();
     const cat  = document.getElementById('docCategoria').value;
     const ext  = pendingFile.name.split('.').pop().toLowerCase();
     const path = `documentos_cad/${Date.now()}_${pendingFile.name}`;
-
     document.getElementById('uploadProgress').classList.remove('hidden');
     document.getElementById('btnEnviar').disabled = true;
     document.getElementById('btnEnviar').style.opacity = '0.5';
-
-    const ref   = storage.ref(path);
-    const task  = ref.put(pendingFile);
-
+    const ref  = storage.ref(path);
+    const task = ref.put(pendingFile);
     task.on('state_changed',
-        snapshot => {
-            const pct = Math.round(snapshot.bytesTransferred / snapshot.totalBytes * 100);
-            document.getElementById('progressFill').style.width = pct + '%';
-            document.getElementById('uploadPct').textContent = pct + '%';
+        s => {
+            const pct = Math.round(s.bytesTransferred/s.totalBytes*100);
+            document.getElementById('progressFill').style.width = pct+'%';
+            document.getElementById('uploadPct').textContent = pct+'%';
             document.getElementById('uploadFileName').textContent = pendingFile.name;
         },
-        err => {
-            toast('Erro no upload: ' + err.message, 'error');
-            document.getElementById('btnEnviar').disabled = false;
-            document.getElementById('btnEnviar').style.opacity = '1';
-        },
+        err => { toast('Erro no upload: '+err.message,'error'); document.getElementById('btnEnviar').disabled=false; document.getElementById('btnEnviar').style.opacity='1'; },
         () => {
             task.snapshot.ref.getDownloadURL().then(url => {
-                db.ref('docs_v8').push({
-                    nome, desc, cat, ext, url,
-                    tamanho: (pendingFile.size/1024/1024).toFixed(2) + ' MB',
-                    timestamp: Date.now()
-                });
-                toast(`"${nome}" enviado com sucesso!`, 'success');
-                pendingFile = null;
-                document.getElementById('docNome').value = '';
-                document.getElementById('docDesc').value = '';
+                db.ref('docs_v8').push({ nome,desc,cat,ext,url, tamanho:(pendingFile.size/1024/1024).toFixed(2)+' MB', timestamp:Date.now() });
+                toast(`"${nome}" enviado!`,'success');
+                pendingFile=null;
+                document.getElementById('docNome').value='';
+                document.getElementById('docDesc').value='';
                 document.getElementById('uploadProgress').classList.add('hidden');
-                document.getElementById('progressFill').style.width = '0%';
-                document.getElementById('btnEnviar').disabled = true;
-                document.getElementById('btnEnviar').style.opacity = '0.4';
-                document.getElementById('uploadZone').innerHTML = `
-                    <i class="fa-solid fa-cloud-arrow-up"></i>
-                    <strong>Clique ou arraste o arquivo aqui</strong>
-                    <p class="mt-1">PDF, Word, Excel, Imagem</p>
-                    <p class="mt-1 text-[10px]">Máx. 20 MB</p>`;
+                document.getElementById('progressFill').style.width='0%';
+                document.getElementById('btnEnviar').disabled=true;
+                document.getElementById('btnEnviar').style.opacity='0.4';
+                document.getElementById('uploadZone').innerHTML=`<i class="fa-solid fa-cloud-arrow-up"></i><strong>Clique ou arraste o arquivo aqui</strong><p class="mt-1">PDF, Word, Excel, Imagem</p><p class="mt-1 text-[10px]">Máx. 20 MB</p>`;
             });
         }
     );
 }
-
 const docIcones = {
-    pdf:  { bg: 'rgba(239,68,68,0.15)',   color: '#ef4444', icon: 'fa-file-pdf' },
-    doc:  { bg: 'rgba(59,130,246,0.15)',  color: '#3b82f6', icon: 'fa-file-word' },
-    docx: { bg: 'rgba(59,130,246,0.15)',  color: '#3b82f6', icon: 'fa-file-word' },
-    xls:  { bg: 'rgba(16,185,129,0.15)', color: '#10b981', icon: 'fa-file-excel' },
-    xlsx: { bg: 'rgba(16,185,129,0.15)', color: '#10b981', icon: 'fa-file-excel' },
-    png:  { bg: 'rgba(168,85,247,0.15)', color: '#a855f7', icon: 'fa-file-image' },
-    jpg:  { bg: 'rgba(168,85,247,0.15)', color: '#a855f7', icon: 'fa-file-image' },
-    jpeg: { bg: 'rgba(168,85,247,0.15)', color: '#a855f7', icon: 'fa-file-image' },
+    pdf:{bg:'rgba(239,68,68,0.15)',color:'#ef4444',icon:'fa-file-pdf'},
+    doc:{bg:'rgba(59,130,246,0.15)',color:'#3b82f6',icon:'fa-file-word'},
+    docx:{bg:'rgba(59,130,246,0.15)',color:'#3b82f6',icon:'fa-file-word'},
+    xls:{bg:'rgba(16,185,129,0.15)',color:'#10b981',icon:'fa-file-excel'},
+    xlsx:{bg:'rgba(16,185,129,0.15)',color:'#10b981',icon:'fa-file-excel'},
+    png:{bg:'rgba(168,85,247,0.15)',color:'#a855f7',icon:'fa-file-image'},
+    jpg:{bg:'rgba(168,85,247,0.15)',color:'#a855f7',icon:'fa-file-image'},
+    jpeg:{bg:'rgba(168,85,247,0.15)',color:'#a855f7',icon:'fa-file-image'},
 };
-const catLabels = { convenio:'Convênio', formulario:'Formulário', resolucao:'Resolução', relatorio:'Relatório', outro:'Outro' };
+const catLabels = {convenio:'Convênio',formulario:'Formulário',resolucao:'Resolução',relatorio:'Relatório',outro:'Outro'};
 let todosOsDocs = {};
-
-db.ref('docs_v8').on('value', snap => {
-    todosOsDocs = snap.val() || {};
-    renderDocs();
-});
-
+db.ref('docs_v8').on('value', snap => { todosOsDocs = snap.val()||{}; renderDocs(); });
 function renderDocs() {
-    const lista    = document.getElementById('listaDocs');
-    const filtro   = document.getElementById('filtroCategoria')?.value || '';
-    const entries  = Object.entries(todosOsDocs).reverse();
-    const filtered = filtro ? entries.filter(([,d]) => d.cat === filtro) : entries;
-
-    if(!filtered.length) {
-        lista.innerHTML = '<p class="text-[11px] text-slate-600 italic">Nenhum documento encontrado.</p>';
-        return;
-    }
-    lista.innerHTML = filtered.map(([id, d]) => {
-        const ico = docIcones[d.ext] || { bg:'rgba(100,116,139,0.15)', color:'#94a3b8', icon:'fa-file' };
+    const lista   = document.getElementById('listaDocs');
+    const filtro  = document.getElementById('filtroCategoria')?.value||'';
+    const entries = Object.entries(todosOsDocs).reverse();
+    const filtered= filtro ? entries.filter(([,d])=>d.cat===filtro) : entries;
+    if(!filtered.length){lista.innerHTML='<p class="text-[11px] text-slate-600 italic">Nenhum documento encontrado.</p>';return;}
+    lista.innerHTML = filtered.map(([id,d])=>{
+        const ico=docIcones[d.ext]||{bg:'rgba(100,116,139,0.15)',color:'#94a3b8',icon:'fa-file'};
         return `<a href="${d.url}" target="_blank" rel="noopener" class="doc-item">
-            <div class="doc-icon" style="background:${ico.bg}">
-                <i class="fa-solid ${ico.icon}" style="color:${ico.color}"></i>
-            </div>
+            <div class="doc-icon" style="background:${ico.bg}"><i class="fa-solid ${ico.icon}" style="color:${ico.color}"></i></div>
             <div class="flex-1 min-w-0">
                 <div class="doc-name truncate">${d.nome}</div>
-                ${d.desc ? `<div class="doc-desc truncate">${d.desc}</div>` : ''}
+                ${d.desc?`<div class="doc-desc truncate">${d.desc}</div>`:''}
                 <div class="doc-size flex gap-3 mt-1">
                     <span class="uppercase tracking-wide" style="color:${ico.color}">${d.ext?.toUpperCase()}</span>
-                    ${d.tamanho ? `<span>${d.tamanho}</span>` : ''}
-                    ${d.cat ? `<span class="text-slate-500">${catLabels[d.cat]||d.cat}</span>` : ''}
+                    ${d.tamanho?`<span>${d.tamanho}</span>`:''}
+                    ${d.cat?`<span class="text-slate-500">${catLabels[d.cat]||d.cat}</span>`:''}
                 </div>
             </div>
             <div class="flex items-center gap-2 ml-2 flex-shrink-0">
@@ -804,74 +998,62 @@ function renderDocs() {
         </a>`;
     }).join('');
 }
-
 function apagarDoc(id) {
     if(!confirm('Remover este documento?')) return;
     db.ref('docs_v8/'+id).once('value', snap => {
-        const d = snap.val();
-        if(d?.url) {
-            storage.refFromURL(d.url).delete().catch(()=>{});
-        }
+        const d=snap.val();
+        if(d?.url) storage.refFromURL(d.url).delete().catch(()=>{});
         db.ref('docs_v8/'+id).remove();
-        toast('Documento removido.', 'info');
+        toast('Documento removido.','info');
     });
 }
 
 // ════════════════════════════════════════
-//  MEMBROS DA COMISSÃO
+//  MEMBROS — ORIGINAL
 // ════════════════════════════════════════
 db.ref('contatos_v8').on('value', snap => {
-    const lista = document.getElementById('listaContatos');
-    const data  = snap.val();
-    if(!data) { lista.innerHTML = '<p class="text-[11px] text-slate-600 italic">Nenhum membro cadastrado.</p>'; return; }
-    lista.innerHTML = Object.entries(data).map(([id, c]) => `
+    const lista=document.getElementById('listaContatos');
+    const data=snap.val();
+    if(!data){lista.innerHTML='<p class="text-[11px] text-slate-600 italic">Nenhum membro cadastrado.</p>';return;}
+    lista.innerHTML=Object.entries(data).map(([id,c])=>`
         <div class="contact-item">
             <div class="contact-avatar"><i class="fa-solid fa-user-tie"></i></div>
             <div class="flex-1">
                 <div class="contact-name">${c.nome}</div>
                 <div class="contact-role">${c.cargo||''}</div>
-                ${c.tel ? `<div class="contact-phone"><i class="fa-solid fa-phone fa-xs mr-1"></i>${c.tel}</div>` : ''}
-                ${c.email ? `<div class="contact-phone" style="color:#94a3b8"><i class="fa-solid fa-envelope fa-xs mr-1"></i>${c.email}</div>` : ''}
+                ${c.tel?`<div class="contact-phone"><i class="fa-solid fa-phone fa-xs mr-1"></i>${c.tel}</div>`:''}
+                ${c.email?`<div class="contact-phone" style="color:#94a3b8"><i class="fa-solid fa-envelope fa-xs mr-1"></i>${c.email}</div>`:''}
             </div>
             <button onclick="apagarContato('${id}')" class="admin-section btn-sm btn-sm-red text-[9px]">✕</button>
         </div>`).join('');
-    document.getElementById('statMembros').textContent = Object.keys(data).length;
+    document.getElementById('statMembros').textContent=Object.keys(data).length;
 });
-
 function abrirModalMembro() {
-    abrirModal('Novo Membro da Comissão', `
+    abrirModal('Novo Membro da Comissão',`
         <div class="space-y-2">
-            <input class="edit-input" id="cNome"  placeholder="Nome completo *">
-            <input class="edit-input" id="cCargo" placeholder="Cargo / Função (Ex: Presidente, Membro)">
-            <input class="edit-input" id="cTel"   placeholder="Telefone">
+            <input class="edit-input" id="cNome" placeholder="Nome completo *">
+            <input class="edit-input" id="cCargo" placeholder="Cargo / Função">
+            <input class="edit-input" id="cTel" placeholder="Telefone">
             <input class="edit-input" id="cEmail" placeholder="E-mail">
-            <button onclick="salvarContato()" class="btn-gold mt-2">
-                <i class="fa-solid fa-floppy-disk mr-2"></i>SALVAR MEMBRO
-            </button>
+            <button onclick="salvarContato()" class="btn-gold mt-2"><i class="fa-solid fa-floppy-disk mr-2"></i>SALVAR MEMBRO</button>
         </div>`);
 }
 function salvarContato() {
-    const n = document.getElementById('cNome').value.trim();
-    if(!n) return toast('Informe o nome.', 'error');
-    db.ref('contatos_v8').push({
-        nome:  n,
-        cargo: document.getElementById('cCargo').value.trim(),
-        tel:   document.getElementById('cTel').value.trim(),
-        email: document.getElementById('cEmail').value.trim()
-    });
-    fecharModal();
-    toast('Membro adicionado!', 'success');
+    const n=document.getElementById('cNome').value.trim();
+    if(!n) return toast('Informe o nome.','error');
+    db.ref('contatos_v8').push({nome:n,cargo:document.getElementById('cCargo').value.trim(),tel:document.getElementById('cTel').value.trim(),email:document.getElementById('cEmail').value.trim()});
+    fecharModal(); toast('Membro adicionado!','success');
 }
-function apagarContato(id) { if(confirm('Remover membro?')) { db.ref('contatos_v8/'+id).remove(); toast('Membro removido.','info'); } }
+function apagarContato(id){if(confirm('Remover membro?')){db.ref('contatos_v8/'+id).remove();toast('Membro removido.','info');}}
 
 // ════════════════════════════════════════
-//  CONTATOS INSTITUCIONAIS
+//  CONTATOS INSTITUCIONAIS — ORIGINAL
 // ════════════════════════════════════════
 db.ref('contInst_v8').on('value', snap => {
-    const lista = document.getElementById('listaContInst');
-    const data  = snap.val();
-    if(!data) { lista.innerHTML = '<p class="text-[11px] text-slate-600 italic">Nenhum contato cadastrado.</p>'; return; }
-    lista.innerHTML = Object.entries(data).map(([id, c]) => `
+    const lista=document.getElementById('listaContInst');
+    const data=snap.val();
+    if(!data){lista.innerHTML='<p class="text-[11px] text-slate-600 italic">Nenhum contato cadastrado.</p>';return;}
+    lista.innerHTML=Object.entries(data).map(([id,c])=>`
         <div class="contact-item">
             <div class="contact-avatar" style="background:linear-gradient(135deg,#1a2a1a,#2a402a);border-color:rgba(16,185,129,0.3)">
                 <i class="fa-solid fa-landmark" style="color:#10b981"></i>
@@ -879,36 +1061,33 @@ db.ref('contInst_v8').on('value', snap => {
             <div class="flex-1">
                 <div class="contact-name">${c.nome}</div>
                 <div class="contact-role">${c.org||''}</div>
-                ${c.tel ? `<div class="contact-phone"><i class="fa-solid fa-phone fa-xs mr-1"></i>${c.tel}</div>` : ''}
+                ${c.tel?`<div class="contact-phone"><i class="fa-solid fa-phone fa-xs mr-1"></i>${c.tel}</div>`:''}
             </div>
             <button onclick="apagarContInst('${id}')" class="admin-section btn-sm btn-sm-red text-[9px]">✕</button>
         </div>`).join('');
 });
 function abrirModalContInst() {
-    abrirModal('Contato Institucional', `
+    abrirModal('Contato Institucional',`
         <div class="space-y-2">
             <input class="edit-input" id="iNome" placeholder="Nome do contato *">
-            <input class="edit-input" id="iOrg"  placeholder="Organização / Tribunal">
-            <input class="edit-input" id="iTel"  placeholder="Telefone">
-            <button onclick="salvarContInst()" class="btn-gold mt-2">
-                <i class="fa-solid fa-floppy-disk mr-2"></i>SALVAR CONTATO
-            </button>
+            <input class="edit-input" id="iOrg" placeholder="Organização / Tribunal">
+            <input class="edit-input" id="iTel" placeholder="Telefone">
+            <button onclick="salvarContInst()" class="btn-gold mt-2"><i class="fa-solid fa-floppy-disk mr-2"></i>SALVAR CONTATO</button>
         </div>`);
 }
 function salvarContInst() {
-    const n = document.getElementById('iNome').value.trim();
-    if(!n) return toast('Informe o nome.', 'error');
-    db.ref('contInst_v8').push({ nome: n, org: document.getElementById('iOrg').value.trim(), tel: document.getElementById('iTel').value.trim() });
-    fecharModal();
-    toast('Contato adicionado!', 'success');
+    const n=document.getElementById('iNome').value.trim();
+    if(!n) return toast('Informe o nome.','error');
+    db.ref('contInst_v8').push({nome:n,org:document.getElementById('iOrg').value.trim(),tel:document.getElementById('iTel').value.trim()});
+    fecharModal(); toast('Contato adicionado!','success');
 }
-function apagarContInst(id) { if(confirm('Remover?')) { db.ref('contInst_v8/'+id).remove(); toast('Removido.','info'); } }
+function apagarContInst(id){if(confirm('Remover?')){db.ref('contInst_v8/'+id).remove();toast('Removido.','info');}}
 
 // Sobre CAD
-db.ref('sobre_v8').on('value', snap => { if(snap.val()) document.getElementById('textoSobreCAD').textContent = snap.val(); });
-function editarSobre() {
-    const atual = document.getElementById('textoSobreCAD').textContent;
-    abrirModal('Sobre a CAD', `
+db.ref('sobre_v8').on('value', snap=>{if(snap.val()) document.getElementById('textoSobreCAD').textContent=snap.val();});
+function editarSobre(){
+    const atual=document.getElementById('textoSobreCAD').textContent;
+    abrirModal('Sobre a CAD',`
         <textarea class="edit-input mb-3" rows="7" id="sobreTxt">${atual}</textarea>
         <button onclick="db.ref('sobre_v8').set(document.getElementById('sobreTxt').value);fecharModal();toast('Texto atualizado!','success')" class="btn-gold">
             <i class="fa-solid fa-floppy-disk mr-2"></i>SALVAR
@@ -916,18 +1095,17 @@ function editarSobre() {
 }
 
 // ════════════════════════════════════════
-//  AVISOS
+//  AVISOS — ORIGINAL
 // ════════════════════════════════════════
-const avisoClasses = { info:'aviso-info', alerta:'aviso-alerta', urgente:'aviso-urgente', ok:'aviso-ok' };
-const avisoBadges  = { info:'badge-info', alerta:'badge-alerta', urgente:'badge-urgente', ok:'badge-ok' };
-const avisoLabels  = { info:'Informativo', alerta:'Alerta', urgente:'URGENTE', ok:'Resolvido' };
-
-db.ref('avisos_v8').on('value', snap => {
-    const lista   = document.getElementById('listaAvisos');
-    const data    = snap.val();
-    if(!data) { lista.innerHTML = '<p class="text-[11px] text-slate-600 italic">Nenhum aviso publicado.</p>'; return; }
-    const entries = Object.entries(data).reverse();
-    lista.innerHTML = entries.map(([id, a]) => `
+const avisoClasses={info:'aviso-info',alerta:'aviso-alerta',urgente:'aviso-urgente',ok:'aviso-ok'};
+const avisoBadges={info:'badge-info',alerta:'badge-alerta',urgente:'badge-urgente',ok:'badge-ok'};
+const avisoLabels={info:'Informativo',alerta:'Alerta',urgente:'URGENTE',ok:'Resolvido'};
+db.ref('avisos_v8').on('value', snap=>{
+    const lista=document.getElementById('listaAvisos');
+    const data=snap.val();
+    if(!data){lista.innerHTML='<p class="text-[11px] text-slate-600 italic">Nenhum aviso publicado.</p>';return;}
+    const entries=Object.entries(data).reverse();
+    lista.innerHTML=entries.map(([id,a])=>`
         <div class="aviso-item ${avisoClasses[a.tipo]||'aviso-info'}">
             <span class="aviso-badge ${avisoBadges[a.tipo]||'badge-info'}">${avisoLabels[a.tipo]||'Info'}</span>
             <div class="font-bold text-[13px] text-white mb-1">${a.titulo||''}</div>
@@ -937,47 +1115,41 @@ db.ref('avisos_v8').on('value', snap => {
                 <button onclick="apagarAviso('${id}')" class="admin-section btn-sm btn-sm-red text-[9px]">✕ Excluir</button>
             </div>
         </div>`).join('');
-
-    const urgentes = entries.filter(([,a]) => a.tipo === 'urgente').length;
-    const badge = document.getElementById('badgeAvisos');
-    if(urgentes > 0) { badge.textContent = urgentes; badge.classList.remove('hidden'); }
+    const urgentes=entries.filter(([,a])=>a.tipo==='urgente').length;
+    const badge=document.getElementById('badgeAvisos');
+    if(urgentes>0){badge.textContent=urgentes;badge.classList.remove('hidden');}
     else badge.classList.add('hidden');
 });
-
-function publicarAviso() {
-    const t     = document.getElementById('textoAviso').value.trim();
-    const titulo= document.getElementById('tituloAviso').value.trim();
-    if(!t) return toast('Escreva a mensagem.', 'error');
-    const tipo  = document.getElementById('tipoAviso').value;
-    const agora = new Date();
-    const data  = agora.toLocaleDateString('pt-BR') + ' ' + agora.toLocaleTimeString('pt-BR', {hour:'2-digit',minute:'2-digit'});
-    db.ref('avisos_v8').push({ tipo, titulo, texto: t, data });
-    document.getElementById('textoAviso').value  = '';
-    document.getElementById('tituloAviso').value = '';
-    toast('Aviso publicado!', 'success');
+function publicarAviso(){
+    const t=document.getElementById('textoAviso').value.trim();
+    const titulo=document.getElementById('tituloAviso').value.trim();
+    if(!t) return toast('Escreva a mensagem.','error');
+    const tipo=document.getElementById('tipoAviso').value;
+    const agora=new Date();
+    const data=agora.toLocaleDateString('pt-BR')+' '+agora.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
+    db.ref('avisos_v8').push({tipo,titulo,texto:t,data});
+    document.getElementById('textoAviso').value='';
+    document.getElementById('tituloAviso').value='';
+    toast('Aviso publicado!','success');
 }
-function apagarAviso(id) { if(confirm('Excluir aviso?')) { db.ref('avisos_v8/'+id).remove(); toast('Aviso excluído.','info'); } }
+function apagarAviso(id){if(confirm('Excluir aviso?')){db.ref('avisos_v8/'+id).remove();toast('Aviso excluído.','info');}}
 
 // ════════════════════════════════════════
-//  MODAL HELPER
+//  MODAL HELPER — ORIGINAL
 // ════════════════════════════════════════
 function abrirModal(titulo, htmlBody) {
     fecharModal();
-    const overlay = document.createElement('div');
-    overlay.className = 'modal-overlay';
-    overlay.id = 'modalCAD';
-    overlay.innerHTML = `
+    const overlay=document.createElement('div');
+    overlay.className='modal-overlay'; overlay.id='modalCAD';
+    overlay.innerHTML=`
         <div class="modal-box">
-            <div class="modal-title">
-                ${titulo}
-                <button class="modal-close" onclick="fecharModal()">×</button>
-            </div>
+            <div class="modal-title">${titulo}<button class="modal-close" onclick="fecharModal()">×</button></div>
             ${htmlBody}
         </div>`;
-    overlay.addEventListener('click', e => { if(e.target === overlay) fecharModal(); });
+    overlay.addEventListener('click',e=>{if(e.target===overlay)fecharModal();});
     document.body.appendChild(overlay);
 }
-function fecharModal() { document.getElementById('modalCAD')?.remove(); }
+function fecharModal(){document.getElementById('modalCAD')?.remove();}
 </script>
 </body>
 </html>
