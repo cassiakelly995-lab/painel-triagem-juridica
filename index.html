@@ -553,10 +553,9 @@ function trocarAba(aba, btn) {
 // ════════════════════════════════════════
 //  LISTA DE ADVOGADOS — AUTOCOMPLETE
 // ════════════════════════════════════════
-let advogadosCadastrados = []; // array de strings com os nomes
+let advogadosCadastrados = [];
 let advHighlight = { Sai: -1, Entra: -1 };
 
-// Carrega do Firebase
 db.ref('advogados_v8').on('value', snap => {
     const data = snap.val();
     if (data) {
@@ -566,13 +565,11 @@ db.ref('advogados_v8').on('value', snap => {
     }
 });
 
-// Abre dropdown com todos os nomes ao focar
 function abrirDropdown(campo) {
     const val = document.getElementById('adv'+campo+'Input').value;
     renderDropdown(campo, val);
 }
 
-// Filtra enquanto digita
 function filtrarAdv(campo) {
     const val = document.getElementById('adv'+campo+'Input').value;
     advHighlight[campo] = -1;
@@ -590,7 +587,6 @@ function renderDropdown(campo, filtro) {
         drop.innerHTML = `<div class="autocomplete-empty"><i class="fa-solid fa-circle-xmark mr-2" style="color:#ef4444"></i>Nenhum advogado encontrado</div>`;
     } else {
         drop.innerHTML = lista.map((nome, i) => {
-            // Destaca o trecho digitado
             const re = new RegExp('('+filtro.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+')','gi');
             const highlighted = nome.replace(re, '<em>$1</em>');
             return `<div class="autocomplete-item" data-idx="${i}" onmousedown="selecionarAdv('${campo}','${nome.replace(/'/g,"\\'")}')">
@@ -611,7 +607,6 @@ function fecharDropdownDelay(campo) {
     setTimeout(() => document.getElementById('drop'+campo).classList.remove('open'), 180);
 }
 
-// Navegação por teclado (↑↓ Enter Esc)
 function navAdv(e, campo) {
     const drop = document.getElementById('drop'+campo);
     const items = drop.querySelectorAll('.autocomplete-item');
@@ -635,7 +630,6 @@ function navAdv(e, campo) {
     if (advHighlight[campo] >= 0) items[advHighlight[campo]].scrollIntoView({ block: 'nearest' });
 }
 
-// ── Modal gerenciar advogados ──
 function abrirModalAdvogados() {
     const itens = advogadosCadastrados.length
         ? advogadosCadastrados.map(nome => `
@@ -674,7 +668,6 @@ function adicionarAdvogado() {
     inp.value = '';
     inp.focus();
     toast(`${nome} adicionado!`, 'success');
-    // Atualiza lista no modal sem fechar
     setTimeout(() => {
         const lista = document.getElementById('listaAdvModal');
         if(lista) lista.innerHTML = advogadosCadastrados.map(n => `
@@ -699,7 +692,7 @@ function removerAdvogado(nome, btn) {
 }
 
 // ════════════════════════════════════════
-//  ESCALA — ORIGINAL
+//  ESCALA
 // ════════════════════════════════════════
 function uploadEscala(input) {
     const file = input.files[0];
@@ -718,7 +711,27 @@ db.ref('escala_v8').on('value', snap => {
 });
 
 // ════════════════════════════════════════
-//  LOGS — COM ORDENAÇÃO POR DATA
+//  ORDENAÇÃO POR DATA — FUNÇÃO CENTRAL
+//  Converte "DD/MM" ou "DD/MM/AAAA" em
+//  número inteiro para ordenar corretamente
+// ════════════════════════════════════════
+function parseDateNum(d) {
+    if (!d) return 0;
+    // Remove espaços extras
+    const str = String(d).trim();
+    const partes = str.split('/');
+    if (partes.length < 2) return 0;
+    const dia  = parseInt(partes[0], 10);
+    const mes  = parseInt(partes[1], 10);
+    const ano  = partes[2] ? parseInt(partes[2], 10) : 0;
+    if (isNaN(dia) || isNaN(mes)) return 0;
+    // Formato: AAAAMMDD (se tiver ano) ou MMDD (só mês/dia)
+    // Usando MMDD * 1 + ano * 10000 para garantir ordem correta entre anos diferentes
+    return ano * 10000 + mes * 100 + dia;
+}
+
+// ════════════════════════════════════════
+//  LOGS
 // ════════════════════════════════════════
 function registrar(tipo) {
     const d = document.getElementById('dataTroca').value.trim();
@@ -727,22 +740,18 @@ function registrar(tipo) {
     if(!d || !s) return toast('Preencha a data e o advogado que SAI!', 'error');
     if(tipo === 'T' && !e) return toast('Preencha o advogado que ENTRA!', 'error');
 
-    // Converte data DD/MM para número comparável (MMDD) para ordenação
-    const partes = d.split('/');
-    const dataNum = partes.length === 2
-        ? parseInt(partes[1].padStart(2,'0') + partes[0].padStart(2,'0'))
-        : 0;
+    // Usa a função central para garantir consistência
+    const dataNum = parseDateNum(d);
 
     db.ref('logs_v8').push({
         tipo,
         data: d,
-        dataNum,                          // ← campo para ordenar
+        dataNum,
         saiu: s,
         entrou: tipo === 'F' ? 'FALTA' : (e || '---'),
         timestamp: Date.now()
     });
 
-    // Limpa campos
     document.getElementById('dataTroca').value = '';
     document.getElementById('advSaiInput').value = '';
     document.getElementById('advEntraInput').value = '';
@@ -755,11 +764,17 @@ db.ref('logs_v8').on('value', snap => {
     const data = snap.val();
     if(!data) return;
 
-    // ── ORDENAÇÃO POR DATA ──
+    // Ordena usando parseDateNum — cobre registros novos (com dataNum) e antigos (sem)
     const items = Object.entries(data).sort((a, b) => {
-        const dA = a[1].dataNum ?? parseDateNum(a[1].data);
-        const dB = b[1].dataNum ?? parseDateNum(b[1].data);
-        return dA - dB; // crescente (01/03 → 31/03)
+        const dA = (a[1].dataNum != null && !isNaN(a[1].dataNum))
+            ? a[1].dataNum
+            : parseDateNum(a[1].data);
+        const dB = (b[1].dataNum != null && !isNaN(b[1].dataNum))
+            ? b[1].dataNum
+            : parseDateNum(b[1].data);
+        // Secundário: timestamp para desempate no mesmo dia
+        if (dA !== dB) return dA - dB;
+        return (a[1].timestamp || 0) - (b[1].timestamp || 0);
     });
 
     items.forEach(([id, item]) => {
@@ -778,25 +793,22 @@ db.ref('logs_v8').on('value', snap => {
     });
 });
 
-// Converte "DD/MM" → número para ordenar registros antigos sem dataNum
-function parseDateNum(d) {
-    if(!d) return 0;
-    const p = d.split('/');
-    if(p.length < 2) return 0;
-    return parseInt(p[1].padStart(2,'0') + p[0].padStart(2,'0'));
-}
-
 function apagar(id) { if(confirm("Excluir registro?")) db.ref('logs_v8').child(id).remove(); }
 
 // ════════════════════════════════════════
-//  EXCEL — ORIGINAL
+//  EXCEL
 // ════════════════════════════════════════
 function exportarExcel() {
     db.ref('logs_v8').once('value', snap => {
         const logs = snap.val();
         if(!logs) return toast('Sem dados para exportar.', 'error');
         const rows = Object.values(logs)
-            .sort((a,b) => (a.dataNum||parseDateNum(a.data)) - (b.dataNum||parseDateNum(b.data)))
+            .sort((a,b) => {
+                const dA = (a.dataNum != null && !isNaN(a.dataNum)) ? a.dataNum : parseDateNum(a.data);
+                const dB = (b.dataNum != null && !isNaN(b.dataNum)) ? b.dataNum : parseDateNum(b.data);
+                if (dA !== dB) return dA - dB;
+                return (a.timestamp||0) - (b.timestamp||0);
+            })
             .map(i => ({
                 "DATA": i.data, "STATUS": i.tipo === 'F' ? 'FALTA' : 'TROCA',
                 "ADV_SAIU": i.saiu, "ADV_ENTROU": i.entrou
@@ -809,7 +821,7 @@ function exportarExcel() {
 }
 
 // ════════════════════════════════════════
-//  CONVÊNIO — ORIGINAL
+//  CONVÊNIO
 // ════════════════════════════════════════
 const convenioDefault = [
     { label: "Órgão Conveniante", value: "OAB Subseção Santana de Parnaíba" },
@@ -878,7 +890,7 @@ function salvarConvenio() {
 }
 
 // ════════════════════════════════════════
-//  STATS — ORIGINAL
+//  STATS
 // ════════════════════════════════════════
 db.ref('stats_v8').on('value', snap => {
     const d = snap.val() || {};
@@ -902,7 +914,7 @@ function salvarStat(campo) {
 }
 
 // ════════════════════════════════════════
-//  DOCUMENTOS — ORIGINAL
+//  DOCUMENTOS
 // ════════════════════════════════════════
 let pendingFile = null;
 function handleFileSelect(input) { if(input.files[0]) setPendingFile(input.files[0]); }
@@ -1009,7 +1021,7 @@ function apagarDoc(id) {
 }
 
 // ════════════════════════════════════════
-//  MEMBROS — ORIGINAL
+//  MEMBROS
 // ════════════════════════════════════════
 db.ref('contatos_v8').on('value', snap => {
     const lista=document.getElementById('listaContatos');
@@ -1047,7 +1059,7 @@ function salvarContato() {
 function apagarContato(id){if(confirm('Remover membro?')){db.ref('contatos_v8/'+id).remove();toast('Membro removido.','info');}}
 
 // ════════════════════════════════════════
-//  CONTATOS INSTITUCIONAIS — ORIGINAL
+//  CONTATOS INSTITUCIONAIS
 // ════════════════════════════════════════
 db.ref('contInst_v8').on('value', snap => {
     const lista=document.getElementById('listaContInst');
@@ -1095,7 +1107,7 @@ function editarSobre(){
 }
 
 // ════════════════════════════════════════
-//  AVISOS — ORIGINAL
+//  AVISOS
 // ════════════════════════════════════════
 const avisoClasses={info:'aviso-info',alerta:'aviso-alerta',urgente:'aviso-urgente',ok:'aviso-ok'};
 const avisoBadges={info:'badge-info',alerta:'badge-alerta',urgente:'badge-urgente',ok:'badge-ok'};
@@ -1135,7 +1147,7 @@ function publicarAviso(){
 function apagarAviso(id){if(confirm('Excluir aviso?')){db.ref('avisos_v8/'+id).remove();toast('Aviso excluído.','info');}}
 
 // ════════════════════════════════════════
-//  MODAL HELPER — ORIGINAL
+//  MODAL HELPER
 // ════════════════════════════════════════
 function abrirModal(titulo, htmlBody) {
     fecharModal();
